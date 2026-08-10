@@ -50,7 +50,7 @@ Prepare a clean directory in your Linux environment and navigate into it.
 ```bash
 touch {your folder name}
 cd {your folder name}
-git clone {this repo}
+git clone -b AAML-sw-dev git@github.com:TTY-RISCV/CUSTOM_SoC_Platform.git
 ```
 #### Step 2: Set Permissions
 ```bash
