@@ -81,7 +81,7 @@ If you have the licence of `VCS` and want faster simulation, you may use the `Ma
 
 <img src="images/lab3/block_diagram-2.png" width="560px">
 
-**Tabel 1: The Control Signals **
+**Tabel 1: The Control Signals**
 | I/O    | Signal name | Bit width | Description                                                                                                               |
 | ------ | ----------- | --------: | ------------------------------------------------------------------------------------------------------------------------- |
 | Input  | `clk`       |         1 | The clock signal                                                                                                          |
@@ -289,7 +289,7 @@ Lab 3-1 uses a memory layout suitable for Row Stationary execution.
 
 The input feature map is stored column by column. Three zero-padded elements are appended after each column so that the TPU can safely access four vertically adjacent 8-bit input elements at a time.
 
-![image](https://hackmd.io/_uploads/r1kYf6tIGg.png)
+![Global Buffer A mapping](images/lab3/lab3-1_A.png)
 
 
 <!-- Figure for Lab 3-1 Global Buffer A -->
@@ -298,7 +298,7 @@ The input feature map is stored column by column. Three zero-padded elements are
 
 The kernel is divided into row tiles. Each word in Global Buffer B contains four vertically adjacent 8-bit kernel elements from the same column. If fewer than four elements remain in the last row tile, the remaining positions are zero-padded.
 
-![image](https://hackmd.io/_uploads/BJebOMaKIze.png)
+![Global Buffer B mapping](images/lab3/lab3-1_B.png)
 
 
 
@@ -308,7 +308,7 @@ The kernel is divided into row tiles. Each word in Global Buffer B contains four
 
 The output feature map is stored row by row. Each 128-bit word contains four horizontally adjacent 32-bit accumulated output values. If fewer than four output values remain in a row, the remaining positions are zero-padded.
 
-![image](https://hackmd.io/_uploads/By3of6YIGg.png)
+![Global Buffer C mapping](images/lab3/lab3-1_C.png)
 
 
 <!-- Figure for Lab 3-1 Global Buffer C -->
