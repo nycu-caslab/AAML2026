@@ -499,7 +499,7 @@ If you have the licence of <code class="docutils literal notranslate"><span clas
 <p><strong>Block Diagram</strong></p>
 <a class="reference internal image-reference" href="../_images/block_diagram-2.png"><img alt="../_images/block_diagram-2.png" src="../_images/block_diagram-2.png" style="width: 560px;" />
 </a>
-<p>**Tabel 1: The Control Signals **</p>
+<p><strong>Tabel 1: The Control Signals</strong></p>
 <div class="pst-scrollable-table-container"><table class="table">
 <thead>
 <tr class="row-odd"><th class="head"><p>I/O</p></th>
@@ -985,19 +985,19 @@ If you have the licence of <code class="docutils literal notranslate"><span clas
 <section id="global-buffer-a-input-feature-map">
 <h4>Global Buffer A - Input Feature Map<a class="headerlink" href="#global-buffer-a-input-feature-map" title="Link to this heading">#</a></h4>
 <p>The input feature map is stored column by column. Three zero-padded elements are appended after each column so that the TPU can safely access four vertically adjacent 8-bit input elements at a time.</p>
-<p><img alt="image" src="https://hackmd.io/_uploads/r1kYf6tIGg.png" /></p>
+<p><img alt="Global Buffer A mapping" src="../_images/lab3-1_A.png" /></p>
 <!-- Figure for Lab 3-1 Global Buffer A -->
 </section>
 <section id="global-buffer-b-kernel">
 <h4>Global Buffer B - Kernel<a class="headerlink" href="#global-buffer-b-kernel" title="Link to this heading">#</a></h4>
 <p>The kernel is divided into row tiles. Each word in Global Buffer B contains four vertically adjacent 8-bit kernel elements from the same column. If fewer than four elements remain in the last row tile, the remaining positions are zero-padded.</p>
-<p><img alt="image" src="https://hackmd.io/_uploads/BJebOMaKIze.png" /></p>
+<p><img alt="Global Buffer B mapping" src="../_images/lab3-1_B.png" /></p>
 <!-- Figure for Lab 3-1 Global Buffer B -->
 </section>
 <section id="global-buffer-c-output">
 <h4>Global Buffer C - Output<a class="headerlink" href="#global-buffer-c-output" title="Link to this heading">#</a></h4>
 <p>The output feature map is stored row by row. Each 128-bit word contains four horizontally adjacent 32-bit accumulated output values. If fewer than four output values remain in a row, the remaining positions are zero-padded.</p>
-<p><img alt="image" src="https://hackmd.io/_uploads/By3of6YIGg.png" /></p>
+<p><img alt="Global Buffer C mapping" src="../_images/lab3-1_C.png" /></p>
 <!-- Figure for Lab 3-1 Global Buffer C -->
 </section>
 </section>
