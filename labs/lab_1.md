@@ -1,27 +1,28 @@
-# Lab 1 : Environment Setup and Profiling a Model
+# Lab 1 : Aligned AXI Data on SIMD
 
 ## Goal of this lab
 ---
-- [Basic - AXI Single Transation & SIMD MAC - 60%](#basic-exercise---axi-single-transation--simd---60)
-- [AXI Address Aligned - 15%](#axi-address-aligned---15)
-- [Running Full TFLM Model - 20%](#running-tflm-model-inference---10)
+- [Basic Exercise - AXI Single Transaction & SIMD MAC - 60%](#basic-exercise---axi-single-transaction--simd---60)
+- [Adavance Exercise 1 - AXI Address Aligned - 15%](#adavance-exercise-1---axi-address-aligned---15)
+- [Adavance Exercise 2 - Running Full TFLM Model - 10%](#adavance-exercise-2---running-tflm-model-inference---10)
 - [Questions in the Demo - 15%](#question-in-demo---10)
 
 ## Introduction
 ---
 
-In this lab, you will focus on AXI single transation and SIMD MAC Operation. Then, we use these custom instruction in convolution part to reduce runtime of model reference. We use `ds_cnn_stream_fe` model to compare convolution between our accelerated version and orignal software-only version.  
+In this lab, you will focus on AXI single transation and SIMD MAC operands. Then, we use these custom instruction in convolution part to reduce runtime of model reference. We use `ds_cnn_stream_fe` model to compare convolution between our accelerated version and orignal software-only version.  
 
 ## Goal of this Lab
 
-- Know about AXI Single Transation 
+- AXI Single Transation 
 - Custom SIMD Instruction
+- Deal with unaligned address AXI request
 
 
-## Basic Exercise - AXI Single Transation & SIMD - (60%)
+## Basic Exercise - AXI Single Transaction & SIMD - (60%)
 --- 
 
-### 1. AXI Single Transation
+### 1. AXI Single Transaction
 
 In this part, the goal is to enable the `NPU` to access data directly through the AXI4 interface instead of relying on the CPU's `LSU` (Load/Store Unit).
 
@@ -38,15 +39,9 @@ Please follow below table to design NPU AXI read/write instruction.
 |  `001` |   `x`  | `cfu_op1`   | Issue a 4-byte AXI4 read request and return the received data |
 |  `010` |   `x`  | `cfu_op2`   | Issue a 4-byte AXI4 write request with the provided data      |
 
-<!-- may not use
-|  `000` |   `x`  | `cfu_op0`   | Calculate sum of `rs1` + `rs2` + 1 |  
--->
-
-```{todo}
-- Control AXI interface in `NPU` to make it can finish a single DRAM transation when it receive corresponding `funct3`. 
-- Return value from `NPU_out` to CPU if receiving reading request. 
-```
-
+> [!todo]
+> - Control AXI interface in `NPU` to make it can finish a single DRAM transation when it receive corresponding `funct3`. 
+> - Return value from `NPU_out` to CPU if receiving reading request. 
 
 ```{note}
 - If you want more information about custom instruction of software, you can trace these files, "accel_ops.h", "accel_ops.cc", and "accel_test.cc". 
@@ -82,21 +77,15 @@ output = | output + (input_data[0, 1, 2, 3] + offset) * filter_data[0, 1, 2, 3] 
          +----------------------------------------------------------------------+
 ```
 
-<!-- ```{hint}
-Values of input data and filter data are in range of `int8`. 
-Values of offset is in range of [-128, 128]. 
-``` -->
-
 ```{note}
 You may choose any `funct3` and `funct7` values to define your own MAC instruction, except for the `funct3` reserved for the AXI read and write instructions.
 ```
 
+>[!todo]
+> Make `NPU` can run custom SIMD instruction if it receive specific `funct3` and `funct7`, and return output value by `NPU_out` to CPU. 
+
 ```{hint}
 This part does not have any test. You can write your test function and add it into user menu to test correction of SIMD instruction. 
-```
-
-```{todo}
-Make `NPU` can run custom SIMD instruction if it receive specific `funct3` and `funct7`. 
 ```
 
 ### 3. conv.h
@@ -104,10 +93,10 @@ Make `NPU` can run custom SIMD instruction if it receive specific `funct3` and `
 In this part, you need to modify `conv.h` and change `ConvPerChannel` function into accelerated version. Please use AXI read function of `NPU` to get input data and filter, and use your MAC instruction in previous part. 
 
 ```{note}
-You can find `ConvPerfChannel` function in  `Platform\sw\tflm_patches\tensorflow\lite\kernels\internal\reference\integer_ops\conv.h`
+You can find `ConvPerfChannel` function in `Platform\sw\tflm_patches\tensorflow\lite\kernels\internal\reference\integer_ops\conv.h`
 ```
 
-Replace some parts of original operations with `cfu_op`, and don’t forget to add `#include "cfu.h"` and `#include "cbo.h"` in the file. 
+Replace some parts of original operations with `cfu_op`, and don’t forget to add `#include "cfu.h"` and `#include "cbo.h"` in the file.
 
 ```cpp
 for (int out_channel = 0; out_channel < output_depth; ++out_channel) {
@@ -141,16 +130,17 @@ for (int out_channel = 0; out_channel < output_depth; ++out_channel) {
 ```
 
 ```{important}
-Input and filter data only are allowed to read with NPU AXI instruction `cfu_op1`. 
+You only allow to get input and filter data by NPU AXI read instruction (`cfu_op1`) which you finsih it in first step.
 ```
 
 ```{hint}
 Because of directly accessing memory without D-cache, you needs to consider about cache coherence problem. Our platform supports two D-cache operation, `cbo_clean` and `cbo_invalidate`. You can use software function in `cbo.h` to control D-cache. 
 ```
 
-```{todo}
-
-```
+> [!todo]
+> - Use the AXI read function to get data and filter values.
+> - Maintain cache coherence using `CBO` instructions to ensure AXI reads the latest data.
+> - Replace the software computation in `ConvPerChannel` with SIMD instructions to reduce reference execution time.
 
 ### 4. Check Result Correction
 
@@ -160,28 +150,20 @@ You can run "Basic Convolution Test" in project menu. This test only have have a
 
 If you pass all testcase, you can get full score of basic part. 
 
-## AXI Address Aligned - (15%)
+## Adavance Exercise 1 - AXI Address Aligned - (15%)
 --- 
 
-Because of 8-bit element type of model, some AXI reading request may request unaligned address data, and unaligned address request would cause AXI trigger exception. Therefore, we need to handle request with unaligned address data, and make address is aligned with 4. 
+Because of 8-bit element type of model, some AXI reading request may use unaligned address data, and unaligned address may cause AXI trigger exception. Therefore, we need to make our `NPU` to handle request with unaligned address data. 
 
 ```{hint}
 We can divide single DRAM request into two DRAM request, and combine two request into one 4 byte data transition. 
-```
 
 For example, NPU want to read 4 bytes data in 0x6000_0002. It needs to read 0x6000_0000 and 0x6000_0004 data. Then, combine higher two byte of first read and lower two byte of second read. 
-
-```{todo}
-- Add address alignment control to the AXI single transaction. 
-- Ensure `NPU` can get correct result if it receive request with unaligned address.
 ```
 
-<!-- 
-```
-Address % 4 == 1 : 5% 
-Address % 4 == 2 : 5%
-Address % 4 == 3 : 5%
-``` -->
+>[!todo]
+> - Add address alignment control to the AXI single transaction. 
+> - Ensure `NPU` can get correct result if it receive request with unaligned address.
 
 ## Adavance Exercise 2 - Running TFLM Model Inference - (10%)
 ---
@@ -189,6 +171,23 @@ Address % 4 == 3 : 5%
 > [ds_cnn_stream_fe.tflite](https://drive.google.com/file/d/1CgEhJm0IoaXx3ULrn-Dfuw3LH83SnFlV/view?usp=sharing)
 
 Select "TFLM Inference, Verification, and Cycles" from the project menu. The output should match the results of the original software-only convolution implementation.
+
+<!-- ```cpp
+// Platform/sw/app/tflm_runner.cc
+/*...*/
+
+printf("Inference complete.\n");
+
+printf("Output Data:\n");
+uint32_t* out_raw_bits = (uint32_t*)output->data.f;
+for (int i = 0; i < 12; i++) {
+printf("%-9d: 0x%08X\n", i, out_raw_bits[i]);
+}
+
+model_io_verify_output(output);
+
+/*...*/
+``` -->
 
 <!-- <img src="images/lab1/.png" width="300px"> -->
 
@@ -200,13 +199,10 @@ Select "TFLM Inference, Verification, and Cycles" from the project menu. The out
 You need to record performance of accerated version than original version, and present your idea of NPU design. 
 
 ### Question in Demo - (10%) 
-You will be asked several questions about the concepts covered in this lab and your implementation. This section accounts for 10% of the total lab score.
+You will be asked several questions about the concepts covered in this lab and your implementation.
 
 ## Submission
 ---
-
-
-
 
 ```{important}
 TAs should be able to run your project without any modification. If TAs cannot compile or run your code, **you can't get any scores even if you passed the DEMO**. Also, **PLAGIARISM is not allowed**.
