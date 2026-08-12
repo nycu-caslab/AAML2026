@@ -1,18 +1,21 @@
 # Lab 3 : Systolic Array
-
+---
 ## Goal of this lab
 ---
-- [Basic Exercise #1 - 20%](#basic-exercise-1-20)
-- [Basic Exercise #2 - 20%](#basic-exercise-2-20)
-- [Basic Exercise #3 - 30%](#basic-exercise-3-30)
-- [Advanced Exercise - 30%](#advanced-exercise-30)
+- [Row Stationary Exercise #1 - 10%](#row-stationary-exercise-1---10) 
+- [Row Stationary Exercise #2 - 10%](#row-stationary-exercise-2---10) 
+- [Row Stationary Exercise #3 - 20%](#row-stationary-exercise-3---20) 
+- [Row Stationary Exercise #4 - 20%](#row-stationary-exercise-4---20)
+- [GEMV Basic Exercise - 30%](#gemv-basic-exercise---30) 
+- [GEMV Performance Challenge - 10%](#gemv-performance-challenge---10)
+
 
 
 ## Introduction
 ---
 The systolic array used by Google Tensor Processing Unit (TPU) accelerates the matrix computation by using the dataflow operation. The systolic array contains multiple processing elements (PEs), each of them is responsible for the multiply–and-accumulate (MAC) operation. It can performs multiple elements in a matrix simultaneously and achieves high computational throughput.
 
-In this lab, we will use Verilog to implement the PE and a small systolic array composed of 4 x 4 PEs. You may refer to different dataflow stationary policy (e.g. weight and output stationary). 
+In this lab, we will use Verilog to implement PEs and a small systolic array composed of multiple PEs to accelerate convolution and general matrix vector multiplication (GEMV). Different stationary dataflows, such as Weight Stationary , Output Stationary , and Row Stationary, can be considered when designing the PE array. 
 
 (Hint: The weight stationary is more complicated than output stationary.)
 ```{note}
@@ -26,28 +29,36 @@ In this lab, we will use Verilog to implement the PE and a small systolic array 
 ---
 The goals of this lab are to familiarize you with the concepts of dataflows in systolic array architectures. This will get you hand-on experience with dataflow routing and processing elements implementations. In this lab, you only need to construct the TPU module.
 
-#### Prerequisite
+### Prerequisite
 
 - Python3 with numpy library installed
 - `iverilog` or `VCS` or `irun`
 - `nWave` or `Verdi` or `GTKWave` or anything that can read `.vcd` or `.fsdb`
 - Makefile
 
-#### Requirements
+### Requirements
+#### lab 3-1
 
-You need to perform Matrix multiplication with one of dataflow stationary method with correct functional simulation in 4x4 Processing elements(PEs). That is, this design can perform (M * K) * (K * N) 8-bit integer matrix multiplication.
+You need to perform Convolution using the row stationary method with correct functional simulation using Processing Elements (PEs). That is, this design should perform 2D convolution between an M × M 8-bit matrix and an N × N 8-bit kernel.
 
-Your design should be written in the Verilog. There is no limitation in how you program your design.
-Your PEs shouldn’t exceed 4x4, where a 2D systolic array architecture is recommended.
-An 8-bits input data, 32-bits accumulated data design. Please be careful with the bit-width problem.
-(1024 + 256 ∗ 2) KiBytes in total of global buffer size.
+Your design should be written in Verilog. There is no limitation on how you implement your design.
+Your PEs shouldn’t exceed 4 × 4, and a 2D systolic array architecture is recommended.
+The design uses 8-bit input data and 32-bit accumulated data. Please be careful with bit-width issues.
+The total global buffer size is (1024 + 256 × 2) KiB.
+#### lab 3-2
+You need to perform GEMV using any one of the stationary methods with correct functional simulation using PEs. This design should perform multiplication between an M × K 4-bit matrix and a K × 1 8-bit vector.
 
-#### Getting Started
+Your design should be written in Verilog. There is no limitation on how you implement your design.
+Your PEs shouldn’t exceed 4 × 4. The design uses 4-bit matrix data, 8-bit vector data, and 32-bit accumulated data. Please be careful with bit-width issues.
+The total global buffer size is (1024 + 256 + 128) KiB.
 
+### Getting Started
+::: danger
 This lab will require a beginner’s level of verilog.
 ```bash
 $ git clone https://github.com/nycu-caslab/AAML2025-Lab3.git
 ```
+:::
 
 ```{note}
 The testbench generates waveform to `dump.vcd` or `dump.fsdb` (change the output file in the `TESTBENCH.v`).
@@ -64,22 +75,23 @@ If you have the licence of `VCS` and want faster simulation, you may use the `Ma
 2. The `Makefile_ncverilog` is for reference only, our Cadence licence has been down for a while :(
 ```
 
-#### Interface and Block Diagram
-
+### Interface and Block Diagram
+### lab 3-1
 **Block Diagram**
 
 <img src="images/lab3/block_diagram-2.png" width="560px">
 
-**Tabel 1: The control signals**
-|  I/O   | Signal name  | Bit width | Description                                |
-|  ----  | ----         | ----      |  ----                                      |     
-| Input  | clk          | 1         | The clock signal                           |
-| Input  | rst_n        | 1         | The reset signal, which is active low      |
-| Input  | in_valid     | 1         | The input is valid when in_valid is high and will only high for one cycle |
-| Input  | K            | 8         | dimension K of the matrix (M,K), (K,N) |
-| Input  | M            | 8         | dimension M of the matrix (M,K), (K,N) |
-| Input  | N            | 8         | dimension N of the matrix (M,K), (K,N) |
-| Output | busy         | 1         | High when the design is busy. Pattern will check your answer when busy is low after every in_valid. |
+**Tabel 1: The Control Signals **
+| I/O    | Signal name | Bit width | Description                                                                                                               |
+| ------ | ----------- | --------: | ------------------------------------------------------------------------------------------------------------------------- |
+| Input  | `clk`       |         1 | The clock signal                                                                                                          |
+| Input  | `rst_n`     |         1 | The reset signal, which is active low                                                                                     |
+| Input  | `in_valid`  |         1 | The input is valid when in_valid is high and will only high for one cycle |
+| Input  | `M`         |         8 | Dimension `M` of the `M × M` input feature map                                                                            |
+| Input  | `N`         |         8 | Dimension `N` of the `N × N` convolution kernel                                                                           |
+| Output | `busy`      |         1 | High when the design is busy. Pattern will check your answer when busy is low after every in_valid.                |
+
+
 
 **Tabel 2: The SRAM interface of A and B SRAM**
 |  I/O   | Signal name  | Bit width | Description                                  |
@@ -99,91 +111,211 @@ If you have the licence of `VCS` and want faster simulation, you may use the `Ma
 ``` {note}
 The 128-bit data input stands for 4 * 32-bit values, allowing 4 elements to be written simultaneously to the C SRAM.
 ```
-#### Rules
 
-- Your TPU design (`TPU.v`) should be under the top module which provided by TA, it's fine to add various new files in the `RTL` directory.
+### lab 3-2
 
-- you may not modify the `global_buffer.v`.
+**Tabel 1: The Control Signals**
+| I/O    | Signal name | Bit width | Description                                                                                           |
+| ------ | ----------- | --------: | ----------------------------------------------------------------------------------------------------- |
+| Input  | `clk`       |         1 | The clock signal                                                                                      |
+| Input  | `rst_n`     |         1 | The reset signal, which is active low                                                                 |
+| Input  | `in_valid`  |         1 | The input is valid when `in_valid` is high and will only high for one cycle                           |
+| Input  | `K`         |         8 | Dimension `K` of the input matrix and vector                                                          |
+| Input  | `M`         |         8 | Dimension `M` of the `M × K` input matrix                                                             |
+| Input  | `N`         |         8 | Dimension `N` of the `K × N` input vector. `N` is fixed to 1 for GEMV                                 |
+| Output | `busy`      |         1 | High when the design is busy. Pattern will check your answer when busy is low after every `in_valid`. |
 
-- At the start of the simulation, testbench will load the global buffer A & B, which assume that CPU or DMA has already prepared the data for TPU in global buffer. When signal `in_valid == 1`, the size of the two matrices will be available for TPU (m, n, k) for ***only one cycle***.
+**Table 2: The SRAM Interface of A SRAM**
+| I/O    | Signal name | Bit width | Description                                  |
+| ------ | ----------- | --------- | -------------------------------------------- |
+| Input  | `wr_en`     | 1         | The write enable signal.                     |
+| Input  | `index`     | 16        | The address of the SRAM to be read or write. |
+| Input  | `data_in`   | 16        | The data input to write to the SRAM          |
+| Output | `data_out`  | 16        | The data output from the SRAM                |
+
+**Table 3: The SRAM Interface of B SRAM**
+| I/O    | Signal name | Bit width | Description                                  |
+| ------ | ----------- | --------- | -------------------------------------------- |
+| Input  | `wr_en`     | 1         | The write enable signal.                     |
+| Input  | `index`     | 16        | The address of the SRAM to be read or write. |
+| Input  | `data_in`   | 32        | The data input to write to the SRAM          |
+| Output | `data_out`  | 32        | The data output from the SRAM                |
+
+**Table 4: The SRAM Interface of C SRAM**
+|  I/O   | Signal name  | Bit width | Description                                  |
+|  ----  | ----         | ----      |  ----                                        |     
+| Input  | wr_en        | 1         | The write enable signal.                     |
+| Input  | index        | 16        | The address of the sram to be read or write. |
+| Input  | data_in      | 128       | The data input to write to the SRAM          |
+| Output | data_out     | 128       | The data output from the SRAM  
+
+### Rules
+
+* Your TPU design (`TPU.v`) should be under the top module provided by TA. It's fine to add various new files in the `RTL` directory.
+
+* You may not modify `global_buffer.v`.
+
+* At the start of the simulation, the testbench will load global buffer A & B, assuming that the CPU or DMA has already prepared the data for the TPU in the global buffer. When signal `in_valid == 1`, the input size parameters (`m`, `n`, `k`) will be available for the TPU for **only one cycle**.
+
 ```{note}
-For the details of the mapping of matrix into global buffer. Please refer to the ***[Appendix](#appendix)***. There are two types of mapping. The transposed ***Type A*** for `matrix A`, and ***Type B*** for `matrix B and C`.
+For the details of the data mapping into the global buffers, please refer to the ***[Appendix](#appendix)***. The Appendix describes the memory layouts used for the Row Stationary convolution in Lab 3-1 and the GEMV in Lab 3-2.
 ```
-- Testbench will compare your output global buffer with golden, when you finish the calculation, that is `busy == 0`. Then you need to wait for the next `in_valid` for the next test case.
 
-- You should implement your own data loader, process elements(PEs), and controller which schedule the data in global buffer A & B to be calculated in the systolic array.
+* The testbench will compare your output global buffer with the golden result when you finish the calculation, that is, when `busy == 0`. Then, you need to wait for the next `in_valid` for the next test case.
 
-- You need to set `busy` to high ***immediately*** after `in_valid` fall from high to low.
+* You should implement your own data loader, PEs, and controller to schedule the data in global buffer A & B to be calculated in the PE array.
 
-- Use asynchronous reset active low architecture.
+* The number of PEs must not exceed **16** (maximum `4 × 4` PEs).
 
-- The execution latency ***per matrix multiplication*** (not the whole execution time) is limited in ***1,500,000*** cycles.
+* For **Lab 3-1**, you must perform 2D convolution using the **Row Stationary** method and a PE array.
+
+  * You may not modify the interface of `TPU.v`.
+  * `1 <= N <= M <= 254`
+  * Stride = 1
+  * Padding = 0
+  * Multiplication and accumulation must be performed inside the PEs.
+
+* For **Lab 3-2**, you must perform GEMV using one of the **Output Stationary, Weight Stationary, or Row Stationary** methods and a PE array.
+
+  * You may not modify the interface of `TPU.v`.
+  * Multiplication and accumulation must be performed inside the PEs. 
+  * Performance is evaluated by cycle count, and a lower cycle count results in a higher ranking.
+
+* You need to set `busy` to high immediately after `in_valid` falls from high to low.
+
+* Use an asynchronous active-low reset architecture.
+
+* The execution latency per test case is limited to 1,500,000 cycles.
 
 
-## Basic Exercise #1 - 20%
+
+## Row Stationary Exercise #1 - 10%
 ---
 - Input data:
-    - A matrix and B matrix which size are constrainted to 2 * 2
+    - Input feature map (M * M) and Kernel (N * N) where M = 7, N = 4
     - control signal (refer to details in table 1, 2, 3)
 
 - Required Output:
-    - the 2*2 C matrix of A matrix * B matrix
-
+    - the Output feature map (UINT32) of the 2D convolution
 - Steps:
     1. Take data from global buffer
     2. Use the data from global buffer to calculate with PEs
     3. Output the result to C global buffer
-    4. `make verif1`
-        - 10 test cases of A(2 * 2) * B(2 * 2)
+    4. `\lab3-1$ make verif1`
+        - 10 test cases of fixed input
     5. The bench will tell if you did it correctly
 
-## Basic Exercise #2 - 20%
+## Row Stationary Exercise #2 - 10%
 ---
 - Input data:
-    - A matrix and B matrix which size are constrainted to 4 * 4
+    - Input feature map (M * M) and Kernel (N * N) where M = 10, N = 5
     - control signal (refer to details in table 1, 2, 3)
 
 - Required Output:
-    - the 4 * 4 C matrix of A matrix * B matrix
-
+    - the Output feature map (UINT32) of the 2D convolution
 - Steps:
-    1. refer to Basic Lab1
-    2. `make verif2`
-        - 10 test cases of A(4 * 4) * B(4 * 4)
+    1. refer to Row Stationary Exercise #1
+    2. `\lab3-1$ make verif2`
+        - 10 test cases of fixed input
 
-## Basic Exercise #3 - 30%
+## Row Stationary Exercise #3 - 20%
 ---
 - Input data:
-    - A matrix and B matrix which size are 4 * K and K * 4 separately
+    - Input feature map (M * M) and Kernel (N * N) where 1 <= N <= M <= 254
     - control signal (refer to details in table 1, 2, 3)
 
 - Required Output:
-    - the 4 * 4 C matrix of A matrix * B matrix
+    - the Output feature map (UINT32) of the 2D convolution
 
 - Steps:
-    1. refer to Basic Lab1
-    2. `make verif3`
-        - 10 test cases of A(4 * K) * B(K * 4)
+    1. refer to Row Stationary Exercise #1
+    2. `\lab3-1$ make verif3`
+        - 10 test cases of large random M, N
 
-## Advanced Exercise - 30%
+## Row Stationary Exercise #4 - 20%
 ---
 - Input data:
-    - A matrix and B matrix which size are M * K and K * N separately
+    - Input feature map (M * M) and Kernel (N * N)
     - control signal (refer to details in table 1, 2, 3)
 
 - Required Output:
-    - the (M * N) C matrix of A matrix * B matrix
+    - the Output feature map (UINT32) of the 2D convolution
 
 - Steps:
-    1. refer to Basic Lab1
-    2. `make verif4`
-        - 50 test cases of A(M * K) * B(K * N), where M, K, N ∈ [4, 128)
+    1. refer to Row Stationary Exercise #1
+    2. `\lab3-1$ make verif4`
+        - Extreme test cases
+        
+## GEMV Basic Exercise - 30%
+---
+- Input data:
+    - Input Matrix (UINT4) and Input Vector (UINT8)
+- Required Output:
+    - the Output Vector (UINT32) of the GEMV operation
+- Steps:
+    1. Take data from global buffer
+    2. Use the data from global buffer to calculate with PEs
+    3. Output the result to C global buffer
+    4. `\lab3-2$ make verif1`
+        - 10 explicit testcases (10%)
+    5. `\lab3-2$ make verif2`
+        - 10 explicit testcases (10%)
+    6. `\lab3-2$ make verif3`
+        - 25 hidden testcases (10%)
+    7. The bench will tell if you did it correctly
+
+## GEMV Performance Challenge - 10%
+---
+-   Input data: 
+    -   refer to GEMV Basic Exercise
+-   Required Output:
+    -   refer to GEMV Basic Exercise
+-   Steps:
+    1.  refer to GEMV Basic Exercise 
+    2.  Run `\lab3-2$ make verif4` for performance evaluation
+        -   The lower the total cycle count, the higher the ranking and score
+
+
 
 
 ## Appendix
 ---
 
-### Memory Mapping - Type A (with transpose)
+### Lab 3-1 Memory Mapping - Row Stationary Convolution
+
+Lab 3-1 uses a memory layout suitable for Row Stationary execution.
+
+#### Global Buffer A - Input Feature Map
+
+The input feature map is stored column by column. Three zero-padded elements are appended after each column so that the TPU can safely access four vertically adjacent 8-bit input elements at a time.
+
+![image](https://hackmd.io/_uploads/r1kYf6tIGg.png)
+
+
+<!-- Figure for Lab 3-1 Global Buffer A -->
+
+#### Global Buffer B - Kernel
+
+The kernel is divided into row tiles. Each word in Global Buffer B contains four vertically adjacent 8-bit kernel elements from the same column. If fewer than four elements remain in the last row tile, the remaining positions are zero-padded.
+
+![image](https://hackmd.io/_uploads/BJebOMaKIze.png)
+
+
+
+<!-- Figure for Lab 3-1 Global Buffer B -->
+
+#### Global Buffer C - Output
+
+The output feature map is stored row by row. Each 128-bit word contains four horizontally adjacent 32-bit accumulated output values. If fewer than four output values remain in a row, the remaining positions are zero-padded.
+
+![image](https://hackmd.io/_uploads/By3of6YIGg.png)
+
+
+<!-- Figure for Lab 3-1 Global Buffer C -->
+
+### Lab 3-2 Memory Mapping - GEMV
+
+#### Memory Mapping - Type A (with transpose)
 
 The matrix A in global buffer A is placed with a transposed style, and other spaces are all 0-padded
 <img src="https://hackmd.io/_uploads/S18IElrj2.png" width="660px">
@@ -197,8 +329,7 @@ the memory layout of this matrix looks like (note the transpose in the layout)
 
 <img src="images/lab3/A_4.png" width="150px">
 
-
-### Memory Mapping - Type B (without transpose)
+#### Memory Mapping - Type B (without transpose)
 
 <img src="https://hackmd.io/_uploads/BJYR4gSo3.png" width="660px">
 
@@ -217,8 +348,12 @@ Please organize your submission files into a zip archive structured as follows:
 ```
 YourID.zip
     └── YourID/
-        ├── TPU.v
-        └── other files you added inside the RTL directory...
+        ├── lab3-1/ 
+        |   ├──TPU.v
+        |   └──other files you added inside the RTL directory...
+        └── lab3-2/ 
+            ├──TPU.v
+            └──other files you added inside the RTL directory...
 ```
 
 ```{important}
