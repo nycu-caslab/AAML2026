@@ -56,7 +56,7 @@ The total global buffer size is (1024 + 256 + 128) KiB.
 ::: danger
 This lab will require a beginner’s level of verilog.
 ```bash
-$ git clone https://github.com/nycu-caslab/AAML2025-Lab3.git
+$ git clone https://github.com/nycu-caslab/AAML2026-Lab3.git
 ```
 :::
 
