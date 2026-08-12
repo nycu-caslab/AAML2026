@@ -11,9 +11,28 @@ Throughout AAML 2026, we will use the AAML RISC-V SoC platform to explore hardwa
 ## AAML RISC-V SoC Platform
 
 ### RISC-V CPU
-### NPU (block)
-### AXI
+For a CPU to function, it must rely on the Instruction Set Architecture (ISA). An instruction set is a predefined list of commands that determines which operations the hardware can understand and execute. In this Lab, we use **RISC-V**, an open source ISA.  
+
+Our CPU supports RV32IM, with M-mode only supporting `mcycle` and `mcycleh`, and it also supports the `fence.i` instructions.  
+
+Moreover, the hardware supports `CBO` (Cache-Block Management Operations). We implement the `zicbom` extension, which allows software to manually manage cache coherence by cleaning or invalidating cache blocks.
+
 ### Extended ISAs
+ISA is divided into two levels: the Base ISA and the Extended ISAs.  
+
+- Base ISA: For RV32I as an example. it only defines the basic integer instructions that a CPU must support, such as `add`, `lw`, `sw`, and `beq`.
+- Extended ISA: Depending on specific computational needs — such as floating-point arithmetic, vector and matrix processing, or even AI tensor operations — we can selectively incorporate these extensions into CPU designs.
+  
+The official specification reserves blank opcodes (such as custom-0), allowing developers like us to extend R-type formatted custom instructions.  
+
+![R-type](images/lab0/R-type.png)
+- We referenced custom-0 and R-type
+- Custom-0 is an opcode retained by the official
+- NPU can be controlled by function3 and function7
+
+### NPU (block)
+
+### AXI
 ### TensorFlow Lite For Micro (TFLM)
 
 ## Porting AAML RISC-V SoC to FPGA

@@ -360,9 +360,9 @@
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#goal-of-this-lab">Goal of this lab</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#aaml-risc-v-soc-platform">AAML RISC-V SoC Platform</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#risc-v-cpu">RISC-V CPU</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#extended-isas">Extended ISAs</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#npu-block">NPU (block)</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#axi">AXI</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#extended-isas">Extended ISAs</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tensorflow-lite-for-micro-tflm">TensorFlow Lite For Micro (TFLM)</a></li>
 </ul>
 </li>
@@ -418,15 +418,30 @@
 <h2>AAML RISC-V SoC Platform<a class="headerlink" href="#aaml-risc-v-soc-platform" title="Link to this heading">#</a></h2>
 <section id="risc-v-cpu">
 <h3>RISC-V CPU<a class="headerlink" href="#risc-v-cpu" title="Link to this heading">#</a></h3>
+<p>For a CPU to function, it must rely on the Instruction Set Architecture (ISA). An instruction set is a predefined list of commands that determines which operations the hardware can understand and execute. In this Lab, we use <strong>RISC-V</strong>, an open source ISA.</p>
+<p>Our CPU supports RV32IM, with M-mode only supporting <code class="docutils literal notranslate"><span class="pre">mcycle</span></code> and <code class="docutils literal notranslate"><span class="pre">mcycleh</span></code>, and it also supports the <code class="docutils literal notranslate"><span class="pre">fence.i</span></code> instructions.</p>
+<p>Moreover, the hardware supports <code class="docutils literal notranslate"><span class="pre">CBO</span></code> (Cache-Block Management Operations). We implement the <code class="docutils literal notranslate"><span class="pre">zicbom</span></code> extension, which allows software to manually manage cache coherence by cleaning or invalidating cache blocks.</p>
+</section>
+<section id="extended-isas">
+<h3>Extended ISAs<a class="headerlink" href="#extended-isas" title="Link to this heading">#</a></h3>
+<p>ISA is divided into two levels: the Base ISA and the Extended ISAs.</p>
+<ul class="simple">
+<li><p>Base ISA: For RV32I as an example. it only defines the basic integer instructions that a CPU must support, such as <code class="docutils literal notranslate"><span class="pre">add</span></code>, <code class="docutils literal notranslate"><span class="pre">lw</span></code>, <code class="docutils literal notranslate"><span class="pre">sw</span></code>, and <code class="docutils literal notranslate"><span class="pre">beq</span></code>.</p></li>
+<li><p>Extended ISA: Depending on specific computational needs — such as floating-point arithmetic, vector and matrix processing, or even AI tensor operations — we can selectively incorporate these extensions into CPU designs.</p></li>
+</ul>
+<p>The official specification reserves blank opcodes (such as custom-0), allowing developers like us to extend R-type formatted custom instructions.</p>
+<p><img alt="R-type" src="../_images/R-type.png" /></p>
+<ul class="simple">
+<li><p>We referenced custom-0 and R-type</p></li>
+<li><p>Custom-0 is an opcode retained by the official</p></li>
+<li><p>NPU can be controlled by function3 and function7</p></li>
+</ul>
 </section>
 <section id="npu-block">
 <h3>NPU (block)<a class="headerlink" href="#npu-block" title="Link to this heading">#</a></h3>
 </section>
 <section id="axi">
 <h3>AXI<a class="headerlink" href="#axi" title="Link to this heading">#</a></h3>
-</section>
-<section id="extended-isas">
-<h3>Extended ISAs<a class="headerlink" href="#extended-isas" title="Link to this heading">#</a></h3>
 </section>
 <section id="tensorflow-lite-for-micro-tflm">
 <h3>TensorFlow Lite For Micro (TFLM)<a class="headerlink" href="#tensorflow-lite-for-micro-tflm" title="Link to this heading">#</a></h3>
@@ -585,9 +600,9 @@ chmod<span class="w"> </span>+x<span class="w"> </span>hw/run_hw.sh
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#goal-of-this-lab">Goal of this lab</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#aaml-risc-v-soc-platform">AAML RISC-V SoC Platform</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#risc-v-cpu">RISC-V CPU</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#extended-isas">Extended ISAs</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#npu-block">NPU (block)</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#axi">AXI</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#extended-isas">Extended ISAs</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tensorflow-lite-for-micro-tflm">TensorFlow Lite For Micro (TFLM)</a></li>
 </ul>
 </li>
