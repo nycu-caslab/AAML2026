@@ -2,431 +2,216 @@
 
 ## Goal of this lab
 ---
-- [Setting up the CFU-Playground Environment - 20%](#setting-up-the-cfu-playground-environment-20)
-- [Porting the KWS model - 50%](#porting-the-kws-model-50)
-- [Measuring the MAC cycles and DRAM usage for the KWS model - 20%](#measuring-the-mac-cycles-and-dram-usage-for-the-kws-model-20)
-- [Questions in the Demo - 10%](#questions-in-the-demo-10)
+- [Basic - AXI Single Transation & SIMD MAC - 60%](#basic-exercise---axi-single-transation--simd---60)
+- [AXI Address Aligned - 15%](#axi-address-aligned---15)
+- [Running Full TFLM Model - 20%](#running-tflm-model-inference---10)
+- [Questions in the Demo - 15%](#question-in-demo---10)
 
 ## Introduction
 ---
-The CFU Playground is a handy frameworks composed of soft RISC-V SoC and platform for testing custom hardware unit. It abstracts away most of the tedious steps involved in details of building the SoC infrastructure when integrating hardware acceleration unit, allowing us to focus on designing our hardware accelerators and control it by executing some custom instructions.
 
-## Setting up the CFU-Playground Environment - 20%
-----
+In this lab, you will focus on AXI single transation and SIMD MAC Operation. Then, we use these custom instruction in convolution part to reduce runtime of model reference. We use `ds_cnn_stream_fe` model to compare convolution between our accelerated version and orignal software-only version.  
+
+## Goal of this Lab
+
+- Know about AXI Single Transation 
+- Custom SIMD Instruction
+
+
+## Basic Exercise - AXI Single Transation & SIMD - (60%)
+--- 
+
+### 1. AXI Single Transation
+
+In this part, the goal is to enable the `NPU` to access data directly through the AXI4 interface instead of relying on the CPU's `LSU` (Load/Store Unit).
+
+The AXI4 master interface of the `NPU` is provided in `Platform\hw\srcs\NPU.v`. The `NPU` must control this interface to issue AXI4 read requests, receive the requested data from memory, and return the data through the CPU interface.
+
+The implementation should handle the AXI4 read transaction correctly, including address and data handshaking. The returned data should then be provided to the CPU through the NPU's existing CPU-side interface, allowing the NPU to directly fetch operands from memory without requiring the CPU's LSU to perform the load operation. 
+
+```{important}
+Please follow below table to design NPU AXI read/write instruction. 
+```
+
+| Funct3 | Funct7 | Software Function | Description |
+| :----: | :----: | :---------- | :------------------------------------------------------------ |
+|  `001` |   `x`  | `cfu_op1`   | Issue a 4-byte AXI4 read request and return the received data |
+|  `010` |   `x`  | `cfu_op2`   | Issue a 4-byte AXI4 write request with the provided data      |
+
+<!-- may not use
+|  `000` |   `x`  | `cfu_op0`   | Calculate sum of `rs1` + `rs2` + 1 |  
+-->
+
+```{todo}
+- Control AXI interface in `NPU` to make it can finish a single DRAM transation when it receive corresponding `funct3`. 
+- Return value from `NPU_out` to CPU if receiving reading request. 
+```
+
+
 ```{note}
-Since the specifications in this course are designed for Linux environments, we strongly recommend Windows users to use WSL (Windows Subsystem for Linux).
-For WSL users, the package [usbipd-win](https://learn.microsoft.com/en-us/windows/wsl/connect-usb) may be necessary to connect USB devices to WSL.
-```
-### 1. Get the supported board 
-[Nexys A7-100T](https://digilent.com/reference/programmable-logic/nexys-a7/start) is used in this course, contact the TAs if you haven't get one.
+- If you want more information about custom instruction of software, you can trace these files, "accel_ops.h", "accel_ops.cc", and "accel_test.cc". 
 
-### 2. Clone the CFU-Playground Repository from the github
-
-``` sh
-$ git clone https://github.com/google/CFU-Playground.git
+- Verification: 
+    1. Run "Accelerator functional test" in project menu. 
+    2. If result show "AXI read" and "AXI write" pass, this part is correct.
 ```
 
-### 3. Run the setup script
+### 2. SIMD MAC
 
-``` bash
-$ cd CFU-Playground
-$ ./scripts/setup
+The main principle of SIMD (Single Instruction, Multiple Data) instructions involves processing multiple data with a single instruction. In the int8 convolution, each filter and input value spans 8 bits. Utilizing a custom CFU operation, we can employ two 32-bit wide registers. This setup enables the execution of four simultaneous MAC (Multiply-Accumulate) operations in a single cycle.
+
+```
+              7 bits
+         +--------------+
+funct7 = | (bool) reset |
+         +--------------+
+
+              int8_t           int8_t           int8_t           int8_t
+         +----------------+----------------+----------------+----------------+
+   in0 = | input_data[0]  | input_data[1]  | input_data[2]  | input_data[3]  |
+         +----------------+----------------+----------------+----------------+
+
+              int8_t           int8_t           int8_t           int8_t
+         +----------------+----------------+----------------+----------------+
+   in1 = | filter_data[0] | filter_data[1] | filter_data[2] | filter_data[3] |
+         +----------------+----------------+----------------+----------------+
+
+                                        int32_t
+         +----------------------------------------------------------------------+
+output = | output + (input_data[0, 1, 2, 3] + offset) * filter_data[0, 1, 2, 3] |
+         +----------------------------------------------------------------------+
 ```
 
-### 4. Install Vivado
-
-- Download Vivado
-
-You may use 2023.2 or 2024.1
-
-> [Vivado Download page](https://www.xilinx.com/support/download/index.html/content/xilinx/en/downloadNav/vivado-design-tools/2023-2.html)
-
-Make sure you can execute the installation binary before you start.
-``` bash
-$ chmod +x FPGAs_AdaptiveSoCs_Unified_2023.2_1013_2256_Lin64.bin
-$ ./FPGAs_AdaptiveSoCs_Unified_2023.2_1013_2256_Lin64.bin
-```
+<!-- ```{hint}
+Values of input data and filter data are in range of `int8`. 
+Values of offset is in range of [-128, 128]. 
+``` -->
 
 ```{note}
-Since the full package of Vivado is pretty big, you may check only the `Artix-7` option to save disk space and download time, and please note that the Vivado can take up to 8 hours to download, so plan to do that ahead of time!
-
-<img src="images/lab1/vivado_option.png" width="550px">
-
+You may choose any `funct3` and `funct7` values to define your own MAC instruction, except for the `funct3` reserved for the AXI read and write instructions.
 ```
-
 
 ```{hint}
-After installing Vivado, add the Vivado binary to your PATH, put it in your `.bashrc` or `.zshrc`, otherwise you will have to add it every time using CFU playground.
-
-```bash
-export PATH=/path/to/tools/Xilinx/Vivado/<Vivado version>/bin:$PATH
+This part does not have any test. You can write your test function and add it into user menu to test correction of SIMD instruction. 
 ```
 
-
-
-### 5. Install RISC-V toolchain ([Download linux-ubuntu](https://github.com/sifive/freedom-tools/releases/tag/v2020.08.0))
-
-![](https://hackmd.io/_uploads/rk517Ux02.png)
-
-Download the August 2020 toolchain from freedom-tools and unpack the binaries to your home directory:
-``` bash
-$ tar xvfz ~/Downloads/riscv64-unknown-elf-gcc-10.1.0-2020.08.2-x86_64-linux-ubuntu14.tar.gz
+```{todo}
+Make `NPU` can run custom SIMD instruction if it receive specific `funct3` and `funct7`. 
 ```
 
-Add the toolchain to your PATH in your `.bashrc` or `.zshrc`:
-``` bash
-export PATH=$PATH:$HOME/riscv64-unknown-elf-gcc-10.1.0-2020.08.2-x86_64-linux-ubuntu14/bin
+### 3. conv.h
+
+In this part, you need to modify `conv.h` and change `ConvPerChannel` function into accelerated version. Please use AXI read function of `NPU` to get input data and filter, and use your MAC instruction in previous part. 
+
+```{note}
+You can find `ConvPerfChannel` function in  `Platform\sw\tflm_patches\tensorflow\lite\kernels\internal\reference\integer_ops\conv.h`
 ```
 
-### 6. Test Run
-
-1. Change the target board
-    - Modify proj/proj.mk
-    ``` bash
-    export TARGET	    ?= digilent_nexys4ddr
-    ```
-    ![](https://hackmd.io/_uploads/SkJUuGA6h.png)
-
-2. Make Your Project
-    ``` bash
-    $ cp -r proj/proj_template_v proj/my_first_cfu
-    $ cd proj/my_first_cfu
-    ```
-3. Test run
-    - Connect FPGA board to computer
-    - Builds and programs gateware
-    ``` bash
-    $ make prog USE_VIVADO=1 TTY=/dev/ttyUSB0 (or any serial you are using)
-    ```
-    - Builds and loads C program (BUILD_JOBS=How many cores does your computer have)
-    ``` bash
-    $ make load BUILD_JOBS=4 TTY=/dev/ttyUSB1 (or any serial you are using)
-    ```
-    now you should observe some output like this:
-
-    ```
-    make[1]: Leaving Directory「/path/to/CFU-Playground/soc」
-    /path/to/CFU-Playground/soc/bin/litex_term --speed 1843200  --kernel /path/to/CFU-Playground/proj/my_first_cfu/build/software.bin /dev/ttyUSB1
-    ```
-
-    - Now press the “CPU_RESET” button on the board and follow the steps below:
-    ```{hint}
-    If you are doing this on a remote server and can't physically access the "CPU_RESET" button, after `make prog` and `make load`, you may press "enter" and key in `reboot` instead of pressing the "CPU_RESET".
-
-    <img src="images/lab1/litex.png" width="150px">
-
-    ```
-
-
-    ![](https://hackmd.io/_uploads/SyXH5fA6n.png)
-    ![](https://hackmd.io/_uploads/rJhYcfAa3.png)
-
-
-
-## Porting the KWS model - 50%
------
-**[Checkout the architecture of the keyword spotting (KWS) model](https://hackmd.io/ou3Ybtx9RkGYopCDtdGLZA?view)**
-
-Since CFU-Playground doesn't have following two audio operators, so we should port them first before we port our KWS model:
-- Audio spectrogram
-- Mfcc
-
-### 1. Download the patch file
-
-> [Download kws_tflm_audio_op.patch](https://drive.google.com/drive/u/0/folders/1VJ4hs8SYhn0fRWSNjqPdVUtT-UyMBsds)
-
-### 2. Put the patch file in CFU-Playground
-
-``` bash
-$ cd CFU-Playground
-$ patch -p1 -i kws_tflm_audio_op.patch
-```
-
-### 3. Modify ```proj/proj.mk```
-
-``` bash
-mkdir -p $(BUILD_DIR)/src/third_party/fft2d
-$(COPY) $(TFLM_TP_DIR)/fft2d/fft.h $(BUILD_DIR)/src/third_party/fft2d
-$(COPY) $(TFLM_TP_DIR)/fft2d/fft2d.h $(BUILD_DIR)/src/third_party/fft2d
-$(COPY) $(TFLM_TP_DIR)/fft2d/fft4g.c $(BUILD_DIR)/src/third_party/fft2d
-```
-![](https://hackmd.io/_uploads/rkhRMXRph.png)
-
-#### Now we are ready for porting the model!
-
-### 4. Create a folder for KWS model
-
-``` bash
-$ cd CFU-Playground/common/src/models/
-$ mkdir ds_cnn_stream_fe
-$ cd ds_cnn_stream_fe
-```
-
-### 5. Download the tflite file and input files
-
-> The tflite file  [ds_cnn_stream_fe.tflite](https://drive.google.com/drive/folders/1psNVso0eMvr7fLztv0Vbeq6U4s5xtmnh?usp=drive_link)
-
-
-> The input file [label.zip](https://drive.google.com/drive/folders/1rY7SDD1qh-EXn8nqex7QDDvqbSiz7Ki_?usp=drive_link)
-
-- Put ```ds_cnn_stream_fe.tflite``` in ```CFU-Playground/common/src/models/ds_cnn_stream_fe/```
-
-- Unzip ```label.zip``` in ```CFU-Playground/common/src/models/```
-
-### 6. Create files to run inference on the model
-
-#### ```CFU-Playground/common/src/models/ds_cnn_stream_fe/ds_cnn.h```
+Replace some parts of original operations with `cfu_op`, and don’t forget to add `#include "cfu.h"` and `#include "cbo.h"` in the file. 
 
 ```cpp
-#ifndef _DS_CNN_STREAM_FE_H
-#define _DS_CNN_STREAM_FE_H
+for (int out_channel = 0; out_channel < output_depth; ++out_channel) {
+    
+    ...
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+    int32_t acc = 
 
-// For integration into menu system
-void ds_cnn_stream_fe_menu();
+    for (int filter_y = 0; filter_y < filter_height; ++filter_y) {
+        const int in_y = in_y_origin + dilation_height_factor * filter_y;
+        for (int filter_x = 0; filter_x < filter_width; ++filter_x) {
+            const int in_x = in_x_origin + dilation_width_factor * filter_x;
 
-#ifdef __cplusplus
-}
-#endif
+            // Zero padding by omitting the areas outside the image.
+            const bool is_point_inside_image =
+                (in_x >= 0) && (in_x < input_width) && (in_y >= 0) &&
+                (in_y < input_height);
 
-#endif  // _DS_CNN_STREAM_FE_H
-```
+            if (!is_point_inside_image) {
+                continue;
+            }
 
-#### ```CFU-Playground/common/src/models/ds_cnn_stream_fe/ds_cnn.cc```
+            for ( ) {
+                
+            }
+        }
+    }
 
-Design the following codes to run inference on the model. You need to use files in ```models/label/``` as your inputs which have already include in the following codes. Then print all 12 output scores.
-
-```cpp
-#include "models/ds_cnn_stream_fe/ds_cnn.h"
-#include <stdio.h>
-#include "menu.h"
-#include "models/ds_cnn_stream_fe/ds_cnn_stream_fe.h"
-#include "tflite.h"
-#include "models/label/label0_board.h"
-#include "models/label/label1_board.h"
-#include "models/label/label6_board.h"
-#include "models/label/label8_board.h"
-#include "models/label/label11_board.h"
-
-
-// Initialize everything once
-// deallocate tensors when done
-static void ds_cnn_stream_fe_init(void) {
-  tflite_load_model(ds_cnn_stream_fe, ds_cnn_stream_fe_len);
-}
-
-// TODO: Implement your design here
-
-static struct Menu MENU = {
-    "Tests for ds_cnn_stream_fe",
-    "ds_cnn_stream_fe",
-    {
-        MENU_END,
-    },
-};
-
-// For integration into menu system
-void ds_cnn_stream_fe_menu() {
-  ds_cnn_stream_fe_init();
-  menu_run(&MENU);
+    ...
 }
 ```
 
-```{note}
-You can refer to the codes of other models in ```common/src/models/``` and use the functions in ```common/src/tflite.cc```
-
-Or refer from the below link for more details.
-[How to run inference using TensorFlow Lite for Microcontrollers](https://www.tensorflow.org/lite/microcontrollers/get_started_low_level#run_inference)
+```{important}
+Input and filter data only are allowed to read with NPU AXI instruction `cfu_op1`. 
 ```
 
-```{warning}
-Output scores should stored as uint32_t since we can't print floats.
+```{hint}
+Because of directly accessing memory without D-cache, you needs to consider about cache coherence problem. Our platform supports two D-cache operation, `cbo_clean` and `cbo_invalidate`. You can use software function in `cbo.h` to control D-cache. 
 ```
 
-### 7. Modifying the files 
-
-Add codes as below:
-
-#### ```CFU-Playground/common/src/models/models.c```
-
-```c
-#include "models/ds_cnn_stream_fe/ds_cnn.h"
-
-
-/* ... some code ... */
-
-
-#if defined(INCLUDE_MODEL_DS_CNN_STREAM_FE)
-        MENU_ITEM(AUTO_INC_CHAR, "Ds cnn stream fe", ds_cnn_stream_fe_menu),
-#endif
-```
-
-#### ```CFU-Playground/common/src/tflite.cc```
-
-Set the kTensorArenaSize. You should set the &#34;size&#34; below.
-
-```cpp
-#ifdef INCLUDE_MODEL_DS_CNN_STREAM_FE
-    3000 * 1024,
-#endif
-```
-```{note}
-The size of kTensorArenaSize will depend on the model you’re using, and may need to be determined by experimentation. You may try all over different size to get minimal value.
-```
-
-#### ```CFU-Playground/proj/my_first_cfu/Makefile```
-
-```bash
-DEFINES += INCLUDE_MODEL_DS_CNN_STREAM_FE
-#DEFINES += INCLUDE_MODEL_PDTI8
-```
-### 8. Running the project
-
-``` bash
-$ cd CFU-Playground/proj/my_first_cfu
-$ make prog USEVIVADO=1 TTY=/dev/ttyUSB0 (or any serial you are using)
-$ make load BUILD_JOBS=4 TTY=/dev/ttyUSB1 (or any serial you are using)
-``` 
-
-```{note}
-The model loaded successfully if you get the following output.
-
-<img src="https://hackmd.io/_uploads/HyUjALkC3.png" width="550px">
+```{todo}
 
 ```
 
+### 4. Check Result Correction
 
-Press a number to run a test. ***(takes plenty of minutes)***
+You can run "Basic Convolution Test" in project menu. This test only have have address aligned condition. 
 
-<img src="images/lab1/enter_a_number.png" width="400px">
+<img src="images/lab1/basic_conv_test.png" width="300px">
 
+If you pass all testcase, you can get full score of basic part. 
 
-```{note}
-If you get the following output scores correct, you could get all the points of this part (which means **50%** points, evaluation details are in the Submission chapter).
+## AXI Address Aligned - (15%)
+--- 
 
+Because of 8-bit element type of model, some AXI reading request may request unaligned address data, and unaligned address request would cause AXI trigger exception. Therefore, we need to handle request with unaligned address data, and make address is aligned with 4. 
 
-<img src="https://hackmd.io/_uploads/rkTp0T6C3.png" width="700px">
+```{hint}
+We can divide single DRAM request into two DRAM request, and combine two request into one 4 byte data transition. 
 ```
 
+For example, NPU want to read 4 bytes data in 0x6000_0002. It needs to read 0x6000_0000 and 0x6000_0004 data. Then, combine higher two byte of first read and lower two byte of second read. 
 
-## Measuring the MAC cycles and DRAM usage for the KWS model - 20%
+```{todo}
+- Add address alignment control to the AXI single transaction. 
+- Ensure `NPU` can get correct result if it receive request with unaligned address.
+```
+
+<!-- 
+```
+Address % 4 == 1 : 5% 
+Address % 4 == 2 : 5%
+Address % 4 == 3 : 5%
+``` -->
+
+## Adavance Exercise 2 - Running TFLM Model Inference - (10%)
 ---
-### Measuring the DRAM space required for a model - 5%
 
-#### 1. Modify ```CFU-Playground/common/src/tflite.cc```
+> [ds_cnn_stream_fe.tflite](https://drive.google.com/file/d/1CgEhJm0IoaXx3ULrn-Dfuw3LH83SnFlV/view?usp=sharing)
 
-Add codes below:
+Select "TFLM Inference, Verification, and Cycles" from the project menu. The output should match the results of the original software-only convolution implementation.
 
-```cpp
-printf("DRAM: %d bytes\n", interpreter->arena_used_bytes());
-```
-![](https://hackmd.io/_uploads/HyFMmBAa2.png)
+<!-- <img src="images/lab1/.png" width="300px"> -->
 
-#### 2. Run the project
+## Demo - (15%)
+---
 
-We can observe that KWS model has used 1934292 bytes of the memory space.
-***(or around this amount)***
+### Simple Presenatation in Demo time - (5%)
 
-![](https://hackmd.io/_uploads/rkoDnDl02.png)
+You need to record performance of accerated version than original version, and present your idea of NPU design. 
 
-### Measuring the cycles of multiply-and-accumulate(MAC) operation required for a model. - 15%
-
-We can use the functions in ```CFU-Playground/common/src/perf.h``` to count the cycles of MAC operations.
-
-#### 1. Inside your project folder run the following:
-
-```bash
-$ mkdir -p src/tensorflow/lite/kernels/internal/reference/integer_ops/
-$ cp \
-  ../../third_party/tflite-micro/tensorflow/lite/kernels/internal/reference/conv.h \
-  src/tensorflow/lite/kernels/internal/reference/conv.h
-```
-
-This will create a copy of the convolution source code in your project directory. At build time your copy of the source code will replace the regular implementation.
-
-#### 2. Modify ```conv.h```
-
-Open the newly created copy at ```proj/my_first_cfu/src/tensorflow/lite/kernels/ internal/reference/conv.h```. Locate the innermost loop of the first function, it should look something like this:
-
-```cpp
-for (int in_channel = 0; in_channel &lt; filter_input_depth; ++in_channel) {
-  float input_value = input_data[Offset(
-      input_shape, batch, in_y, in_x, in_channel + group * filter_input_depth)];
-  float filter_value = filter_data[Offset(
-      filter_shape, out_channel, filter_y, filter_x, in_channel)];
-total += (input_value * filter_value);
-}
-```
-
-Add ``` #include "perf.h"``` at the top of the file and then surround the inner loop with perf functions to count how many cycles this inner loop takes.
-
-```cpp
-/* ... some code ... */
-
-#include "perf.h"
-
-/* ... some code ... */
-
-perf_enable_counter(0);
-for (int in_channel = 0; in_channel < filter_input_depth; ++in_channel) {
-  float input_value = input_data[Offset(
-      input_shape, batch, in_y, in_x, in_channel + group * filter_input_depth)];
-  float filter_value = filter_data[Offset(
-      filter_shape, out_channel, filter_y, filter_x, in_channel)];
-total += (input_value * filter_value);
-}
-perf_disable_counter(0);
-```
-
-#### 3. Run the project
-You must make clean first. To enable performance counters you should use the command below.
-
-```bash
-$ make clean
-$ make prog EXTRA_LITEX_ARGS="--cpu-variant=perf+cfu"
-$ make load
-```
-```{note}
-The output shall look something like this, but note that the result is highly related to cache and DRAM, so you may get **different** result everytime.
-
-You will receive all 15 points as long as you measure the MAC cycles correctly and 5 points for measuring the DRAM usage.
-    
-     Counter |  Total | Starts | Average |     Raw
-    ---------+--------+--------+---------+--------------
-        0    |  2464M | 2679000|   919   |   2463511289
-        1    |     0  |     0  |   n/a   |            0
-        2    |     0  |     0  |   n/a   |            0
-        3    |     0  |     0  |   n/a   |            0
-        4    |     0  |     0  |   n/a   |            0
-        5    |     0  |     0  |   n/a   |            0
-        6    |     0  |     0  |   n/a   |            0
-        7    |     0  |     0  |   n/a   |            0
-     38970M (  38970422645 )  cycles total
-    
-```
-
-## Questions in the Demo - 10%
-
+### Question in Demo - (10%) 
 You will be asked several questions about the concepts covered in this lab and your implementation. This section accounts for 10% of the total lab score.
 
 ## Submission
 ---
-Since this lab is all about setting up the enviornment, you **DO NOT** have to submit anything to E3.
+
+
+
 
 ```{important}
-Screenshot the following:
-
-1. The golden test with "passed" result.
-2. Run any of the **THREE** labels using the KWS model.
-3. the MAC cycles and the DRAM usage (only one label is required).
-
-You will have to show your screenshots in the demo and explain your codes.
+TAs should be able to run your project without any modification. If TAs cannot compile or run your code, **you can't get any scores even if you passed the DEMO**. Also, **PLAGIARISM is not allowed**.
 ```
 
-### Reference
----
+## Reference 
 
-- [CFU-Playground](https://cfu-playground.readthedocs.io/en/latest/index.html)
+- [Netron](https://netron.app/) : You can visulaize the layer graph of .tflite file by this website. 
