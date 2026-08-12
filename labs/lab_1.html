@@ -358,57 +358,23 @@
                 <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#goal-of-this-lab">Goal of this lab</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#introduction">Introduction</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setting-up-the-cfu-playground-environment-20">Setting up the CFU-Playground Environment - 20%</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#get-the-supported-board">1. Get the supported board</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#clone-the-cfu-playground-repository-from-the-github">2. Clone the CFU-Playground Repository from the github</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#run-the-setup-script">3. Run the setup script</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#install-vivado">4. Install Vivado</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#install-risc-v-toolchain-download-linux-ubuntu">5. Install RISC-V toolchain (Download linux-ubuntu)</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#test-run">6. Test Run</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Goal of this Lab</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#basic-exercise-axi-single-transation-simd-60">Basic Exercise - AXI Single Transation &amp; SIMD - (60%)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#axi-single-transation">1. AXI Single Transation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#simd-mac">2. SIMD MAC</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#conv-h">3. conv.h</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#check-result-correction">4. Check Result Correction</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#porting-the-kws-model-50">Porting the KWS model - 50%</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#download-the-patch-file">1. Download the patch file</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#put-the-patch-file-in-cfu-playground">2. Put the patch file in CFU-Playground</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#modify-proj-proj-mk">3. Modify <code class="docutils literal notranslate"><span class="pre">proj/proj.mk</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#now-we-are-ready-for-porting-the-model">Now we are ready for porting the model!</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#axi-address-aligned-15">AXI Address Aligned - (15%)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#adavance-exercise-2-running-tflm-model-inference-10">Adavance Exercise 2 - Running TFLM Model Inference - (10%)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#demo-15">Demo - (15%)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#simple-presenatation-in-demo-time-5">Simple Presenatation in Demo time - (5%)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#question-in-demo-10">Question in Demo - (10%)</a></li>
 </ul>
 </li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#create-a-folder-for-kws-model">4. Create a folder for KWS model</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#download-the-tflite-file-and-input-files">5. Download the tflite file and input files</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#create-files-to-run-inference-on-the-model">6. Create files to run inference on the model</a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#cfu-playground-common-src-models-ds-cnn-stream-fe-ds-cnn-h"><code class="docutils literal notranslate"><span class="pre">CFU-Playground/common/src/models/ds_cnn_stream_fe/ds_cnn.h</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#cfu-playground-common-src-models-ds-cnn-stream-fe-ds-cnn-cc"><code class="docutils literal notranslate"><span class="pre">CFU-Playground/common/src/models/ds_cnn_stream_fe/ds_cnn.cc</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#modifying-the-files">7. Modifying the files</a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#cfu-playground-common-src-models-models-c"><code class="docutils literal notranslate"><span class="pre">CFU-Playground/common/src/models/models.c</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#cfu-playground-common-src-tflite-cc"><code class="docutils literal notranslate"><span class="pre">CFU-Playground/common/src/tflite.cc</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#cfu-playground-proj-my-first-cfu-makefile"><code class="docutils literal notranslate"><span class="pre">CFU-Playground/proj/my_first_cfu/Makefile</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#running-the-project">8. Running the project</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#measuring-the-mac-cycles-and-dram-usage-for-the-kws-model-20">Measuring the MAC cycles and DRAM usage for the KWS model - 20%</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#measuring-the-dram-space-required-for-a-model-5">Measuring the DRAM space required for a model - 5%</a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#modify-cfu-playground-common-src-tflite-cc">1. Modify <code class="docutils literal notranslate"><span class="pre">CFU-Playground/common/src/tflite.cc</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#run-the-project">2. Run the project</a></li>
-</ul>
-</li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#measuring-the-cycles-of-multiply-and-accumulate-mac-operation-required-for-a-model-15">Measuring the cycles of multiply-and-accumulate(MAC) operation required for a model. - 15%</a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#inside-your-project-folder-run-the-following">1. Inside your project folder run the following:</a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#modify-conv-h">2. Modify <code class="docutils literal notranslate"><span class="pre">conv.h</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">3. Run the project</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#questions-in-the-demo-10">Questions in the Demo - 10%</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#submission">Submission</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#reference">Reference</a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#submission">Submission</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#reference">Reference</a></li>
 </ul>
             </nav>
         </div>
@@ -426,442 +392,216 @@
 <h2>Goal of this lab<a class="headerlink" href="#goal-of-this-lab" title="Link to this heading">#</a></h2>
 <hr class="docutils" />
 <ul class="simple">
-<li><p><a class="reference internal" href="#setting-up-the-cfu-playground-environment-20"><span class="xref myst">Setting up the CFU-Playground Environment - 20%</span></a></p></li>
-<li><p><a class="reference internal" href="#porting-the-kws-model-50"><span class="xref myst">Porting the KWS model - 50%</span></a></p></li>
-<li><p><a class="reference internal" href="#measuring-the-mac-cycles-and-dram-usage-for-the-kws-model-20"><span class="xref myst">Measuring the MAC cycles and DRAM usage for the KWS model - 20%</span></a></p></li>
-<li><p><a class="reference internal" href="#questions-in-the-demo-10"><span class="xref myst">Questions in the Demo - 10%</span></a></p></li>
+<li><p><a class="reference internal" href="#basic-exercise---axi-single-transation--simd---60"><span class="xref myst">Basic - AXI Single Transation &amp; SIMD MAC - 60%</span></a></p></li>
+<li><p><a class="reference internal" href="#axi-address-aligned---15"><span class="xref myst">AXI Address Aligned - 15%</span></a></p></li>
+<li><p><a class="reference internal" href="#running-tflm-model-inference---10"><span class="xref myst">Running Full TFLM Model - 20%</span></a></p></li>
+<li><p><a class="reference internal" href="#question-in-demo---10"><span class="xref myst">Questions in the Demo - 15%</span></a></p></li>
 </ul>
 </section>
 <section id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">#</a></h2>
 <hr class="docutils" />
-<p>The CFU Playground is a handy frameworks composed of soft RISC-V SoC and platform for testing custom hardware unit. It abstracts away most of the tedious steps involved in details of building the SoC infrastructure when integrating hardware acceleration unit, allowing us to focus on designing our hardware accelerators and control it by executing some custom instructions.</p>
-</section>
-<section id="setting-up-the-cfu-playground-environment-20">
-<h2>Setting up the CFU-Playground Environment - 20%<a class="headerlink" href="#setting-up-the-cfu-playground-environment-20" title="Link to this heading">#</a></h2>
-<hr class="docutils" />
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Since the specifications in this course are designed for Linux environments, we strongly recommend Windows users to use WSL (Windows Subsystem for Linux).
-For WSL users, the package <a class="reference external" href="https://learn.microsoft.com/en-us/windows/wsl/connect-usb">usbipd-win</a> may be necessary to connect USB devices to WSL.</p>
-</div>
-<section id="get-the-supported-board">
-<h3>1. Get the supported board<a class="headerlink" href="#get-the-supported-board" title="Link to this heading">#</a></h3>
-<p><a class="reference external" href="https://digilent.com/reference/programmable-logic/nexys-a7/start">Nexys A7-100T</a> is used in this course, contact the TAs if you haven’t get one.</p>
-</section>
-<section id="clone-the-cfu-playground-repository-from-the-github">
-<h3>2. Clone the CFU-Playground Repository from the github<a class="headerlink" href="#clone-the-cfu-playground-repository-from-the-github" title="Link to this heading">#</a></h3>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/google/CFU-Playground.git
-</pre></div>
-</div>
-</section>
-<section id="run-the-setup-script">
-<h3>3. Run the setup script<a class="headerlink" href="#run-the-setup-script" title="Link to this heading">#</a></h3>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>CFU-Playground
-$<span class="w"> </span>./scripts/setup
-</pre></div>
-</div>
-</section>
-<section id="install-vivado">
-<h3>4. Install Vivado<a class="headerlink" href="#install-vivado" title="Link to this heading">#</a></h3>
-<ul class="simple">
-<li><p>Download Vivado</p></li>
-</ul>
-<p>You may use 2023.2 or 2024.1</p>
-<blockquote>
-<div><p><a class="reference external" href="https://www.xilinx.com/support/download/index.html/content/xilinx/en/downloadNav/vivado-design-tools/2023-2.html">Vivado Download page</a></p>
-</div></blockquote>
-<p>Make sure you can execute the installation binary before you start.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>chmod<span class="w"> </span>+x<span class="w"> </span>FPGAs_AdaptiveSoCs_Unified_2023.2_1013_2256_Lin64.bin
-$<span class="w"> </span>./FPGAs_AdaptiveSoCs_Unified_2023.2_1013_2256_Lin64.bin
-</pre></div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Since the full package of Vivado is pretty big, you may check only the <code class="docutils literal notranslate"><span class="pre">Artix-7</span></code> option to save disk space and download time, and please note that the Vivado can take up to 8 hours to download, so plan to do that ahead of time!</p>
-<a class="reference internal image-reference" href="labs/images/lab1/vivado_option.png"><img alt="labs/images/lab1/vivado_option.png" src="labs/images/lab1/vivado_option.png" style="width: 550px;" />
-</a>
-</div>
-<div class="admonition hint">
-<p class="admonition-title">Hint</p>
-<p>After installing Vivado, add the Vivado binary to your PATH, put it in your <code class="docutils literal notranslate"><span class="pre">.bashrc</span></code> or <code class="docutils literal notranslate"><span class="pre">.zshrc</span></code>, otherwise you will have to add it every time using CFU playground.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span>/path/to/tools/Xilinx/Vivado/&lt;Vivado<span class="w"> </span>version&gt;/bin:<span class="nv">$PATH</span>
-</pre></div>
-</div>
-</div>
-</section>
-<section id="install-risc-v-toolchain-download-linux-ubuntu">
-<h3>5. Install RISC-V toolchain (<a class="reference external" href="https://github.com/sifive/freedom-tools/releases/tag/v2020.08.0">Download linux-ubuntu</a>)<a class="headerlink" href="#install-risc-v-toolchain-download-linux-ubuntu" title="Link to this heading">#</a></h3>
-<p><img alt="" src="https://hackmd.io/_uploads/rk517Ux02.png" /></p>
-<p>Download the August 2020 toolchain from freedom-tools and unpack the binaries to your home directory:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>tar<span class="w"> </span>xvfz<span class="w"> </span>~/Downloads/riscv64-unknown-elf-gcc-10.1.0-2020.08.2-x86_64-linux-ubuntu14.tar.gz
-</pre></div>
-</div>
-<p>Add the toolchain to your PATH in your <code class="docutils literal notranslate"><span class="pre">.bashrc</span></code> or <code class="docutils literal notranslate"><span class="pre">.zshrc</span></code>:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:<span class="nv">$HOME</span>/riscv64-unknown-elf-gcc-10.1.0-2020.08.2-x86_64-linux-ubuntu14/bin
-</pre></div>
-</div>
-</section>
-<section id="test-run">
-<h3>6. Test Run<a class="headerlink" href="#test-run" title="Link to this heading">#</a></h3>
-<ol class="arabic">
-<li><p>Change the target board</p>
-<ul class="simple">
-<li><p>Modify proj/proj.mk</p></li>
-</ul>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span>TARGET<span class="w">	    </span>?<span class="o">=</span><span class="w"> </span>digilent_nexys4ddr
-</pre></div>
-</div>
-<p><img alt="" src="https://hackmd.io/_uploads/SkJUuGA6h.png" /></p>
-</li>
-<li><p>Make Your Project</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>cp<span class="w"> </span>-r<span class="w"> </span>proj/proj_template_v<span class="w"> </span>proj/my_first_cfu
-$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>proj/my_first_cfu
-</pre></div>
-</div>
-</li>
-<li><p>Test run</p>
-<ul class="simple">
-<li><p>Connect FPGA board to computer</p></li>
-<li><p>Builds and programs gateware</p></li>
-</ul>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>make<span class="w"> </span>prog<span class="w"> </span><span class="nv">USE_VIVADO</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="nv">TTY</span><span class="o">=</span>/dev/ttyUSB0<span class="w"> </span><span class="o">(</span>or<span class="w"> </span>any<span class="w"> </span>serial<span class="w"> </span>you<span class="w"> </span>are<span class="w"> </span>using<span class="o">)</span>
-</pre></div>
-</div>
-<ul class="simple">
-<li><p>Builds and loads C program (BUILD_JOBS=How many cores does your computer have)</p></li>
-</ul>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>make<span class="w"> </span>load<span class="w"> </span><span class="nv">BUILD_JOBS</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">TTY</span><span class="o">=</span>/dev/ttyUSB1<span class="w"> </span><span class="o">(</span>or<span class="w"> </span>any<span class="w"> </span>serial<span class="w"> </span>you<span class="w"> </span>are<span class="w"> </span>using<span class="o">)</span>
-</pre></div>
-</div>
-<p>now you should observe some output like this:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>make[1]: Leaving Directory「/path/to/CFU-Playground/soc」
-/path/to/CFU-Playground/soc/bin/litex_term --speed 1843200  --kernel /path/to/CFU-Playground/proj/my_first_cfu/build/software.bin /dev/ttyUSB1
-</pre></div>
-</div>
-<ul class="simple">
-<li><p>Now press the “CPU_RESET” button on the board and follow the steps below:</p></li>
-</ul>
-<div class="admonition hint">
-<p class="admonition-title">Hint</p>
-<p>If you are doing this on a remote server and can’t physically access the “CPU_RESET” button, after <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">prog</span></code> and <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">load</span></code>, you may press “enter” and key in <code class="docutils literal notranslate"><span class="pre">reboot</span></code> instead of pressing the “CPU_RESET”.</p>
-<a class="reference internal image-reference" href="../_images/litex.png"><img alt="../_images/litex.png" src="../_images/litex.png" style="width: 150px;" />
-</a>
-</div>
-<p><img alt="" src="https://hackmd.io/_uploads/SyXH5fA6n.png" />
-<img alt="" src="https://hackmd.io/_uploads/rJhYcfAa3.png" /></p>
-</li>
-</ol>
-</section>
-</section>
-<section id="porting-the-kws-model-50">
-<h2>Porting the KWS model - 50%<a class="headerlink" href="#porting-the-kws-model-50" title="Link to this heading">#</a></h2>
-<hr class="docutils" />
-<p><strong><a class="reference external" href="https://hackmd.io/ou3Ybtx9RkGYopCDtdGLZA?view">Checkout the architecture of the keyword spotting (KWS) model</a></strong></p>
-<p>Since CFU-Playground doesn’t have following two audio operators, so we should port them first before we port our KWS model:</p>
-<ul class="simple">
-<li><p>Audio spectrogram</p></li>
-<li><p>Mfcc</p></li>
-</ul>
-<section id="download-the-patch-file">
-<h3>1. Download the patch file<a class="headerlink" href="#download-the-patch-file" title="Link to this heading">#</a></h3>
-<blockquote>
-<div><p><a class="reference external" href="https://drive.google.com/drive/u/0/folders/1VJ4hs8SYhn0fRWSNjqPdVUtT-UyMBsds">Download kws_tflm_audio_op.patch</a></p>
-</div></blockquote>
-</section>
-<section id="put-the-patch-file-in-cfu-playground">
-<h3>2. Put the patch file in CFU-Playground<a class="headerlink" href="#put-the-patch-file-in-cfu-playground" title="Link to this heading">#</a></h3>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>CFU-Playground
-$<span class="w"> </span>patch<span class="w"> </span>-p1<span class="w"> </span>-i<span class="w"> </span>kws_tflm_audio_op.patch
-</pre></div>
-</div>
-</section>
-<section id="modify-proj-proj-mk">
-<h3>3. Modify <code class="docutils literal notranslate"><span class="pre">proj/proj.mk</span></code><a class="headerlink" href="#modify-proj-proj-mk" title="Link to this heading">#</a></h3>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir<span class="w"> </span>-p<span class="w"> </span><span class="k">$(</span>BUILD_DIR<span class="k">)</span>/src/third_party/fft2d
-<span class="k">$(</span>COPY<span class="k">)</span><span class="w"> </span><span class="k">$(</span>TFLM_TP_DIR<span class="k">)</span>/fft2d/fft.h<span class="w"> </span><span class="k">$(</span>BUILD_DIR<span class="k">)</span>/src/third_party/fft2d
-<span class="k">$(</span>COPY<span class="k">)</span><span class="w"> </span><span class="k">$(</span>TFLM_TP_DIR<span class="k">)</span>/fft2d/fft2d.h<span class="w"> </span><span class="k">$(</span>BUILD_DIR<span class="k">)</span>/src/third_party/fft2d
-<span class="k">$(</span>COPY<span class="k">)</span><span class="w"> </span><span class="k">$(</span>TFLM_TP_DIR<span class="k">)</span>/fft2d/fft4g.c<span class="w"> </span><span class="k">$(</span>BUILD_DIR<span class="k">)</span>/src/third_party/fft2d
-</pre></div>
-</div>
-<p><img alt="" src="https://hackmd.io/_uploads/rkhRMXRph.png" /></p>
-<section id="now-we-are-ready-for-porting-the-model">
-<h4>Now we are ready for porting the model!<a class="headerlink" href="#now-we-are-ready-for-porting-the-model" title="Link to this heading">#</a></h4>
-</section>
-</section>
-<section id="create-a-folder-for-kws-model">
-<h3>4. Create a folder for KWS model<a class="headerlink" href="#create-a-folder-for-kws-model" title="Link to this heading">#</a></h3>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>CFU-Playground/common/src/models/
-$<span class="w"> </span>mkdir<span class="w"> </span>ds_cnn_stream_fe
-$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>ds_cnn_stream_fe
-</pre></div>
-</div>
-</section>
-<section id="download-the-tflite-file-and-input-files">
-<h3>5. Download the tflite file and input files<a class="headerlink" href="#download-the-tflite-file-and-input-files" title="Link to this heading">#</a></h3>
-<blockquote>
-<div><p>The tflite file  <a class="reference external" href="https://drive.google.com/drive/folders/1psNVso0eMvr7fLztv0Vbeq6U4s5xtmnh?usp=drive_link">ds_cnn_stream_fe.tflite</a></p>
-</div></blockquote>
-<blockquote>
-<div><p>The input file <a class="reference external" href="https://drive.google.com/drive/folders/1rY7SDD1qh-EXn8nqex7QDDvqbSiz7Ki_?usp=drive_link">label.zip</a></p>
-</div></blockquote>
-<ul class="simple">
-<li><p>Put <code class="docutils literal notranslate"><span class="pre">ds_cnn_stream_fe.tflite</span></code> in <code class="docutils literal notranslate"><span class="pre">CFU-Playground/common/src/models/ds_cnn_stream_fe/</span></code></p></li>
-<li><p>Unzip <code class="docutils literal notranslate"><span class="pre">label.zip</span></code> in <code class="docutils literal notranslate"><span class="pre">CFU-Playground/common/src/models/</span></code></p></li>
-</ul>
-</section>
-<section id="create-files-to-run-inference-on-the-model">
-<h3>6. Create files to run inference on the model<a class="headerlink" href="#create-files-to-run-inference-on-the-model" title="Link to this heading">#</a></h3>
-<section id="cfu-playground-common-src-models-ds-cnn-stream-fe-ds-cnn-h">
-<h4><code class="docutils literal notranslate"><span class="pre">CFU-Playground/common/src/models/ds_cnn_stream_fe/ds_cnn.h</span></code><a class="headerlink" href="#cfu-playground-common-src-models-ds-cnn-stream-fe-ds-cnn-h" title="Link to this heading">#</a></h4>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#ifndef _DS_CNN_STREAM_FE_H</span>
-<span class="cp">#define _DS_CNN_STREAM_FE_H</span>
-
-<span class="cp">#ifdef __cplusplus</span>
-<span class="k">extern</span><span class="w"> </span><span class="s">&quot;C&quot;</span><span class="w"> </span><span class="p">{</span>
-<span class="cp">#endif</span>
-
-<span class="c1">// For integration into menu system</span>
-<span class="kt">void</span><span class="w"> </span><span class="nf">ds_cnn_stream_fe_menu</span><span class="p">();</span>
-
-<span class="cp">#ifdef __cplusplus</span>
-<span class="p">}</span>
-<span class="cp">#endif</span>
-
-<span class="cp">#endif  </span><span class="c1">// _DS_CNN_STREAM_FE_H</span>
-</pre></div>
-</div>
-</section>
-<section id="cfu-playground-common-src-models-ds-cnn-stream-fe-ds-cnn-cc">
-<h4><code class="docutils literal notranslate"><span class="pre">CFU-Playground/common/src/models/ds_cnn_stream_fe/ds_cnn.cc</span></code><a class="headerlink" href="#cfu-playground-common-src-models-ds-cnn-stream-fe-ds-cnn-cc" title="Link to this heading">#</a></h4>
-<p>Design the following codes to run inference on the model. You need to use files in <code class="docutils literal notranslate"><span class="pre">models/label/</span></code> as your inputs which have already include in the following codes. Then print all 12 output scores.</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;models/ds_cnn_stream_fe/ds_cnn.h&quot;</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;menu.h&quot;</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;models/ds_cnn_stream_fe/ds_cnn_stream_fe.h&quot;</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;tflite.h&quot;</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;models/label/label0_board.h&quot;</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;models/label/label1_board.h&quot;</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;models/label/label6_board.h&quot;</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;models/label/label8_board.h&quot;</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;models/label/label11_board.h&quot;</span>
-
-
-<span class="c1">// Initialize everything once</span>
-<span class="c1">// deallocate tensors when done</span>
-<span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">ds_cnn_stream_fe_init</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="n">tflite_load_model</span><span class="p">(</span><span class="n">ds_cnn_stream_fe</span><span class="p">,</span><span class="w"> </span><span class="n">ds_cnn_stream_fe_len</span><span class="p">);</span>
-<span class="p">}</span>
-
-<span class="c1">// TODO: Implement your design here</span>
-
-<span class="k">static</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">Menu</span><span class="w"> </span><span class="n">MENU</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="s">&quot;Tests for ds_cnn_stream_fe&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="s">&quot;ds_cnn_stream_fe&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="p">{</span>
-<span class="w">        </span><span class="n">MENU_END</span><span class="p">,</span>
-<span class="w">    </span><span class="p">},</span>
-<span class="p">};</span>
-
-<span class="c1">// For integration into menu system</span>
-<span class="kt">void</span><span class="w"> </span><span class="nf">ds_cnn_stream_fe_menu</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="n">ds_cnn_stream_fe_init</span><span class="p">();</span>
-<span class="w">  </span><span class="n">menu_run</span><span class="p">(</span><span class="o">&amp;</span><span class="n">MENU</span><span class="p">);</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>You can refer to the codes of other models in <code class="docutils literal notranslate"><span class="pre">common/src/models/</span></code> and use the functions in <code class="docutils literal notranslate"><span class="pre">common/src/tflite.cc</span></code></p>
-<p>Or refer from the below link for more details.
-<a class="reference external" href="https://www.tensorflow.org/lite/microcontrollers/get_started_low_level#run_inference">How to run inference using TensorFlow Lite for Microcontrollers</a></p>
-</div>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>Output scores should stored as uint32_t since we can’t print floats.</p>
-</div>
-</section>
-</section>
-<section id="modifying-the-files">
-<h3>7. Modifying the files<a class="headerlink" href="#modifying-the-files" title="Link to this heading">#</a></h3>
-<p>Add codes as below:</p>
-<section id="cfu-playground-common-src-models-models-c">
-<h4><code class="docutils literal notranslate"><span class="pre">CFU-Playground/common/src/models/models.c</span></code><a class="headerlink" href="#cfu-playground-common-src-models-models-c" title="Link to this heading">#</a></h4>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;models/ds_cnn_stream_fe/ds_cnn.h&quot;</span>
-
-
-<span class="cm">/* ... some code ... */</span>
-
-
-<span class="cp">#if defined(INCLUDE_MODEL_DS_CNN_STREAM_FE)</span>
-<span class="w">        </span><span class="n">MENU_ITEM</span><span class="p">(</span><span class="n">AUTO_INC_CHAR</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Ds cnn stream fe&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ds_cnn_stream_fe_menu</span><span class="p">),</span>
-<span class="cp">#endif</span>
-</pre></div>
-</div>
-</section>
-<section id="cfu-playground-common-src-tflite-cc">
-<h4><code class="docutils literal notranslate"><span class="pre">CFU-Playground/common/src/tflite.cc</span></code><a class="headerlink" href="#cfu-playground-common-src-tflite-cc" title="Link to this heading">#</a></h4>
-<p>Set the kTensorArenaSize. You should set the “size” below.</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#ifdef INCLUDE_MODEL_DS_CNN_STREAM_FE</span>
-<span class="w">    </span><span class="mi">3000</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1024</span><span class="p">,</span>
-<span class="cp">#endif</span>
-</pre></div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>The size of kTensorArenaSize will depend on the model you’re using, and may need to be determined by experimentation. You may try all over different size to get minimal value.</p>
-</div>
-</section>
-<section id="cfu-playground-proj-my-first-cfu-makefile">
-<h4><code class="docutils literal notranslate"><span class="pre">CFU-Playground/proj/my_first_cfu/Makefile</span></code><a class="headerlink" href="#cfu-playground-proj-my-first-cfu-makefile" title="Link to this heading">#</a></h4>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">DEFINES</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span>INCLUDE_MODEL_DS_CNN_STREAM_FE
-<span class="c1">#DEFINES += INCLUDE_MODEL_PDTI8</span>
-</pre></div>
-</div>
-</section>
-</section>
-<section id="running-the-project">
-<h3>8. Running the project<a class="headerlink" href="#running-the-project" title="Link to this heading">#</a></h3>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>CFU-Playground/proj/my_first_cfu
-$<span class="w"> </span>make<span class="w"> </span>prog<span class="w"> </span><span class="nv">USEVIVADO</span><span class="o">=</span><span class="m">1</span><span class="w"> </span><span class="nv">TTY</span><span class="o">=</span>/dev/ttyUSB0<span class="w"> </span><span class="o">(</span>or<span class="w"> </span>any<span class="w"> </span>serial<span class="w"> </span>you<span class="w"> </span>are<span class="w"> </span>using<span class="o">)</span>
-$<span class="w"> </span>make<span class="w"> </span>load<span class="w"> </span><span class="nv">BUILD_JOBS</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="nv">TTY</span><span class="o">=</span>/dev/ttyUSB1<span class="w"> </span><span class="o">(</span>or<span class="w"> </span>any<span class="w"> </span>serial<span class="w"> </span>you<span class="w"> </span>are<span class="w"> </span>using<span class="o">)</span>
-</pre></div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>The model loaded successfully if you get the following output.</p>
-<a class="reference internal image-reference" href="https://hackmd.io/_uploads/HyUjALkC3.png"><img alt="https://hackmd.io/_uploads/HyUjALkC3.png" src="https://hackmd.io/_uploads/HyUjALkC3.png" style="width: 550px;" />
-</a>
-</div>
-<p>Press a number to run a test. <em><strong>(takes plenty of minutes)</strong></em></p>
-<a class="reference internal image-reference" href="../_images/enter_a_number.png"><img alt="../_images/enter_a_number.png" src="../_images/enter_a_number.png" style="width: 400px;" />
-</a>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>If you get the following output scores correct, you could get all the points of this part (which means <strong>50%</strong> points, evaluation details are in the Submission chapter).</p>
-<a class="reference internal image-reference" href="https://hackmd.io/_uploads/rkTp0T6C3.png"><img alt="https://hackmd.io/_uploads/rkTp0T6C3.png" src="https://hackmd.io/_uploads/rkTp0T6C3.png" style="width: 700px;" />
-</a>
-</div>
-</section>
-</section>
-<section id="measuring-the-mac-cycles-and-dram-usage-for-the-kws-model-20">
-<h2>Measuring the MAC cycles and DRAM usage for the KWS model - 20%<a class="headerlink" href="#measuring-the-mac-cycles-and-dram-usage-for-the-kws-model-20" title="Link to this heading">#</a></h2>
-<hr class="docutils" />
-<section id="measuring-the-dram-space-required-for-a-model-5">
-<h3>Measuring the DRAM space required for a model - 5%<a class="headerlink" href="#measuring-the-dram-space-required-for-a-model-5" title="Link to this heading">#</a></h3>
-<section id="modify-cfu-playground-common-src-tflite-cc">
-<h4>1. Modify <code class="docutils literal notranslate"><span class="pre">CFU-Playground/common/src/tflite.cc</span></code><a class="headerlink" href="#modify-cfu-playground-common-src-tflite-cc" title="Link to this heading">#</a></h4>
-<p>Add codes below:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;DRAM: %d bytes</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">interpreter</span><span class="o">-&gt;</span><span class="n">arena_used_bytes</span><span class="p">());</span>
-</pre></div>
-</div>
-<p><img alt="" src="https://hackmd.io/_uploads/HyFMmBAa2.png" /></p>
-</section>
-<section id="run-the-project">
-<h4>2. Run the project<a class="headerlink" href="#run-the-project" title="Link to this heading">#</a></h4>
-<p>We can observe that KWS model has used 1934292 bytes of the memory space.
-<em><strong>(or around this amount)</strong></em></p>
-<p><img alt="" src="https://hackmd.io/_uploads/rkoDnDl02.png" /></p>
-</section>
-</section>
-<section id="measuring-the-cycles-of-multiply-and-accumulate-mac-operation-required-for-a-model-15">
-<h3>Measuring the cycles of multiply-and-accumulate(MAC) operation required for a model. - 15%<a class="headerlink" href="#measuring-the-cycles-of-multiply-and-accumulate-mac-operation-required-for-a-model-15" title="Link to this heading">#</a></h3>
-<p>We can use the functions in <code class="docutils literal notranslate"><span class="pre">CFU-Playground/common/src/perf.h</span></code> to count the cycles of MAC operations.</p>
-<section id="inside-your-project-folder-run-the-following">
-<h4>1. Inside your project folder run the following:<a class="headerlink" href="#inside-your-project-folder-run-the-following" title="Link to this heading">#</a></h4>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mkdir<span class="w"> </span>-p<span class="w"> </span>src/tensorflow/lite/kernels/internal/reference/integer_ops/
-$<span class="w"> </span>cp<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>../../third_party/tflite-micro/tensorflow/lite/kernels/internal/reference/conv.h<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>src/tensorflow/lite/kernels/internal/reference/conv.h
-</pre></div>
-</div>
-<p>This will create a copy of the convolution source code in your project directory. At build time your copy of the source code will replace the regular implementation.</p>
-</section>
-<section id="modify-conv-h">
-<h4>2. Modify <code class="docutils literal notranslate"><span class="pre">conv.h</span></code><a class="headerlink" href="#modify-conv-h" title="Link to this heading">#</a></h4>
-<p>Open the newly created copy at <code class="docutils literal notranslate"><span class="pre">proj/my_first_cfu/src/tensorflow/lite/kernels/</span> <span class="pre">internal/reference/conv.h</span></code>. Locate the innermost loop of the first function, it should look something like this:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">in_channel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">in_channel</span><span class="w"> </span><span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="w"> </span><span class="n">filter_input_depth</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">in_channel</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="kt">float</span><span class="w"> </span><span class="n">input_value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">input_data</span><span class="p">[</span><span class="n">Offset</span><span class="p">(</span>
-<span class="w">      </span><span class="n">input_shape</span><span class="p">,</span><span class="w"> </span><span class="n">batch</span><span class="p">,</span><span class="w"> </span><span class="n">in_y</span><span class="p">,</span><span class="w"> </span><span class="n">in_x</span><span class="p">,</span><span class="w"> </span><span class="n">in_channel</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">group</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">filter_input_depth</span><span class="p">)];</span>
-<span class="w">  </span><span class="kt">float</span><span class="w"> </span><span class="n">filter_value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">filter_data</span><span class="p">[</span><span class="n">Offset</span><span class="p">(</span>
-<span class="w">      </span><span class="n">filter_shape</span><span class="p">,</span><span class="w"> </span><span class="n">out_channel</span><span class="p">,</span><span class="w"> </span><span class="n">filter_y</span><span class="p">,</span><span class="w"> </span><span class="n">filter_x</span><span class="p">,</span><span class="w"> </span><span class="n">in_channel</span><span class="p">)];</span>
-<span class="n">total</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="p">(</span><span class="n">input_value</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">filter_value</span><span class="p">);</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>Add <code class="docutils literal notranslate"> <span class="pre">#include</span> <span class="pre">&quot;perf.h&quot;</span></code> at the top of the file and then surround the inner loop with perf functions to count how many cycles this inner loop takes.</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cm">/* ... some code ... */</span>
-
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;perf.h&quot;</span>
-
-<span class="cm">/* ... some code ... */</span>
-
-<span class="n">perf_enable_counter</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
-<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">in_channel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">in_channel</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">filter_input_depth</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">in_channel</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="kt">float</span><span class="w"> </span><span class="n">input_value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">input_data</span><span class="p">[</span><span class="n">Offset</span><span class="p">(</span>
-<span class="w">      </span><span class="n">input_shape</span><span class="p">,</span><span class="w"> </span><span class="n">batch</span><span class="p">,</span><span class="w"> </span><span class="n">in_y</span><span class="p">,</span><span class="w"> </span><span class="n">in_x</span><span class="p">,</span><span class="w"> </span><span class="n">in_channel</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">group</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">filter_input_depth</span><span class="p">)];</span>
-<span class="w">  </span><span class="kt">float</span><span class="w"> </span><span class="n">filter_value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">filter_data</span><span class="p">[</span><span class="n">Offset</span><span class="p">(</span>
-<span class="w">      </span><span class="n">filter_shape</span><span class="p">,</span><span class="w"> </span><span class="n">out_channel</span><span class="p">,</span><span class="w"> </span><span class="n">filter_y</span><span class="p">,</span><span class="w"> </span><span class="n">filter_x</span><span class="p">,</span><span class="w"> </span><span class="n">in_channel</span><span class="p">)];</span>
-<span class="n">total</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="p">(</span><span class="n">input_value</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">filter_value</span><span class="p">);</span>
-<span class="p">}</span>
-<span class="n">perf_disable_counter</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
-</pre></div>
-</div>
+<p>In this lab, you will focus on AXI single transation and SIMD MAC Operation. Then, we use these custom instruction in convolution part to reduce runtime of model reference. We use <code class="docutils literal notranslate"><span class="pre">ds_cnn_stream_fe</span></code> model to compare convolution between our accelerated version and orignal software-only version.</p>
 </section>
 <section id="id1">
-<h4>3. Run the project<a class="headerlink" href="#id1" title="Link to this heading">#</a></h4>
-<p>You must make clean first. To enable performance counters you should use the command below.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>make<span class="w"> </span>clean
-$<span class="w"> </span>make<span class="w"> </span>prog<span class="w"> </span><span class="nv">EXTRA_LITEX_ARGS</span><span class="o">=</span><span class="s2">&quot;--cpu-variant=perf+cfu&quot;</span>
-$<span class="w"> </span>make<span class="w"> </span>load
-</pre></div>
+<h2>Goal of this Lab<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Know about AXI Single Transation</p></li>
+<li><p>Custom SIMD Instruction</p></li>
+</ul>
+</section>
+<section id="basic-exercise-axi-single-transation-simd-60">
+<h2>Basic Exercise - AXI Single Transation &amp; SIMD - (60%)<a class="headerlink" href="#basic-exercise-axi-single-transation-simd-60" title="Link to this heading">#</a></h2>
+<hr class="docutils" />
+<section id="axi-single-transation">
+<h3>1. AXI Single Transation<a class="headerlink" href="#axi-single-transation" title="Link to this heading">#</a></h3>
+<p>In this part, the goal is to enable the <code class="docutils literal notranslate"><span class="pre">NPU</span></code> to access data directly through the AXI4 interface instead of relying on the CPU’s <code class="docutils literal notranslate"><span class="pre">LSU</span></code> (Load/Store Unit).</p>
+<p>The AXI4 master interface of the <code class="docutils literal notranslate"><span class="pre">NPU</span></code> is provided in <code class="docutils literal notranslate"><span class="pre">Platform\hw\srcs\NPU.v</span></code>. The <code class="docutils literal notranslate"><span class="pre">NPU</span></code> must control this interface to issue AXI4 read requests, receive the requested data from memory, and return the data through the CPU interface.</p>
+<p>The implementation should handle the AXI4 read transaction correctly, including address and data handshaking. The returned data should then be provided to the CPU through the NPU’s existing CPU-side interface, allowing the NPU to directly fetch operands from memory without requiring the CPU’s LSU to perform the load operation.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Please follow below table to design NPU AXI read/write instruction.</p>
 </div>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-center"><p>Funct3</p></th>
+<th class="head text-center"><p>Funct7</p></th>
+<th class="head text-left"><p>Software Function</p></th>
+<th class="head text-left"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-center"><p><code class="docutils literal notranslate"><span class="pre">001</span></code></p></td>
+<td class="text-center"><p><code class="docutils literal notranslate"><span class="pre">x</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">cfu_op1</span></code></p></td>
+<td class="text-left"><p>Issue a 4-byte AXI4 read request and return the received data</p></td>
+</tr>
+<tr class="row-odd"><td class="text-center"><p><code class="docutils literal notranslate"><span class="pre">010</span></code></p></td>
+<td class="text-center"><p><code class="docutils literal notranslate"><span class="pre">x</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">cfu_op2</span></code></p></td>
+<td class="text-left"><p>Issue a 4-byte AXI4 write request with the provided data</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- may not use
+|  `000` |   `x`  | `cfu_op0`   | Calculate sum of `rs1` + `rs2` + 1 |  
+-->
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The output shall look something like this, but note that the result is highly related to cache and DRAM, so you may get <strong>different</strong> result everytime.</p>
-<p>You will receive all 15 points as long as you measure the MAC cycles correctly and 5 points for measuring the DRAM usage.</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span> Counter |  Total | Starts | Average |     Raw
----------+--------+--------+---------+--------------
-    0    |  2464M | 2679000|   919   |   2463511289
-    1    |     0  |     0  |   n/a   |            0
-    2    |     0  |     0  |   n/a   |            0
-    3    |     0  |     0  |   n/a   |            0
-    4    |     0  |     0  |   n/a   |            0
-    5    |     0  |     0  |   n/a   |            0
-    6    |     0  |     0  |   n/a   |            0
-    7    |     0  |     0  |   n/a   |            0
- 38970M (  38970422645 )  cycles total
+<ul class="simple">
+<li><p>If you want more information about custom instruction of software, you can trace these files, “accel_ops.h”, “accel_ops.cc”, and “accel_test.cc”.</p></li>
+<li><p>Verification:</p>
+<ol class="arabic simple">
+<li><p>Run “Accelerator functional test” in project menu.</p></li>
+<li><p>If result show “AXI read” and “AXI write” pass, this part is correct.</p></li>
+</ol>
+</li>
+</ul>
+</div>
+</section>
+<section id="simd-mac">
+<h3>2. SIMD MAC<a class="headerlink" href="#simd-mac" title="Link to this heading">#</a></h3>
+<p>The main principle of SIMD (Single Instruction, Multiple Data) instructions involves processing multiple data with a single instruction. In the int8 convolution, each filter and input value spans 8 bits. Utilizing a custom CFU operation, we can employ two 32-bit wide registers. This setup enables the execution of four simultaneous MAC (Multiply-Accumulate) operations in a single cycle.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>              <span class="mi">7</span> <span class="n">bits</span>
+         <span class="o">+--------------+</span>
+<span class="n">funct7</span> <span class="o">=</span> <span class="o">|</span> <span class="p">(</span><span class="nb">bool</span><span class="p">)</span> <span class="n">reset</span> <span class="o">|</span>
+         <span class="o">+--------------+</span>
+
+              <span class="n">int8_t</span>           <span class="n">int8_t</span>           <span class="n">int8_t</span>           <span class="n">int8_t</span>
+         <span class="o">+----------------+----------------+----------------+----------------+</span>
+   <span class="n">in0</span> <span class="o">=</span> <span class="o">|</span> <span class="n">input_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="o">|</span> <span class="n">input_data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>  <span class="o">|</span> <span class="n">input_data</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>  <span class="o">|</span> <span class="n">input_data</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>  <span class="o">|</span>
+         <span class="o">+----------------+----------------+----------------+----------------+</span>
+
+              <span class="n">int8_t</span>           <span class="n">int8_t</span>           <span class="n">int8_t</span>           <span class="n">int8_t</span>
+         <span class="o">+----------------+----------------+----------------+----------------+</span>
+   <span class="n">in1</span> <span class="o">=</span> <span class="o">|</span> <span class="n">filter_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">|</span> <span class="n">filter_data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">|</span> <span class="n">filter_data</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">|</span> <span class="n">filter_data</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">|</span>
+         <span class="o">+----------------+----------------+----------------+----------------+</span>
+
+                                        <span class="n">int32_t</span>
+         <span class="o">+----------------------------------------------------------------------+</span>
+<span class="n">output</span> <span class="o">=</span> <span class="o">|</span> <span class="n">output</span> <span class="o">+</span> <span class="p">(</span><span class="n">input_data</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="n">offset</span><span class="p">)</span> <span class="o">*</span> <span class="n">filter_data</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">|</span>
+         <span class="o">+----------------------------------------------------------------------+</span>
 </pre></div>
 </div>
+<!-- ```{hint}
+Values of input data and filter data are in range of `int8`. 
+Values of offset is in range of [-128, 128]. 
+``` -->
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You may choose any <code class="docutils literal notranslate"><span class="pre">funct3</span></code> and <code class="docutils literal notranslate"><span class="pre">funct7</span></code> values to define your own MAC instruction, except for the <code class="docutils literal notranslate"><span class="pre">funct3</span></code> reserved for the AXI read and write instructions.</p>
+</div>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>This part does not have any test. You can write your test function and add it into user menu to test correction of SIMD instruction.</p>
 </div>
 </section>
+<section id="conv-h">
+<h3>3. conv.h<a class="headerlink" href="#conv-h" title="Link to this heading">#</a></h3>
+<p>In this part, you need to modify <code class="docutils literal notranslate"><span class="pre">conv.h</span></code> and change <code class="docutils literal notranslate"><span class="pre">ConvPerChannel</span></code> function into accelerated version. Please use AXI read function of <code class="docutils literal notranslate"><span class="pre">NPU</span></code> to get input data and filter, and use your MAC instruction in previous part.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You can find <code class="docutils literal notranslate"><span class="pre">ConvPerfChannel</span></code> function in  <code class="docutils literal notranslate"><span class="pre">Platform\sw\tflm_patches\tensorflow\lite\kernels\internal\reference\integer_ops\conv.h</span></code></p>
+</div>
+<p>Replace some parts of original operations with <code class="docutils literal notranslate"><span class="pre">cfu_op</span></code>, and don’t forget to add <code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&quot;cfu.h&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&quot;cbo.h&quot;</span></code> in the file.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">out_channel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">out_channel</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">output_depth</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">out_channel</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="p">...</span>
+
+<span class="w">    </span><span class="kt">int32_t</span><span class="w"> </span><span class="n">acc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>
+
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">filter_y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">filter_y</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">filter_height</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">filter_y</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">in_y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">in_y_origin</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">dilation_height_factor</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">filter_y</span><span class="p">;</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">filter_x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">filter_x</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">filter_width</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">filter_x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">in_x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">in_x_origin</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">dilation_width_factor</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">filter_x</span><span class="p">;</span>
+
+<span class="w">            </span><span class="c1">// Zero padding by omitting the areas outside the image.</span>
+<span class="w">            </span><span class="k">const</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">is_point_inside_image</span><span class="w"> </span><span class="o">=</span>
+<span class="w">                </span><span class="p">(</span><span class="n">in_x</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">(</span><span class="n">in_x</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">input_width</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">(</span><span class="n">in_y</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span>
+<span class="w">                </span><span class="p">(</span><span class="n">in_y</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">input_height</span><span class="p">);</span>
+
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">is_point_inside_image</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="k">continue</span><span class="p">;</span>
+<span class="w">            </span><span class="p">}</span>
+
+<span class="w">            </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="p">...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Input and filter data only are allowed to read with NPU AXI instruction <code class="docutils literal notranslate"><span class="pre">cfu_op1</span></code>.</p>
+</div>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>Because of directly accessing memory without D-cache, you needs to consider about cache coherence problem. Our platform supports two D-cache operation, <code class="docutils literal notranslate"><span class="pre">cbo_clean</span></code> and <code class="docutils literal notranslate"><span class="pre">cbo_invalidate</span></code>. You can use software function in <code class="docutils literal notranslate"><span class="pre">cbo.h</span></code> to control D-cache.</p>
+</div>
+</section>
+<section id="check-result-correction">
+<h3>4. Check Result Correction<a class="headerlink" href="#check-result-correction" title="Link to this heading">#</a></h3>
+<p>You can run “Basic Convolution Test” in project menu. This test only have have address aligned condition.</p>
+<a class="reference internal image-reference" href="../_images/basic_conv_test.png"><img alt="../_images/basic_conv_test.png" src="../_images/basic_conv_test.png" style="width: 300px;" />
+</a>
+<p>If you pass all testcase, you can get full score of basic part.</p>
 </section>
 </section>
-<section id="questions-in-the-demo-10">
-<h2>Questions in the Demo - 10%<a class="headerlink" href="#questions-in-the-demo-10" title="Link to this heading">#</a></h2>
+<section id="axi-address-aligned-15">
+<h2>AXI Address Aligned - (15%)<a class="headerlink" href="#axi-address-aligned-15" title="Link to this heading">#</a></h2>
+<hr class="docutils" />
+<p>Because of 8-bit element type of model, some AXI reading request may request unaligned address data, and unaligned address request would cause AXI trigger exception. Therefore, we need to handle request with unaligned address data, and make address is aligned with 4.</p>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<p>We can divide single DRAM request into two DRAM request, and combine two request into one 4 byte data transition.</p>
+</div>
+<p>For example, NPU want to read 4 bytes data in 0x6000_0002. It needs to read 0x6000_0000 and 0x6000_0004 data. Then, combine higher two byte of first read and lower two byte of second read.</p>
+<!-- 
+```
+Address % 4 == 1 : 5% 
+Address % 4 == 2 : 5%
+Address % 4 == 3 : 5%
+``` -->
+</section>
+<section id="adavance-exercise-2-running-tflm-model-inference-10">
+<h2>Adavance Exercise 2 - Running TFLM Model Inference - (10%)<a class="headerlink" href="#adavance-exercise-2-running-tflm-model-inference-10" title="Link to this heading">#</a></h2>
+<hr class="docutils" />
+<blockquote>
+<div><p><a class="reference external" href="https://drive.google.com/file/d/1CgEhJm0IoaXx3ULrn-Dfuw3LH83SnFlV/view?usp=sharing">ds_cnn_stream_fe.tflite</a></p>
+</div></blockquote>
+<p>Select “TFLM Inference, Verification, and Cycles” from the project menu. The output should match the results of the original software-only convolution implementation.</p>
+<!-- <img src="images/lab1/.png" width="300px"> -->
+</section>
+<section id="demo-15">
+<h2>Demo - (15%)<a class="headerlink" href="#demo-15" title="Link to this heading">#</a></h2>
+<hr class="docutils" />
+<section id="simple-presenatation-in-demo-time-5">
+<h3>Simple Presenatation in Demo time - (5%)<a class="headerlink" href="#simple-presenatation-in-demo-time-5" title="Link to this heading">#</a></h3>
+<p>You need to record performance of accerated version than original version, and present your idea of NPU design.</p>
+</section>
+<section id="question-in-demo-10">
+<h3>Question in Demo - (10%)<a class="headerlink" href="#question-in-demo-10" title="Link to this heading">#</a></h3>
 <p>You will be asked several questions about the concepts covered in this lab and your implementation. This section accounts for 10% of the total lab score.</p>
+</section>
 </section>
 <section id="submission">
 <h2>Submission<a class="headerlink" href="#submission" title="Link to this heading">#</a></h2>
 <hr class="docutils" />
-<p>Since this lab is all about setting up the enviornment, you <strong>DO NOT</strong> have to submit anything to E3.</p>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
-<p>Screenshot the following:</p>
-<ol class="arabic simple">
-<li><p>The golden test with “passed” result.</p></li>
-<li><p>Run any of the <strong>THREE</strong> labels using the KWS model.</p></li>
-<li><p>the MAC cycles and the DRAM usage (only one label is required).</p></li>
-</ol>
-<p>You will have to show your screenshots in the demo and explain your codes.</p>
+<p>TAs should be able to run your project without any modification. If TAs cannot compile or run your code, <strong>you can’t get any scores even if you passed the DEMO</strong>. Also, <strong>PLAGIARISM is not allowed</strong>.</p>
 </div>
-<section id="reference">
-<h3>Reference<a class="headerlink" href="#reference" title="Link to this heading">#</a></h3>
-<hr class="docutils" />
-<ul class="simple">
-<li><p><a class="reference external" href="https://cfu-playground.readthedocs.io/en/latest/index.html">CFU-Playground</a></p></li>
-</ul>
 </section>
+<section id="reference">
+<h2>Reference<a class="headerlink" href="#reference" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://netron.app/">Netron</a> : You can visulaize the layer graph of .tflite file by this website.</p></li>
+</ul>
 </section>
 </section>
 
@@ -914,57 +654,23 @@ $<span class="w"> </span>make<span class="w"> </span>load
     <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#goal-of-this-lab">Goal of this lab</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#introduction">Introduction</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setting-up-the-cfu-playground-environment-20">Setting up the CFU-Playground Environment - 20%</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#get-the-supported-board">1. Get the supported board</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#clone-the-cfu-playground-repository-from-the-github">2. Clone the CFU-Playground Repository from the github</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#run-the-setup-script">3. Run the setup script</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#install-vivado">4. Install Vivado</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#install-risc-v-toolchain-download-linux-ubuntu">5. Install RISC-V toolchain (Download linux-ubuntu)</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#test-run">6. Test Run</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Goal of this Lab</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#basic-exercise-axi-single-transation-simd-60">Basic Exercise - AXI Single Transation &amp; SIMD - (60%)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#axi-single-transation">1. AXI Single Transation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#simd-mac">2. SIMD MAC</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#conv-h">3. conv.h</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#check-result-correction">4. Check Result Correction</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#porting-the-kws-model-50">Porting the KWS model - 50%</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#download-the-patch-file">1. Download the patch file</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#put-the-patch-file-in-cfu-playground">2. Put the patch file in CFU-Playground</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#modify-proj-proj-mk">3. Modify <code class="docutils literal notranslate"><span class="pre">proj/proj.mk</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#now-we-are-ready-for-porting-the-model">Now we are ready for porting the model!</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#axi-address-aligned-15">AXI Address Aligned - (15%)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#adavance-exercise-2-running-tflm-model-inference-10">Adavance Exercise 2 - Running TFLM Model Inference - (10%)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#demo-15">Demo - (15%)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#simple-presenatation-in-demo-time-5">Simple Presenatation in Demo time - (5%)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#question-in-demo-10">Question in Demo - (10%)</a></li>
 </ul>
 </li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#create-a-folder-for-kws-model">4. Create a folder for KWS model</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#download-the-tflite-file-and-input-files">5. Download the tflite file and input files</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#create-files-to-run-inference-on-the-model">6. Create files to run inference on the model</a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#cfu-playground-common-src-models-ds-cnn-stream-fe-ds-cnn-h"><code class="docutils literal notranslate"><span class="pre">CFU-Playground/common/src/models/ds_cnn_stream_fe/ds_cnn.h</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#cfu-playground-common-src-models-ds-cnn-stream-fe-ds-cnn-cc"><code class="docutils literal notranslate"><span class="pre">CFU-Playground/common/src/models/ds_cnn_stream_fe/ds_cnn.cc</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#modifying-the-files">7. Modifying the files</a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#cfu-playground-common-src-models-models-c"><code class="docutils literal notranslate"><span class="pre">CFU-Playground/common/src/models/models.c</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#cfu-playground-common-src-tflite-cc"><code class="docutils literal notranslate"><span class="pre">CFU-Playground/common/src/tflite.cc</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#cfu-playground-proj-my-first-cfu-makefile"><code class="docutils literal notranslate"><span class="pre">CFU-Playground/proj/my_first_cfu/Makefile</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#running-the-project">8. Running the project</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#measuring-the-mac-cycles-and-dram-usage-for-the-kws-model-20">Measuring the MAC cycles and DRAM usage for the KWS model - 20%</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#measuring-the-dram-space-required-for-a-model-5">Measuring the DRAM space required for a model - 5%</a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#modify-cfu-playground-common-src-tflite-cc">1. Modify <code class="docutils literal notranslate"><span class="pre">CFU-Playground/common/src/tflite.cc</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#run-the-project">2. Run the project</a></li>
-</ul>
-</li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#measuring-the-cycles-of-multiply-and-accumulate-mac-operation-required-for-a-model-15">Measuring the cycles of multiply-and-accumulate(MAC) operation required for a model. - 15%</a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#inside-your-project-folder-run-the-following">1. Inside your project folder run the following:</a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#modify-conv-h">2. Modify <code class="docutils literal notranslate"><span class="pre">conv.h</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">3. Run the project</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#questions-in-the-demo-10">Questions in the Demo - 10%</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#submission">Submission</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#reference">Reference</a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#submission">Submission</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#reference">Reference</a></li>
 </ul>
   </nav></div>
 
