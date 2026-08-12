@@ -356,8 +356,8 @@
             </div>
             <nav aria-label="Page">
                 <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#introduction">Introduction</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#goal-of-this-lab">Goal of this lab</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#introduction">Introduction</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#aaml-risc-v-soc-platform">AAML RISC-V SoC Platform</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#risc-v-cpu">RISC-V CPU</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#extended-isas">Extended ISAs</a></li>
@@ -400,19 +400,18 @@
                   
   <section id="lab-0-environment-setup">
 <h1>Lab 0 : Environment Setup<a class="headerlink" href="#lab-0-environment-setup" title="Link to this heading">#</a></h1>
-<section id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">#</a></h2>
-<p>Throughout AAML 2026, we will use the AAML RISC-V SoC platform to explore hardware/software co-design for machine-learning acceleration. The platform integrates a RISC-V CPU, a customizable ML accelerator connected through custom instructions and AXI, and TensorFlow Lite for Microcontrollers (TFLM). In Lab 0, you will set up the required tools, program the reference SoC onto the FPGA, and run a reference TFLM application to verify the development environment for the following labs.</p>
-</section>
 <section id="goal-of-this-lab">
 <h2>Goal of this lab<a class="headerlink" href="#goal-of-this-lab" title="Link to this heading">#</a></h2>
 <ul class="simple">
-<li><p><a class="reference internal" href="#aaml-risc-v-soc-platform"><span class="xref myst">Identify the roles of the CPU, custom accelerator, AXI interface, custom instructions, and TFLM in the AAML RISC-V SoC platform.</span></a></p></li>
-<li><p><a class="reference internal" href="#toolchain-setup"><span class="xref myst">Install and verify Vivado and the RISC-V cross-compilation toolchain required by the platform.</span></a></p></li>
-<li><p><a class="reference internal" href="#platform-setup"><span class="xref myst">Clone and prepare the <code class="docutils literal notranslate"><span class="pre">AAML-sw-dev</span></code> version of <code class="docutils literal notranslate"><span class="pre">CUSTOM_SoC_Platform</span></code>.</span></a></p></li>
-<li><p><a class="reference internal" href="#running-the-platform"><span class="xref myst">Build the reference SoC and program it onto a Nexys A7-100T FPGA.</span></a></p></li>
-<li><p><a class="reference internal" href="#running-the-platform"><span class="xref myst">Build and upload a reference TFLM application, and verify its operation through the UART console.</span></a></p></li>
+<li><p><a class="reference internal" href="#aaml-risc-v-soc-platform"><span class="xref myst">Understand the AAML RISC-V SoC platform.</span></a></p></li>
+<li><p><a class="reference internal" href="#toolchain-setup"><span class="xref myst">Set up Vivado and the RISC-V toolchain.</span></a></p></li>
+<li><p><a class="reference internal" href="#platform-setup"><span class="xref myst">Clone and set up <code class="docutils literal notranslate"><span class="pre">CUSTOM_SoC_Platform</span></code>.</span></a></p></li>
+<li><p><a class="reference internal" href="#running-the-platform"><span class="xref myst">Program the FPGA and run a TFLM application.</span></a></p></li>
 </ul>
+</section>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">#</a></h2>
+<p>Throughout AAML 2026, we will use the AAML RISC-V SoC platform to explore hardware/software co-design for machine-learning acceleration. The platform integrates a RISC-V CPU, a customizable ML accelerator connected through custom instructions and AXI, and TensorFlow Lite for Microcontrollers (TFLM). In Lab 0, you will set up the required tools, program the reference SoC onto the FPGA, and run a reference TFLM application to verify the development environment for the following labs.</p>
 </section>
 <section id="aaml-risc-v-soc-platform">
 <h2>AAML RISC-V SoC Platform<a class="headerlink" href="#aaml-risc-v-soc-platform" title="Link to this heading">#</a></h2>
@@ -596,8 +595,8 @@ chmod<span class="w"> </span>+x<span class="w"> </span>hw/run_hw.sh
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#introduction">Introduction</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#goal-of-this-lab">Goal of this lab</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#introduction">Introduction</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#aaml-risc-v-soc-platform">AAML RISC-V SoC Platform</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#risc-v-cpu">RISC-V CPU</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#extended-isas">Extended ISAs</a></li>
