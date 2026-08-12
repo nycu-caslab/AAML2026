@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Lab 1 : Environment Setup and Profiling a Model &#8212; CSIC30066: Accelerator Architectures for Machine Learning</title>
+    <title>Lab 1 : Aligned AXI Data on SIMD &#8212; CSIC30066: Accelerator Architectures for Machine Learning</title>
   
   
   
@@ -195,7 +195,7 @@
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Labs:</span></p>
 <ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="lab_0.html">Lab 0 : Environment Setup</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Lab 1 : Environment Setup and Profiling a Model</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Lab 1 : Aligned AXI Data on SIMD</a></li>
 <li class="toctree-l1"><a class="reference internal" href="lab_2.html">Lab 2 : Quantization and SIMD MAC</a></li>
 <li class="toctree-l1"><a class="reference internal" href="lab_3.html">Lab 3 : Systolic Array</a></li>
 <li class="toctree-l1"><a class="reference internal" href="lab_4.html">Lab 4 : Elementwise Unit</a></li>
@@ -346,7 +346,7 @@
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Lab 1 : Environment Setup and Profiling a Model</h1>
+    <h1>Lab 1 : Aligned AXI Data on SIMD</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -359,14 +359,14 @@
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#goal-of-this-lab">Goal of this lab</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#introduction">Introduction</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Goal of this Lab</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#basic-exercise-axi-single-transation-simd-60">Basic Exercise - AXI Single Transation &amp; SIMD - (60%)</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#axi-single-transation">1. AXI Single Transation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#basic-exercise-axi-single-transaction-simd-60">Basic Exercise - AXI Single Transaction &amp; SIMD - (60%)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#axi-single-transaction">1. AXI Single Transaction</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#simd-mac">2. SIMD MAC</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#conv-h">3. conv.h</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#check-result-correction">4. Check Result Correction</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#axi-address-aligned-15">AXI Address Aligned - (15%)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#adavance-exercise-1-axi-address-aligned-15">Adavance Exercise 1 - AXI Address Aligned - (15%)</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#adavance-exercise-2-running-tflm-model-inference-10">Adavance Exercise 2 - Running TFLM Model Inference - (10%)</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#demo-15">Demo - (15%)</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#simple-presenatation-in-demo-time-5">Simple Presenatation in Demo time - (5%)</a></li>
@@ -386,35 +386,36 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="lab-1-environment-setup-and-profiling-a-model">
-<h1>Lab 1 : Environment Setup and Profiling a Model<a class="headerlink" href="#lab-1-environment-setup-and-profiling-a-model" title="Link to this heading">#</a></h1>
+  <section id="lab-1-aligned-axi-data-on-simd">
+<h1>Lab 1 : Aligned AXI Data on SIMD<a class="headerlink" href="#lab-1-aligned-axi-data-on-simd" title="Link to this heading">#</a></h1>
 <section id="goal-of-this-lab">
 <h2>Goal of this lab<a class="headerlink" href="#goal-of-this-lab" title="Link to this heading">#</a></h2>
 <hr class="docutils" />
 <ul class="simple">
-<li><p><a class="reference internal" href="#basic-exercise---axi-single-transation--simd---60"><span class="xref myst">Basic - AXI Single Transation &amp; SIMD MAC - 60%</span></a></p></li>
-<li><p><a class="reference internal" href="#axi-address-aligned---15"><span class="xref myst">AXI Address Aligned - 15%</span></a></p></li>
-<li><p><a class="reference internal" href="#running-tflm-model-inference---10"><span class="xref myst">Running Full TFLM Model - 20%</span></a></p></li>
+<li><p><a class="reference internal" href="#basic-exercise---axi-single-transaction--simd---60"><span class="xref myst">Basic Exercise - AXI Single Transaction &amp; SIMD MAC - 60%</span></a></p></li>
+<li><p><a class="reference internal" href="#adavance-exercise-1---axi-address-aligned---15"><span class="xref myst">Adavance Exercise 1 - AXI Address Aligned - 15%</span></a></p></li>
+<li><p><a class="reference internal" href="#adavance-exercise-2---running-tflm-model-inference---10"><span class="xref myst">Adavance Exercise 2 - Running Full TFLM Model - 10%</span></a></p></li>
 <li><p><a class="reference internal" href="#question-in-demo---10"><span class="xref myst">Questions in the Demo - 15%</span></a></p></li>
 </ul>
 </section>
 <section id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">#</a></h2>
 <hr class="docutils" />
-<p>In this lab, you will focus on AXI single transation and SIMD MAC Operation. Then, we use these custom instruction in convolution part to reduce runtime of model reference. We use <code class="docutils literal notranslate"><span class="pre">ds_cnn_stream_fe</span></code> model to compare convolution between our accelerated version and orignal software-only version.</p>
+<p>In this lab, you will focus on AXI single transation and SIMD MAC operands. Then, we use these custom instruction in convolution part to reduce runtime of model reference. We use <code class="docutils literal notranslate"><span class="pre">ds_cnn_stream_fe</span></code> model to compare convolution between our accelerated version and orignal software-only version.</p>
 </section>
 <section id="id1">
 <h2>Goal of this Lab<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
 <ul class="simple">
-<li><p>Know about AXI Single Transation</p></li>
+<li><p>AXI Single Transation</p></li>
 <li><p>Custom SIMD Instruction</p></li>
+<li><p>Deal with unaligned address AXI request</p></li>
 </ul>
 </section>
-<section id="basic-exercise-axi-single-transation-simd-60">
-<h2>Basic Exercise - AXI Single Transation &amp; SIMD - (60%)<a class="headerlink" href="#basic-exercise-axi-single-transation-simd-60" title="Link to this heading">#</a></h2>
+<section id="basic-exercise-axi-single-transaction-simd-60">
+<h2>Basic Exercise - AXI Single Transaction &amp; SIMD - (60%)<a class="headerlink" href="#basic-exercise-axi-single-transaction-simd-60" title="Link to this heading">#</a></h2>
 <hr class="docutils" />
-<section id="axi-single-transation">
-<h3>1. AXI Single Transation<a class="headerlink" href="#axi-single-transation" title="Link to this heading">#</a></h3>
+<section id="axi-single-transaction">
+<h3>1. AXI Single Transaction<a class="headerlink" href="#axi-single-transaction" title="Link to this heading">#</a></h3>
 <p>In this part, the goal is to enable the <code class="docutils literal notranslate"><span class="pre">NPU</span></code> to access data directly through the AXI4 interface instead of relying on the CPU’s <code class="docutils literal notranslate"><span class="pre">LSU</span></code> (Load/Store Unit).</p>
 <p>The AXI4 master interface of the <code class="docutils literal notranslate"><span class="pre">NPU</span></code> is provided in <code class="docutils literal notranslate"><span class="pre">Platform\hw\srcs\NPU.v</span></code>. The <code class="docutils literal notranslate"><span class="pre">NPU</span></code> must control this interface to issue AXI4 read requests, receive the requested data from memory, and return the data through the CPU interface.</p>
 <p>The implementation should handle the AXI4 read transaction correctly, including address and data handshaking. The returned data should then be provided to the CPU through the NPU’s existing CPU-side interface, allowing the NPU to directly fetch operands from memory without requiring the CPU’s LSU to perform the load operation.</p>
@@ -444,9 +445,13 @@
 </tbody>
 </table>
 </div>
-<!-- may not use
-|  `000` |   `x`  | `cfu_op0`   | Calculate sum of `rs1` + `rs2` + 1 |  
--->
+<blockquote>
+<div><p>[!todo]</p>
+<ul class="simple">
+<li><p>Control AXI interface in <code class="docutils literal notranslate"><span class="pre">NPU</span></code> to make it can finish a single DRAM transation when it receive corresponding <code class="docutils literal notranslate"><span class="pre">funct3</span></code>.</p></li>
+<li><p>Return value from <code class="docutils literal notranslate"><span class="pre">NPU_out</span></code> to CPU if receiving reading request.</p></li>
+</ul>
+</div></blockquote>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <ul class="simple">
@@ -484,14 +489,14 @@
          <span class="o">+----------------------------------------------------------------------+</span>
 </pre></div>
 </div>
-<!-- ```{hint}
-Values of input data and filter data are in range of `int8`. 
-Values of offset is in range of [-128, 128]. 
-``` -->
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>You may choose any <code class="docutils literal notranslate"><span class="pre">funct3</span></code> and <code class="docutils literal notranslate"><span class="pre">funct7</span></code> values to define your own MAC instruction, except for the <code class="docutils literal notranslate"><span class="pre">funct3</span></code> reserved for the AXI read and write instructions.</p>
 </div>
+<blockquote>
+<div><p>[!todo]
+Make <code class="docutils literal notranslate"><span class="pre">NPU</span></code> can run custom SIMD instruction if it receive specific <code class="docutils literal notranslate"><span class="pre">funct3</span></code> and <code class="docutils literal notranslate"><span class="pre">funct7</span></code>, and return output value by <code class="docutils literal notranslate"><span class="pre">NPU_out</span></code> to CPU.</p>
+</div></blockquote>
 <div class="admonition hint">
 <p class="admonition-title">Hint</p>
 <p>This part does not have any test. You can write your test function and add it into user menu to test correction of SIMD instruction.</p>
@@ -502,7 +507,7 @@ Values of offset is in range of [-128, 128].
 <p>In this part, you need to modify <code class="docutils literal notranslate"><span class="pre">conv.h</span></code> and change <code class="docutils literal notranslate"><span class="pre">ConvPerChannel</span></code> function into accelerated version. Please use AXI read function of <code class="docutils literal notranslate"><span class="pre">NPU</span></code> to get input data and filter, and use your MAC instruction in previous part.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>You can find <code class="docutils literal notranslate"><span class="pre">ConvPerfChannel</span></code> function in  <code class="docutils literal notranslate"><span class="pre">Platform\sw\tflm_patches\tensorflow\lite\kernels\internal\reference\integer_ops\conv.h</span></code></p>
+<p>You can find <code class="docutils literal notranslate"><span class="pre">ConvPerfChannel</span></code> function in <code class="docutils literal notranslate"><span class="pre">Platform\sw\tflm_patches\tensorflow\lite\kernels\internal\reference\integer_ops\conv.h</span></code></p>
 </div>
 <p>Replace some parts of original operations with <code class="docutils literal notranslate"><span class="pre">cfu_op</span></code>, and don’t forget to add <code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&quot;cfu.h&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&quot;cbo.h&quot;</span></code> in the file.</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">out_channel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">out_channel</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">output_depth</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">out_channel</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
@@ -537,12 +542,20 @@ Values of offset is in range of [-128, 128].
 </div>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
-<p>Input and filter data only are allowed to read with NPU AXI instruction <code class="docutils literal notranslate"><span class="pre">cfu_op1</span></code>.</p>
+<p>You only allow to get input and filter data by NPU AXI read instruction (<code class="docutils literal notranslate"><span class="pre">cfu_op1</span></code>) which you finsih it in first step.</p>
 </div>
 <div class="admonition hint">
 <p class="admonition-title">Hint</p>
 <p>Because of directly accessing memory without D-cache, you needs to consider about cache coherence problem. Our platform supports two D-cache operation, <code class="docutils literal notranslate"><span class="pre">cbo_clean</span></code> and <code class="docutils literal notranslate"><span class="pre">cbo_invalidate</span></code>. You can use software function in <code class="docutils literal notranslate"><span class="pre">cbo.h</span></code> to control D-cache.</p>
 </div>
+<blockquote>
+<div><p>[!todo]</p>
+<ul class="simple">
+<li><p>Use the AXI read function to get data and filter values.</p></li>
+<li><p>Maintain cache coherence using <code class="docutils literal notranslate"><span class="pre">CBO</span></code> instructions to ensure AXI reads the latest data.</p></li>
+<li><p>Replace the software computation in <code class="docutils literal notranslate"><span class="pre">ConvPerChannel</span></code> with SIMD instructions to reduce reference execution time.</p></li>
+</ul>
+</div></blockquote>
 </section>
 <section id="check-result-correction">
 <h3>4. Check Result Correction<a class="headerlink" href="#check-result-correction" title="Link to this heading">#</a></h3>
@@ -552,21 +565,22 @@ Values of offset is in range of [-128, 128].
 <p>If you pass all testcase, you can get full score of basic part.</p>
 </section>
 </section>
-<section id="axi-address-aligned-15">
-<h2>AXI Address Aligned - (15%)<a class="headerlink" href="#axi-address-aligned-15" title="Link to this heading">#</a></h2>
+<section id="adavance-exercise-1-axi-address-aligned-15">
+<h2>Adavance Exercise 1 - AXI Address Aligned - (15%)<a class="headerlink" href="#adavance-exercise-1-axi-address-aligned-15" title="Link to this heading">#</a></h2>
 <hr class="docutils" />
-<p>Because of 8-bit element type of model, some AXI reading request may request unaligned address data, and unaligned address request would cause AXI trigger exception. Therefore, we need to handle request with unaligned address data, and make address is aligned with 4.</p>
+<p>Because of 8-bit element type of model, some AXI reading request may use unaligned address data, and unaligned address may cause AXI trigger exception. Therefore, we need to make our <code class="docutils literal notranslate"><span class="pre">NPU</span></code> to handle request with unaligned address data.</p>
 <div class="admonition hint">
 <p class="admonition-title">Hint</p>
 <p>We can divide single DRAM request into two DRAM request, and combine two request into one 4 byte data transition.</p>
-</div>
 <p>For example, NPU want to read 4 bytes data in 0x6000_0002. It needs to read 0x6000_0000 and 0x6000_0004 data. Then, combine higher two byte of first read and lower two byte of second read.</p>
-<!-- 
-```
-Address % 4 == 1 : 5% 
-Address % 4 == 2 : 5%
-Address % 4 == 3 : 5%
-``` -->
+</div>
+<blockquote>
+<div><p>[!todo]</p>
+<ul class="simple">
+<li><p>Add address alignment control to the AXI single transaction.</p></li>
+<li><p>Ensure <code class="docutils literal notranslate"><span class="pre">NPU</span></code> can get correct result if it receive request with unaligned address.</p></li>
+</ul>
+</div></blockquote>
 </section>
 <section id="adavance-exercise-2-running-tflm-model-inference-10">
 <h2>Adavance Exercise 2 - Running TFLM Model Inference - (10%)<a class="headerlink" href="#adavance-exercise-2-running-tflm-model-inference-10" title="Link to this heading">#</a></h2>
@@ -575,6 +589,22 @@ Address % 4 == 3 : 5%
 <div><p><a class="reference external" href="https://drive.google.com/file/d/1CgEhJm0IoaXx3ULrn-Dfuw3LH83SnFlV/view?usp=sharing">ds_cnn_stream_fe.tflite</a></p>
 </div></blockquote>
 <p>Select “TFLM Inference, Verification, and Cycles” from the project menu. The output should match the results of the original software-only convolution implementation.</p>
+<!-- ```cpp
+// Platform/sw/app/tflm_runner.cc
+/*...*/
+
+printf("Inference complete.\n");
+
+printf("Output Data:\n");
+uint32_t* out_raw_bits = (uint32_t*)output->data.f;
+for (int i = 0; i < 12; i++) {
+printf("%-9d: 0x%08X\n", i, out_raw_bits[i]);
+}
+
+model_io_verify_output(output);
+
+/*...*/
+``` -->
 <!-- <img src="images/lab1/.png" width="300px"> -->
 </section>
 <section id="demo-15">
@@ -586,7 +616,7 @@ Address % 4 == 3 : 5%
 </section>
 <section id="question-in-demo-10">
 <h3>Question in Demo - (10%)<a class="headerlink" href="#question-in-demo-10" title="Link to this heading">#</a></h3>
-<p>You will be asked several questions about the concepts covered in this lab and your implementation. This section accounts for 10% of the total lab score.</p>
+<p>You will be asked several questions about the concepts covered in this lab and your implementation.</p>
 </section>
 </section>
 <section id="submission">
@@ -655,14 +685,14 @@ Address % 4 == 3 : 5%
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#goal-of-this-lab">Goal of this lab</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#introduction">Introduction</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Goal of this Lab</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#basic-exercise-axi-single-transation-simd-60">Basic Exercise - AXI Single Transation &amp; SIMD - (60%)</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#axi-single-transation">1. AXI Single Transation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#basic-exercise-axi-single-transaction-simd-60">Basic Exercise - AXI Single Transaction &amp; SIMD - (60%)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#axi-single-transaction">1. AXI Single Transaction</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#simd-mac">2. SIMD MAC</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#conv-h">3. conv.h</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#check-result-correction">4. Check Result Correction</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#axi-address-aligned-15">AXI Address Aligned - (15%)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#adavance-exercise-1-axi-address-aligned-15">Adavance Exercise 1 - AXI Address Aligned - (15%)</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#adavance-exercise-2-running-tflm-model-inference-10">Adavance Exercise 2 - Running TFLM Model Inference - (10%)</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#demo-15">Demo - (15%)</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#simple-presenatation-in-demo-time-5">Simple Presenatation in Demo time - (5%)</a></li>
