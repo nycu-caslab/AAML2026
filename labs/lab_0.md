@@ -34,7 +34,42 @@ The official specification reserves blank opcodes (such as custom-0), allowing d
 
 ### AXI
 ### TensorFlow Lite For Micro (TFLM)
-
+TfLM (Tensorflow Lite for Microcontrollers) is designed to run machine learning models on microcontrollers and other devices with only a few kilobytes of memory.  
+  
+Based on TFLM architecture, the standard procedure for switching existing models and importing new models:  
+- Select
+    1. List bundled models
+        ```
+        make models
+        make profiles
+        make templates
+        // Bare MODEL_FILE values are resolved under MODEL_DIR, which defaults to models.
+        ```
+    2. Bundled profiles:
+        ```
+        ad01          ad01_int8.tflite fixture input and golden output
+        vww_96        vww_96_int8.tflite zero input, output verification skipped
+        generic_zero  fallback for new models while bring-up data is not ready
+        ```
+    3. Build a specific model:
+        ```
+        make MODEL_FILE=ad01_int8.tflite
+        ```
+    4. Select a profile explicitly:
+        ```
+        make MODEL_FILE=my_model.tflite MODEL_PROFILE=generic_zero
+        make MODEL_FILE=ad01_int8.tflite MODEL_PROFILE=ad01
+        ```
+- Add
+    1. Copy it into `Platform/sw/models`.
+    2. Register any missing kernels in `project/tflm_ops.cc`.
+    3. Start with `MODEL_PROFILE=generic_zero` if fixture data is not ready.
+    4. Create `models/<profile>_profile.cc` when the model needs fixture input, generated input, custom tensor handling, or golden-output verification. Use `templates/model_profile_template.cc` as the starting pattern.
+    5. Implement `const ModelProfile* model_profile_get(void)`.
+    6. For simple int8 models, fill `input_data` and `expected_output`.
+    7. For custom tensor types, generated inputs, or multi-output checks, set the `prepare_input` or `verify_output` function pointers.
+    8. Set `TENSOR_ARENA_SIZE` if the model needs a larger arena.
+    9. Run `make validate`, then build with `make MODEL_FILE=<name>.tflite`.
 ## Porting AAML RISC-V SoC to FPGA
 This section will guide you through the core three steps from installing the toolchain, cloning the platform, to running the platform.
 
