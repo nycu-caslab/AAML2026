@@ -5,22 +5,16 @@
 - [Basic Exercise - AXI Single Transaction & SIMD MAC - 60%](#basic-exercise---axi-single-transaction--simd---60)
 - [Adavance Exercise 1 - AXI Address Aligned - 15%](#adavance-exercise-1---axi-address-aligned---15)
 - [Adavance Exercise 2 - Running Full TFLM Model - 10%](#adavance-exercise-2---running-tflm-model-inference---10)
-- [Questions in the Demo - 15%](#question-in-demo---10)
+- [Questions in the Demo - 15%](#demo---15)
 
 ## Introduction
 ---
 
 In this lab, you will focus on AXI single transation and SIMD MAC operands. Then, we use these custom instruction in convolution part to reduce runtime of model reference. We use `ds_cnn_stream_fe` model to compare convolution between our accelerated version and orignal software-only version.  
 
-## Goal of this Lab
 
-- AXI Single Transation 
-- Custom SIMD Instruction
-- Deal with unaligned address AXI request
-
-
-## Basic Exercise - AXI Single Transaction & SIMD - (60%)
---- 
+## Basic Exercise - AXI Single Transaction & SIMD - 60%
+---
 
 ### 1. AXI Single Transaction
 
@@ -34,12 +28,12 @@ The implementation should handle the AXI4 read transaction correctly, including 
 Please follow below table to design NPU AXI read/write instruction. 
 ```
 
-| Funct3 | Funct7 | Software Function | Description |
-| :----: | :----: | :---------- | :------------------------------------------------------------ |
-|  `001` |   `x`  | `cfu_op1`   | Issue a 4-byte AXI4 read request and return the received data |
-|  `010` |   `x`  | `cfu_op2`   | Issue a 4-byte AXI4 write request with the provided data      |
+| Funct3 | Funct7 | Software Function | Description                                                   |
+| :----: | :----: | :---------------: | :------------------------------------------------------------ |
+|  `001` |   `x`  | `cfu_op1`         | Issue a 4-byte AXI4 read request and return the received data |
+|  `010` |   `x`  | `cfu_op2`         | Issue a 4-byte AXI4 write request with the provided data      |
 
-> [!todo]
+> [!Note] TODO
 > - Control AXI interface in `NPU` to make it can finish a single DRAM transation when it receive corresponding `funct3`. 
 > - Return value from `NPU_out` to CPU if receiving reading request. 
 
@@ -78,15 +72,17 @@ output = | output + (input_data[0, 1, 2, 3] + offset) * filter_data[0, 1, 2, 3] 
 ```
 
 ```{note}
-You may choose any `funct3` and `funct7` values to define your own MAC instruction, except for the `funct3` reserved for the AXI read and write instructions.
+- You may choose any `funct3` and `funct7` values to define your own MAC instruction, except for the `funct3` reserved for the AXI read and write instructions.
+- You can also define your instruction to accelerated convolution function in next step. 
 ```
-
->[!todo]
-> Make `NPU` can run custom SIMD instruction if it receive specific `funct3` and `funct7`, and return output value by `NPU_out` to CPU. 
 
 ```{hint}
 This part does not have any test. You can write your test function and add it into user menu to test correction of SIMD instruction. 
 ```
+
+>[!Note] TODO
+> Make `NPU` can run custom SIMD instruction if it receive specific `funct3` and `funct7`, and return output value by `NPU_out` to CPU. 
+
 
 ### 3. conv.h
 
@@ -130,14 +126,14 @@ for (int out_channel = 0; out_channel < output_depth; ++out_channel) {
 ```
 
 ```{important}
-You only allow to get input and filter data by NPU AXI read instruction (`cfu_op1`) which you finsih it in first step.
+You only allow to get input and filter data by NPU AXI read instruction (`cfu_op1`) which you finsih in first step.
 ```
 
 ```{hint}
 Because of directly accessing memory without D-cache, you needs to consider about cache coherence problem. Our platform supports two D-cache operation, `cbo_clean` and `cbo_invalidate`. You can use software function in `cbo.h` to control D-cache. 
 ```
 
-> [!todo]
+> [!Note] TODO
 > - Use the AXI read function to get data and filter values.
 > - Maintain cache coherence using `CBO` instructions to ensure AXI reads the latest data.
 > - Replace the software computation in `ConvPerChannel` with SIMD instructions to reduce reference execution time.
@@ -150,8 +146,8 @@ You can run "Basic Convolution Test" in project menu. This test only have have a
 
 If you pass all testcase, you can get full score of basic part. 
 
-## Adavance Exercise 1 - AXI Address Aligned - (15%)
---- 
+## Adavance Exercise 1 - AXI Address Aligned - 15%
+---
 
 Because of 8-bit element type of model, some AXI reading request may use unaligned address data, and unaligned address may cause AXI trigger exception. Therefore, we need to make our `NPU` to handle request with unaligned address data. 
 
@@ -161,23 +157,34 @@ We can divide single DRAM request into two DRAM request, and combine two request
 For example, NPU want to read 4 bytes data in 0x6000_0002. It needs to read 0x6000_0000 and 0x6000_0004 data. Then, combine higher two byte of first read and lower two byte of second read. 
 ```
 
->[!todo]
+>[!Note] TODO
 > - Add address alignment control to the AXI single transaction. 
 > - Ensure `NPU` can get correct result if it receive request with unaligned address.
 
-## Adavance Exercise 2 - Running TFLM Model Inference - (10%)
+## Adavance Exercise 2 - Running TFLM Model Inference - 10%
 ---
 
+In this part, We use `ds_cnn_stream_fe` as our benchmark model. Then, compare runtime cycles to show performance improve on accelerated version convolution.
+
+```{note}
+You can download .tflite file and input data from below links.
+
 > [ds_cnn_stream_fe.tflite](https://drive.google.com/file/d/1CgEhJm0IoaXx3ULrn-Dfuw3LH83SnFlV/view?usp=sharing)
+> [input file](https://drive.google.com/drive/folders/1rY7SDD1qh-EXn8nqex7QDDvqbSiz7Ki_)
+```
 
-Select "TFLM Inference, Verification, and Cycles" from the project menu. The output should match the results of the original software-only convolution implementation.
+> [!Note] TODO
+> 1. Add below code to show outupt data
+> 2. Select "TFLM Inference, Verification, and Cycles" from the project menu. 
+> 3. Compare result between orignal version and accelerated version.
 
-<!-- ```cpp
+```cpp
 // Platform/sw/app/tflm_runner.cc
 /*...*/
 
 printf("Inference complete.\n");
 
+// show value of output dataa. 
 printf("Output Data:\n");
 uint32_t* out_raw_bits = (uint32_t*)output->data.f;
 for (int i = 0; i < 12; i++) {
@@ -187,11 +194,16 @@ printf("%-9d: 0x%08X\n", i, out_raw_bits[i]);
 model_io_verify_output(output);
 
 /*...*/
-``` -->
+```
 
-<!-- <img src="images/lab1/.png" width="300px"> -->
+```{important}
+If your result is match and runtime cycles is less than original version, you can get score from this part.
+```
 
-## Demo - (15%)
+This is result of label1 output: 
+<img src="images/lab1/tflm_label1_output.png" width="400px">
+
+## Demo - 15%
 ---
 
 ### Simple Presenatation in Demo time - (5%)
