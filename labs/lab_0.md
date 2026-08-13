@@ -1,13 +1,13 @@
 # Lab 0 : Environment Setup
 
+## Goal of this lab
+- [Understand the AAML RISC-V SoC platform.](#aaml-risc-v-soc-platform)
+- [Set up Vivado and the RISC-V toolchain.](#toolchain-setup)
+- [Clone and set up `CUSTOM_SoC_Platform`.](#platform-setup)
+- [Program the FPGA and run a TFLM application.](#running-the-platform)
 ## Introduction
 Throughout AAML 2026, we will use the AAML RISC-V SoC platform to explore hardware/software co-design for machine-learning acceleration. The platform integrates a RISC-V CPU, a customizable ML accelerator connected through custom instructions and AXI, and TensorFlow Lite for Microcontrollers (TFLM). In Lab 0, you will set up the required tools, program the reference SoC onto the FPGA, and run a reference TFLM application to verify the development environment for the following labs.
-## Goal of this lab
-- [Identify the roles of the CPU, custom accelerator, AXI interface, custom instructions, and TFLM in the AAML RISC-V SoC platform.](#aaml-risc-v-soc-platform)
-- [Install and verify Vivado and the RISC-V cross-compilation toolchain required by the platform.](#toolchain-setup)
-- [Clone and prepare the `AAML-sw-dev` version of `CUSTOM_SoC_Platform`.](#platform-setup)
-- [Build the reference SoC and program it onto a Nexys A7-100T FPGA.](#running-the-platform)
-- [Build and upload a reference TFLM application, and verify its operation through the UART console.](#running-the-platform)
+
 ## AAML RISC-V SoC Platform
 
 ### RISC-V CPU
@@ -31,6 +31,23 @@ The official specification reserves blank opcodes (such as custom-0), allowing d
 - NPU can be controlled by function3 and function7
 
 ### NPU (block)
+In this platform, `NPU` is the name of the customizable accelerator block connected to the RISC-V CPU. The CPU still runs the application and the TFLM interpreter and remains responsible for program control. Software explicitly invokes the NPU only for selected compute-intensive operations.
+
+The CPU communicates with the NPU through a request-response interface based on a `CUSTOM-0` instruction. `funct3` and `funct7` select the operation, while `rs1` and `rs2` provide two 32-bit operands. The CPU asserts `NPU_start` to begin an operation, which may take one or more cycles. When the operation finishes, the NPU places a 32-bit result on `NPU_out` and asserts `NPU_done`; the CPU then writes the result to `rd` and continues execution.
+
+```text
+                      CUSTOM-0 request/result
++--------------------+ <=====================> +--------------------+
+| RISC-V CPU         |                         | Customizable NPU   |
+| Application + TFLM |                         | Compute / Control  |
++---------+----------+                         +----------+---------+
+          | CPU cache / AXI                               | AXI4 master
+          +-------------------+     +---------------------+
+                              v     v
+                         AXI Interconnect
+                                |
+                           Shared DDR2
+```
 
 ### AXI
 ### TensorFlow Lite For Micro (TFLM)
