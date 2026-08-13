@@ -367,11 +367,7 @@
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#adavance-exercise-1-axi-address-aligned-15">Adavance Exercise 1 - AXI Address Aligned - 15%</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#adavance-exercise-2-running-tflm-model-inference-10">Adavance Exercise 2 - Running TFLM Model Inference - 10%</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#demo-15">Demo - 15%</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#simple-presenatation-in-demo-time-5">Simple Presenatation in Demo time - (5%)</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#question-in-demo-10">Question in Demo - (10%)</a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#question-in-demo-15">Question in Demo - 15%</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#submission">Submission</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#reference">Reference</a></li>
 </ul>
@@ -391,10 +387,10 @@
 <h2>Goal of this lab<a class="headerlink" href="#goal-of-this-lab" title="Link to this heading">#</a></h2>
 <hr class="docutils" />
 <ul class="simple">
-<li><p><a class="reference internal" href="#basic-exercise---axi-single-transaction--simd---60"><span class="xref myst">Basic Exercise - AXI Single Transaction &amp; SIMD MAC - 60%</span></a></p></li>
-<li><p><a class="reference internal" href="#adavance-exercise-1---axi-address-aligned---15"><span class="xref myst">Adavance Exercise 1 - AXI Address Aligned - 15%</span></a></p></li>
-<li><p><a class="reference internal" href="#adavance-exercise-2---running-tflm-model-inference---10"><span class="xref myst">Adavance Exercise 2 - Running Full TFLM Model - 10%</span></a></p></li>
-<li><p><a class="reference internal" href="#demo---15"><span class="xref myst">Questions in the Demo - 15%</span></a></p></li>
+<li><p><a class="reference internal" href="#basic-exercise-axi-single-transaction-simd-60"><span class="xref myst">Basic Exercise - AXI Single Transaction &amp; SIMD MAC - 60%</span></a></p></li>
+<li><p><a class="reference internal" href="#adavance-exercise-1-axi-address-aligned-15"><span class="xref myst">Adavance Exercise 1 - AXI Address Aligned - 15%</span></a></p></li>
+<li><p><a class="reference internal" href="#adavance-exercise-2-running-tflm-model-inference-10"><span class="xref myst">Adavance Exercise 2 - Running Full TFLM Model - 10%</span></a></p></li>
+<li><p><a class="reference internal" href="#question-in-demo-15"><span class="xref myst">Questions in the Demo - 15%</span></a></p></li>
 </ul>
 </section>
 <section id="introduction">
@@ -437,7 +433,7 @@
 </table>
 </div>
 <blockquote>
-<div><p>[!Note] TODO</p>
+<div><p>TODO:</p>
 <ul class="simple">
 <li><p>Control AXI interface in <code class="docutils literal notranslate"><span class="pre">NPU</span></code> to make it can finish a single DRAM transation when it receive corresponding <code class="docutils literal notranslate"><span class="pre">funct3</span></code>.</p></li>
 <li><p>Return value from <code class="docutils literal notranslate"><span class="pre">NPU_out</span></code> to CPU if receiving reading request.</p></li>
@@ -454,6 +450,17 @@
 </ol>
 </li>
 </ul>
+</div>
+<p>Correct Result (Test 2 and 3):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">STARTING</span> <span class="n">ACCELERATOR</span> <span class="n">FUNCTIONAL</span> <span class="n">TEST</span><span class="o">...</span>
+<span class="go">[TEST 1/5] Scalar Math... PASS</span>
+<span class="go">[TEST 2/5] AXI Write... PASS</span>
+<span class="go">[TEST 3/5] AXI Read... PASS</span>
+<span class="go">[TEST 4/5] Unaligned AXI Read... PASS</span>
+<span class="go">[TEST 5/5] Unaligned AXI Write... PASS</span>
+<span class="go">[SUCCESS] All functional tests passed!</span>
+<span class="go">---</span>
+</pre></div>
 </div>
 </section>
 <section id="simd-mac">
@@ -492,7 +499,7 @@
 <p>This part does not have any test. You can write your test function and add it into user menu to test correction of SIMD instruction.</p>
 </div>
 <blockquote>
-<div><p>[!Note] TODO
+<div><p>TODO:
 Make <code class="docutils literal notranslate"><span class="pre">NPU</span></code> can run custom SIMD instruction if it receive specific <code class="docutils literal notranslate"><span class="pre">funct3</span></code> and <code class="docutils literal notranslate"><span class="pre">funct7</span></code>, and return output value by <code class="docutils literal notranslate"><span class="pre">NPU_out</span></code> to CPU.</p>
 </div></blockquote>
 </section>
@@ -543,7 +550,7 @@ Make <code class="docutils literal notranslate"><span class="pre">NPU</span></co
 <p>Because of directly accessing memory without D-cache, you needs to consider about cache coherence problem. Our platform supports two D-cache operation, <code class="docutils literal notranslate"><span class="pre">cbo_clean</span></code> and <code class="docutils literal notranslate"><span class="pre">cbo_invalidate</span></code>. You can use software function in <code class="docutils literal notranslate"><span class="pre">cbo.h</span></code> to control D-cache.</p>
 </div>
 <blockquote>
-<div><p>[!Note] TODO</p>
+<div><p>TODO:</p>
 <ul class="simple">
 <li><p>Use the AXI read function to get data and filter values.</p></li>
 <li><p>Maintain cache coherence using <code class="docutils literal notranslate"><span class="pre">CBO</span></code> instructions to ensure AXI reads the latest data.</p></li>
@@ -569,12 +576,28 @@ Make <code class="docutils literal notranslate"><span class="pre">NPU</span></co
 <p>For example, NPU want to read 4 bytes data in 0x6000_0002. It needs to read 0x6000_0000 and 0x6000_0004 data. Then, combine higher two byte of first read and lower two byte of second read.</p>
 </div>
 <blockquote>
-<div><p>[!Note] TODO</p>
+<div><p>TODO:</p>
 <ul class="simple">
 <li><p>Add address alignment control to the AXI single transaction.</p></li>
 <li><p>Ensure <code class="docutils literal notranslate"><span class="pre">NPU</span></code> can get correct result if it receive request with unaligned address.</p></li>
 </ul>
 </div></blockquote>
+<p>Verfication:</p>
+<ol class="arabic simple">
+<li><p>Run “Accelerator functional test” in project menu.</p></li>
+<li><p>If you pass “Unaligned AXI Read” and “Unaligned AXI Write”, your implement is correct.</p></li>
+</ol>
+<p>Correct Result (Test 4 and 5):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">STARTING</span> <span class="n">ACCELERATOR</span> <span class="n">FUNCTIONAL</span> <span class="n">TEST</span><span class="o">...</span>
+<span class="go">[TEST 1/5] Scalar Math... PASS</span>
+<span class="go">[TEST 2/5] AXI Write... PASS</span>
+<span class="go">[TEST 3/5] AXI Read... PASS</span>
+<span class="go">[TEST 4/5] Unaligned AXI Read... PASS</span>
+<span class="go">[TEST 5/5] Unaligned AXI Write... PASS</span>
+<span class="go">[SUCCESS] All functional tests passed!</span>
+<span class="go">---</span>
+</pre></div>
+</div>
 </section>
 <section id="adavance-exercise-2-running-tflm-model-inference-10">
 <h2>Adavance Exercise 2 - Running TFLM Model Inference - 10%<a class="headerlink" href="#adavance-exercise-2-running-tflm-model-inference-10" title="Link to this heading">#</a></h2>
@@ -583,15 +606,17 @@ Make <code class="docutils literal notranslate"><span class="pre">NPU</span></co
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>You can download .tflite file and input data from below links.</p>
-<blockquote>
-<div><p><a class="reference external" href="https://drive.google.com/file/d/1CgEhJm0IoaXx3ULrn-Dfuw3LH83SnFlV/view?usp=sharing">ds_cnn_stream_fe.tflite</a>
-<a class="reference external" href="https://drive.google.com/drive/folders/1rY7SDD1qh-EXn8nqex7QDDvqbSiz7Ki_">input file</a></p>
-</div></blockquote>
+<ul class="simple">
+<li><p><a class="reference external" href="https://drive.google.com/file/d/1CgEhJm0IoaXx3ULrn-Dfuw3LH83SnFlV/view?usp=sharing">ds_cnn_stream_fe.tflite</a></p></li>
+<li><p><a class="reference external" href="https://raw.githubusercontent.com/nycu-caslab/AAML2026/refs/heads/main/lab1_util/ds_cnn_stream_fe_profile.cc">ds_cnn_stream_fe_profile.cc</a></p></li>
+<li><p><a class="reference external" href="https://drive.google.com/drive/folders/1rY7SDD1qh-EXn8nqex7QDDvqbSiz7Ki_">input file</a></p></li>
+</ul>
 </div>
 <blockquote>
-<div><p>[!Note] TODO</p>
+<div><p>TODO:</p>
 <ol class="arabic simple">
-<li><p>Add below code to show outupt data</p></li>
+<li><p>Add .tflite, profile.cc, and input data into platform</p></li>
+<li><p>Add below code to show outupt data after inference complete.</p></li>
 <li><p>Select “TFLM Inference, Verification, and Cycles” from the project menu.</p></li>
 <li><p>Compare result between orignal version and accelerated version.</p></li>
 </ol>
@@ -601,36 +626,29 @@ Make <code class="docutils literal notranslate"><span class="pre">NPU</span></co
 
 <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Inference complete.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
 
-<span class="c1">// show value of output dataa. </span>
+<span class="c1">// show value of output data. </span>
 <span class="n">printf</span><span class="p">(</span><span class="s">&quot;Output Data:</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
 <span class="kt">uint32_t</span><span class="o">*</span><span class="w"> </span><span class="n">out_raw_bits</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">uint32_t</span><span class="o">*</span><span class="p">)</span><span class="n">output</span><span class="o">-&gt;</span><span class="n">data</span><span class="p">.</span><span class="n">f</span><span class="p">;</span>
 <span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">12</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="n">printf</span><span class="p">(</span><span class="s">&quot;%-9d: 0x%08X</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">out_raw_bits</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+<span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;%-9d: 0x%08X</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">out_raw_bits</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
 <span class="p">}</span>
-
-<span class="n">model_io_verify_output</span><span class="p">(</span><span class="n">output</span><span class="p">);</span>
+<span class="c1">//</span>
 
 <span class="cm">/*...*/</span>
 </pre></div>
 </div>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
-<p>If your result is match and runtime cycles is less than original version, you can get score from this part.</p>
+<p>If your result is match and runtime cycles is less than original version, you can get score in this part.</p>
 </div>
-<p>This is result of label1 output:
-<a class="reference internal" href="../_images/tflm_label1_output.png"><img alt="../_images/tflm_label1_output.png" src="../_images/tflm_label1_output.png" style="width: 400px;" /></a></p>
+<p>This is result of label1 output:</p>
+<a class="reference internal image-reference" href="../_images/tflm_label1_output.png"><img alt="../_images/tflm_label1_output.png" src="../_images/tflm_label1_output.png" style="width: 400px;" />
+</a>
 </section>
-<section id="demo-15">
-<h2>Demo - 15%<a class="headerlink" href="#demo-15" title="Link to this heading">#</a></h2>
+<section id="question-in-demo-15">
+<h2>Question in Demo - 15%<a class="headerlink" href="#question-in-demo-15" title="Link to this heading">#</a></h2>
 <hr class="docutils" />
-<section id="simple-presenatation-in-demo-time-5">
-<h3>Simple Presenatation in Demo time - (5%)<a class="headerlink" href="#simple-presenatation-in-demo-time-5" title="Link to this heading">#</a></h3>
-<p>You need to record performance of accerated version than original version, and present your idea of NPU design.</p>
-</section>
-<section id="question-in-demo-10">
-<h3>Question in Demo - (10%)<a class="headerlink" href="#question-in-demo-10" title="Link to this heading">#</a></h3>
-<p>You will be asked several questions about the concepts covered in this lab and your implementation.</p>
-</section>
+<p>You will be asked several questions about the concepts covered in this lab and your NPU design.</p>
 </section>
 <section id="submission">
 <h2>Submission<a class="headerlink" href="#submission" title="Link to this heading">#</a></h2>
@@ -706,11 +724,7 @@ Make <code class="docutils literal notranslate"><span class="pre">NPU</span></co
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#adavance-exercise-1-axi-address-aligned-15">Adavance Exercise 1 - AXI Address Aligned - 15%</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#adavance-exercise-2-running-tflm-model-inference-10">Adavance Exercise 2 - Running TFLM Model Inference - 10%</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#demo-15">Demo - 15%</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#simple-presenatation-in-demo-time-5">Simple Presenatation in Demo time - (5%)</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#question-in-demo-10">Question in Demo - (10%)</a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#question-in-demo-15">Question in Demo - 15%</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#submission">Submission</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#reference">Reference</a></li>
 </ul>
