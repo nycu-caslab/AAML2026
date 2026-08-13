@@ -35,7 +35,7 @@ In this platform, `NPU` is the name of the customizable accelerator block connec
 
 The CPU communicates with the NPU through a request-response interface based on a `CUSTOM-0` instruction. `funct3` and `funct7` select the operation, while `rs1` and `rs2` provide two 32-bit operands. The CPU asserts `NPU_start` to begin an operation, which may take one or more cycles. When the operation finishes, the NPU places a 32-bit result on `NPU_out` and asserts `NPU_done`; the CPU then writes the result to `rd` and continues execution.
 
-```text
+```
                       CUSTOM-0 request/result
 +--------------------+ <=====================> +--------------------+
 | RISC-V CPU         |                         | Customizable NPU   |
