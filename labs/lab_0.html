@@ -438,6 +438,21 @@
 </section>
 <section id="npu-block">
 <h3>NPU (block)<a class="headerlink" href="#npu-block" title="Link to this heading">#</a></h3>
+<p>In this platform, <code class="docutils literal notranslate"><span class="pre">NPU</span></code> is the name of the customizable accelerator block connected to the RISC-V CPU. The CPU still runs the application and the TFLM interpreter and remains responsible for program control. Software explicitly invokes the NPU only for selected compute-intensive operations.</p>
+<p>The CPU communicates with the NPU through a request-response interface based on a <code class="docutils literal notranslate"><span class="pre">CUSTOM-0</span></code> instruction. <code class="docutils literal notranslate"><span class="pre">funct3</span></code> and <code class="docutils literal notranslate"><span class="pre">funct7</span></code> select the operation, while <code class="docutils literal notranslate"><span class="pre">rs1</span></code> and <code class="docutils literal notranslate"><span class="pre">rs2</span></code> provide two 32-bit operands. The CPU asserts <code class="docutils literal notranslate"><span class="pre">NPU_start</span></code> to begin an operation, which may take one or more cycles. When the operation finishes, the NPU places a 32-bit result on <code class="docutils literal notranslate"><span class="pre">NPU_out</span></code> and asserts <code class="docutils literal notranslate"><span class="pre">NPU_done</span></code>; the CPU then writes the result to <code class="docutils literal notranslate"><span class="pre">rd</span></code> and continues execution.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>                      CUSTOM-0 request/result
++--------------------+ &lt;=====================&gt; +--------------------+
+| RISC-V CPU         |                         | Customizable NPU   |
+| Application + TFLM |                         | Compute / Control  |
++---------+----------+                         +----------+---------+
+          | CPU cache / AXI                               | AXI4 master
+          +-------------------+     +---------------------+
+                              v     v
+                         AXI Interconnect
+                                |
+                           Shared DDR2
+</pre></div>
+</div>
 </section>
 <section id="axi">
 <h3>AXI<a class="headerlink" href="#axi" title="Link to this heading">#</a></h3>

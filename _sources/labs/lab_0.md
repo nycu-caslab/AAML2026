@@ -31,6 +31,23 @@ The official specification reserves blank opcodes (such as custom-0), allowing d
 - NPU can be controlled by function3 and function7
 
 ### NPU (block)
+In this platform, `NPU` is the name of the customizable accelerator block connected to the RISC-V CPU. The CPU still runs the application and the TFLM interpreter and remains responsible for program control. Software explicitly invokes the NPU only for selected compute-intensive operations.
+
+The CPU communicates with the NPU through a request-response interface based on a `CUSTOM-0` instruction. `funct3` and `funct7` select the operation, while `rs1` and `rs2` provide two 32-bit operands. The CPU asserts `NPU_start` to begin an operation, which may take one or more cycles. When the operation finishes, the NPU places a 32-bit result on `NPU_out` and asserts `NPU_done`; the CPU then writes the result to `rd` and continues execution.
+
+```text
+                      CUSTOM-0 request/result
++--------------------+ <=====================> +--------------------+
+| RISC-V CPU         |                         | Customizable NPU   |
+| Application + TFLM |                         | Compute / Control  |
++---------+----------+                         +----------+---------+
+          | CPU cache / AXI                               | AXI4 master
+          +-------------------+     +---------------------+
+                              v     v
+                         AXI Interconnect
+                                |
+                           Shared DDR2
+```
 
 ### AXI
 ### TensorFlow Lite For Micro (TFLM)
