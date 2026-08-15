@@ -157,4 +157,4 @@ make run MODEL_FILE=ad01_int8.tflite MODEL_PROFILE=ad01
 
 ### Detail Reference on How to Use the Platform
 
-See the documentation for [hardware](to be placed) and [software](to be placed)
+See the documentation for the SoC [hardware](../attachments/SoC_HW.md) and [software](../attachments/SoC_SW.md)
