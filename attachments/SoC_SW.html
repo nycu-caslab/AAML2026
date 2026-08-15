@@ -1,0 +1,636 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>CUSTOM SoC Software &#8212; CSIC30066: Accelerator Architectures for Machine Learning</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=4418a689" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'attachments/SoC_SW';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">CSIC30066: Accelerator Architectures for Machine Learning</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Class:</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../class/staff.html">Staff</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Labs:</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../labs/lab_0.html">Lab 0 : Environment Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../labs/lab_1.html">Lab 1 : Aligned AXI Data on SIMD</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../labs/lab_2.html">Lab 2 : Quantization and SIMD MAC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../labs/lab_3.html">Lab 3 : Systolic Array</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../labs/lab_4.html">Lab 4 : Elementwise Unit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../labs/lab_5.html">Lab 5 : Systolic Array with im2col for Convolution</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Project:</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../project/final_project.html">Final Project: Pruned Wav2Letter</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/attachments/SoC_SW.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>CUSTOM SoC Software</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#quick-start">Quick Start</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#file-layout">File Layout</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#adding-a-menu-item">Adding A Menu Item</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#adding-a-custom-instruction-helper">Adding A Custom Instruction Helper</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#running-performance-tests">Running Performance Tests</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#adding-or-switching-models">Adding Or Switching Models</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#generated-files">Generated Files</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="custom-soc-software">
+<h1>CUSTOM SoC Software<a class="headerlink" href="#custom-soc-software" title="Link to this heading">#</a></h1>
+<section id="quick-start">
+<h2>Quick Start<a class="headerlink" href="#quick-start" title="Link to this heading">#</a></h2>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nb">help</span>
+make<span class="w"> </span>config
+make<span class="w"> </span>models
+make<span class="w"> </span>profiles
+make<span class="w"> </span>templates
+make<span class="w"> </span>validate
+make<span class="w"> </span>check-env
+make<span class="w"> </span><span class="nv">MODEL_FILE</span><span class="o">=</span>ad01_int8.tflite
+make<span class="w"> </span>run<span class="w"> </span><span class="nv">MODEL_FILE</span><span class="o">=</span>ad01_int8.tflite
+</pre></div>
+</div>
+<p>Useful build overrides:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="nv">MODEL_DIR</span><span class="o">=</span>models
+<span class="nv">MODEL_FILE</span><span class="o">=</span>ad01_int8.tflite
+<span class="nv">MODEL_PROFILE</span><span class="o">=</span>ad01
+<span class="nv">TENSOR_ARENA_SIZE</span><span class="o">=</span><span class="m">262144</span>
+<span class="nv">USE_SOFTWARE_CFU</span><span class="o">=</span><span class="m">1</span>
+<span class="nv">TARGET_PREFIX</span><span class="o">=</span>riscv64-unknown-elf
+<span class="nv">APP_DEFINES</span><span class="o">=</span><span class="s2">&quot;-DMY_FLAG=1&quot;</span>
+<span class="nv">APP_EXTRA_SRCS</span><span class="o">=</span><span class="s2">&quot;project/my_extra_file.cc&quot;</span>
+</pre></div>
+</div>
+<p>For repeated local settings, copy <code class="docutils literal notranslate"><span class="pre">project.mk.example</span></code> to <code class="docutils literal notranslate"><span class="pre">project.mk</span></code> and edit
+that file. <code class="docutils literal notranslate"><span class="pre">project.mk</span></code> is ignored by git, and command-line variables still
+override it:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>cp<span class="w"> </span>project.mk.example<span class="w"> </span>project.mk
+make<span class="w"> </span>config
+make
+make<span class="w"> </span><span class="nv">MODEL_FILE</span><span class="o">=</span>ad01_int8.tflite<span class="w"> </span><span class="nv">MODEL_PROFILE</span><span class="o">=</span>ad01
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">config</span></code> prints the resolved build settings, including the selected model
+profile source.</p>
+<p><code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">validate</span></code> prints the resolved build settings and lists available models,
+profiles, and templates. It does not build or require the RISC-V embedded
+toolchain.</p>
+</section>
+<section id="file-layout">
+<h2>File Layout<a class="headerlink" href="#file-layout" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">project/proj_menu.*</span></code> owns the built-in project menu entries for accelerator
+tests, TFLM inference, and the user extension menu.</p>
+<p><code class="docutils literal notranslate"><span class="pre">project/user_menu.*</span></code> is the intended first place to add a new project-specific
+test, demo, or experiment.</p>
+<p><code class="docutils literal notranslate"><span class="pre">app/cfu.*</span></code>, <code class="docutils literal notranslate"><span class="pre">app/software_cfu.*</span></code>, and <code class="docutils literal notranslate"><span class="pre">project/accel_ops.h</span></code> wrap CUSTOM-0
+access. Use <code class="docutils literal notranslate"><span class="pre">cfu_op0..cfu_op7(funct7,</span> <span class="pre">rs1,</span> <span class="pre">rs2)</span></code> for raw CUSTOM-0 fields, or
+add semantic helpers in <code class="docutils literal notranslate"><span class="pre">accel_ops.h</span></code>.</p>
+</section>
+<section id="adding-a-menu-item">
+<h2>Adding A Menu Item<a class="headerlink" href="#adding-a-menu-item" title="Link to this heading">#</a></h2>
+<p>Edit <code class="docutils literal notranslate"><span class="pre">project/user_menu.cc</span></code>:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">do_my_test</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="c1">// Project-specific test code.</span>
+<span class="p">}</span>
+
+<span class="k">const</span><span class="w"> </span><span class="n">MenuItem</span><span class="w"> </span><span class="n">kUserItems</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">MENU_ITEM</span><span class="p">(</span><span class="sc">&#39;m&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;my test&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">do_my_test</span><span class="p">),</span>
+<span class="w">    </span><span class="n">MENU_END</span><span class="p">,</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<p>Rebuild and open the firmware menu:</p>
+<ol class="arabic simple">
+<li><p>Select <code class="docutils literal notranslate"><span class="pre">1</span></code> for Project menu.</p></li>
+<li><p>Select <code class="docutils literal notranslate"><span class="pre">u</span></code> for User extension menu.</p></li>
+<li><p>Select your new entry.</p></li>
+</ol>
+<p>For a larger test, start from <code class="docutils literal notranslate"><span class="pre">templates/app_extension_template.cc</span></code>, add the new
+file through <code class="docutils literal notranslate"><span class="pre">APP_EXTRA_SRCS</span></code>, and register its function in
+<code class="docutils literal notranslate"><span class="pre">project/user_menu.cc</span></code>.</p>
+</section>
+<section id="adding-a-custom-instruction-helper">
+<h2>Adding A Custom Instruction Helper<a class="headerlink" href="#adding-a-custom-instruction-helper" title="Link to this heading">#</a></h2>
+<ol class="arabic simple">
+<li><p>Choose a <code class="docutils literal notranslate"><span class="pre">funct3/funct7</span></code> pair. <code class="docutils literal notranslate"><span class="pre">cfu_op0..cfu_op7</span></code> select <code class="docutils literal notranslate"><span class="pre">funct3=0..7</span></code>;
+their first argument is <code class="docutils literal notranslate"><span class="pre">funct7</span></code>.</p></li>
+<li><p>Implement the hardware behavior in <code class="docutils literal notranslate"><span class="pre">../hw/srcs/NPU.v</span></code>, or start from
+<code class="docutils literal notranslate"><span class="pre">../hw/templates/custom_accelerator_template.v</span></code>.</p></li>
+<li><p>Implement the software fallback in <code class="docutils literal notranslate"><span class="pre">app/software_cfu.cc</span></code>.</p></li>
+<li><p>Add a readable wrapper in <code class="docutils literal notranslate"><span class="pre">project/accel_ops.h</span></code>.</p></li>
+<li><p>Add a functional or cycle-counting test entry in <code class="docutils literal notranslate"><span class="pre">project/user_menu.cc</span></code> or
+<code class="docutils literal notranslate"><span class="pre">project/accel_tests.cc</span></code>.</p></li>
+</ol>
+<p>Build with <code class="docutils literal notranslate"><span class="pre">USE_SOFTWARE_CFU=1</span></code> when you want to test the software fallback
+without issuing CUSTOM-0 instructions.</p>
+<p>For raw hardware calls, keep <code class="docutils literal notranslate"><span class="pre">funct3</span></code> and <code class="docutils literal notranslate"><span class="pre">funct7</span></code> as compile-time numeric
+literals or preprocessor macros, for example:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#define MY_ACCEL_FUNCT7 6</span>
+
+<span class="k">static</span><span class="w"> </span><span class="kr">inline</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="nf">accel_my_op</span><span class="p">(</span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">cfu_op0</span><span class="p">(</span><span class="n">MY_ACCEL_FUNCT7</span><span class="p">,</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Use <code class="docutils literal notranslate"><span class="pre">templates/custom_instruction_template.cc</span></code> for a standalone performance
+test skeleton. After adding template-based code, run <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">validate</span></code>; if the
+extension adds a new menu item, register its function in <code class="docutils literal notranslate"><span class="pre">project/user_menu.cc</span></code>.</p>
+</section>
+<section id="running-performance-tests">
+<h2>Running Performance Tests<a class="headerlink" href="#running-performance-tests" title="Link to this heading">#</a></h2>
+<p>The firmware menu has three built-in performance paths:</p>
+<ol class="arabic simple">
+<li><p>Main menu <code class="docutils literal notranslate"><span class="pre">2</span></code> runs low-level performance counter checks.</p></li>
+<li><p>Main menu <code class="docutils literal notranslate"><span class="pre">1</span></code>, then project menu <code class="docutils literal notranslate"><span class="pre">b</span></code>, runs the scalar custom-instruction
+benchmark through <code class="docutils literal notranslate"><span class="pre">project/accel_ops.h</span></code>.</p></li>
+<li><p>Main menu <code class="docutils literal notranslate"><span class="pre">1</span></code>, then project menu <code class="docutils literal notranslate"><span class="pre">3</span></code>, runs the selected TFLM model and prints
+inference cycles and time.</p></li>
+</ol>
+</section>
+<section id="adding-or-switching-models">
+<h2>Adding Or Switching Models<a class="headerlink" href="#adding-or-switching-models" title="Link to this heading">#</a></h2>
+<p>List bundled models:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>models
+make<span class="w"> </span>profiles
+make<span class="w"> </span>templates
+</pre></div>
+</div>
+<p>Bare <code class="docutils literal notranslate"><span class="pre">MODEL_FILE</span></code> values are resolved under <code class="docutils literal notranslate"><span class="pre">MODEL_DIR</span></code>, which defaults to
+<code class="docutils literal notranslate"><span class="pre">models</span></code>.</p>
+<p>Bundled profiles:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>ad01          ad01_int8.tflite fixture input and golden output
+vww_96        vww_96_int8.tflite zero input, output verification skipped
+generic_zero  fallback for new models while bring-up data is not ready
+</pre></div>
+</div>
+<p>Build a specific model:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">MODEL_FILE</span><span class="o">=</span>ad01_int8.tflite
+</pre></div>
+</div>
+<p>Select a profile explicitly:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">MODEL_FILE</span><span class="o">=</span>my_model.tflite<span class="w"> </span><span class="nv">MODEL_PROFILE</span><span class="o">=</span>generic_zero
+make<span class="w"> </span><span class="nv">MODEL_FILE</span><span class="o">=</span>ad01_int8.tflite<span class="w"> </span><span class="nv">MODEL_PROFILE</span><span class="o">=</span>ad01
+</pre></div>
+</div>
+<p>When adding a new <code class="docutils literal notranslate"><span class="pre">.tflite</span></code> file:</p>
+<ol class="arabic simple">
+<li><p>Copy it into <code class="docutils literal notranslate"><span class="pre">Platform/sw/models</span></code>.</p></li>
+<li><p>Register any missing kernels in <code class="docutils literal notranslate"><span class="pre">project/tflm_ops.cc</span></code>.</p></li>
+<li><p>Start with <code class="docutils literal notranslate"><span class="pre">MODEL_PROFILE=generic_zero</span></code> if fixture data is not ready.</p></li>
+<li><p>Create <code class="docutils literal notranslate"><span class="pre">models/&lt;profile&gt;_profile.cc</span></code> when the model needs fixture input,
+generated input, custom tensor handling, or golden-output verification. Use
+<code class="docutils literal notranslate"><span class="pre">templates/model_profile_template.cc</span></code> as the starting pattern.</p></li>
+<li><p>Implement <code class="docutils literal notranslate"><span class="pre">const</span> <span class="pre">ModelProfile*</span> <span class="pre">model_profile_get(void)</span></code>.</p></li>
+<li><p>For simple int8 models, fill <code class="docutils literal notranslate"><span class="pre">input_data</span></code> and <code class="docutils literal notranslate"><span class="pre">expected_output</span></code>.</p></li>
+<li><p>For custom tensor types, generated inputs, or multi-output checks, set the
+<code class="docutils literal notranslate"><span class="pre">prepare_input</span></code> or <code class="docutils literal notranslate"><span class="pre">verify_output</span></code> function pointers.</p></li>
+<li><p>Set <code class="docutils literal notranslate"><span class="pre">TENSOR_ARENA_SIZE</span></code> if the model needs a larger arena.</p></li>
+<li><p>Run <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">validate</span></code>, then build with <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">MODEL_FILE=&lt;name&gt;.tflite</span></code>.</p></li>
+</ol>
+<p>To make a new model auto-select its profile, add a <code class="docutils literal notranslate"><span class="pre">MODEL_BASENAME</span></code> mapping in
+the Makefile.</p>
+</section>
+<section id="generated-files">
+<h2>Generated Files<a class="headerlink" href="#generated-files" title="Link to this heading">#</a></h2>
+<p>The Makefile generates:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>../build/sw/generated/model_data.h
+../build/sw/model_data.c
+../build/sw/main.elf
+../build/sw/main.bin
+</pre></div>
+</div>
+<p>Do not edit generated files directly. Change <code class="docutils literal notranslate"><span class="pre">MODEL_FILE</span></code>, source files, or
+Makefile variables instead.</p>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#quick-start">Quick Start</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#file-layout">File Layout</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#adding-a-menu-item">Adding A Menu Item</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#adding-a-custom-instruction-helper">Adding A Custom Instruction Helper</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#running-performance-tests">Running Performance Tests</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#adding-or-switching-models">Adding Or Switching Models</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#generated-files">Generated Files</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By  NYCU CAS-Lab
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2025, NYCU CAS-Lab.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
