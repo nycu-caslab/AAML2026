@@ -561,7 +561,7 @@ Make <code class="docutils literal notranslate"><span class="pre">NPU</span></co
 <section id="check-result-correction">
 <h3>4. Check Result Correction<a class="headerlink" href="#check-result-correction" title="Link to this heading">#</a></h3>
 <p>You can run “Basic Convolution Test” in project menu. This test only have have address aligned condition.</p>
-<a class="reference internal image-reference" href="../_images/basic_conv_test.png"><img alt="../_images/basic_conv_test.png" src="../_images/basic_conv_test.png" style="width: 300px;" />
+<a class="reference internal image-reference" href="../_images/basic_conv_test.png"><img alt="../_images/basic_conv_test.png" src="../_images/basic_conv_test.png" style="width: 450px;" />
 </a>
 <p>If you pass all testcase, you can get full score of basic part.</p>
 </section>
@@ -616,11 +616,21 @@ Make <code class="docutils literal notranslate"><span class="pre">NPU</span></co
 <div><p>TODO:</p>
 <ol class="arabic simple">
 <li><p>Add .tflite, profile.cc, and input data into platform</p></li>
+<li><p>Register TFLM Ops in <code class="docutils literal notranslate"><span class="pre">tflm_ops.cc</span></code>, and modify <code class="docutils literal notranslate"><span class="pre">kTflmResolverOpCount</span></code> in <code class="docutils literal notranslate"><span class="pre">tflm_ops.h</span></code> with number of register op.</p></li>
+<li><p>Set parameter in <code class="docutils literal notranslate"><span class="pre">project.mk</span></code> file (<code class="docutils literal notranslate"><span class="pre">MODEL_FILE</span></code>, <code class="docutils literal notranslate"><span class="pre">MODEL_PROFILE</span></code>, <code class="docutils literal notranslate"><span class="pre">TENSOR_ARENA_SIZE</span></code>), and add file of input data into <code class="docutils literal notranslate"><span class="pre">APP_EXTRA_SRCS</span></code>.</p></li>
 <li><p>Add below code to show outupt data after inference complete.</p></li>
 <li><p>Select “TFLM Inference, Verification, and Cycles” from the project menu.</p></li>
 <li><p>Compare result between orignal version and accelerated version.</p></li>
 </ol>
 </div></blockquote>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<ul class="simple">
+<li><p>You can use website in reference to know what TFLM OP will be used in model.</p></li>
+<li><p>You can set <code class="docutils literal notranslate"><span class="pre">TENSOR_ARENA_SIZE</span></code> as 1MB to avoid</p></li>
+<li><p>You can see your output is same as orignal version if your implement is correct.</p></li>
+</ul>
+</div>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Platform/sw/app/tflm_runner.cc</span>
 <span class="cm">/*...*/</span>
 
@@ -639,7 +649,7 @@ Make <code class="docutils literal notranslate"><span class="pre">NPU</span></co
 </div>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
-<p>If your result is match and runtime cycles is less than original version, you can get score in this part.</p>
+<p>If your result is match than original version convolution and runtime cycles is less, you can get score in this part.</p>
 </div>
 <p>This is result of label1 output:</p>
 <a class="reference internal image-reference" href="../_images/tflm_label1_output.png"><img alt="../_images/tflm_label1_output.png" src="../_images/tflm_label1_output.png" style="width: 400px;" />
