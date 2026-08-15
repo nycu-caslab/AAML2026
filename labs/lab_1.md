@@ -153,7 +153,7 @@ Because of directly accessing memory without D-cache, you needs to consider abou
 
 You can run "Basic Convolution Test" in project menu. This test only have have address aligned condition. 
 
-<img src="images/lab1/basic_conv_test.png" width="300px">
+<img src="images/lab1/basic_conv_test.png" width="450px">
 
 If you pass all testcase, you can get full score of basic part. 
 
@@ -205,9 +205,17 @@ You can download .tflite file and input data from below links.
 
 > TODO: 
 > 1. Add .tflite, profile.cc, and input data into platform
-> 2. Add below code to show outupt data after inference complete.
-> 3. Select "TFLM Inference, Verification, and Cycles" from the project menu. 
-> 4. Compare result between orignal version and accelerated version.
+> 2. Register TFLM Ops in `tflm_ops.cc`, and modify `kTflmResolverOpCount` in `tflm_ops.h` with number of register op.
+> 3. Set parameter in `project.mk` file (`MODEL_FILE`, `MODEL_PROFILE`, `TENSOR_ARENA_SIZE`), and add file of input data into `APP_EXTRA_SRCS`.
+> 4. Add below code to show outupt data after inference complete.
+> 5. Select "TFLM Inference, Verification, and Cycles" from the project menu. 
+> 6. Compare result between orignal version and accelerated version.
+
+```{hint}
+- You can use website in reference to know what TFLM OP will be used in model. 
+- You can set `TENSOR_ARENA_SIZE` as 1MB to avoid 
+- You can see your output is same as orignal version if your implement is correct.
+```
 
 ```cpp
 // Platform/sw/app/tflm_runner.cc
@@ -227,7 +235,7 @@ for (int i = 0; i < 12; i++) {
 ```
 
 ```{important}
-If your result is match and runtime cycles is less than original version, you can get score in this part.
+If your result is match than original version convolution and runtime cycles is less, you can get score in this part.
 ```
 
 This is result of label1 output: 
