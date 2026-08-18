@@ -15,7 +15,7 @@
 ---
 The systolic array used by Google Tensor Processing Unit (TPU) accelerates the matrix computation by using the dataflow operation. The systolic array contains multiple processing elements (PEs), each of them is responsible for the multiply–and-accumulate (MAC) operation. It can performs multiple elements in a matrix simultaneously and achieves high computational throughput.
 
-In this lab, we will use Verilog to implement PEs and a small systolic array composed of multiple PEs to accelerate convolution and general matrix vector multiplication (GEMV). Different stationary dataflows, such as Weight Stationary , Output Stationary , and Row Stationary, can be considered when designing the PE array. 
+In this lab, we will use Verilog to implement PEs and a small systolic array composed of multiple PEs to accelerate convolution and general matrix vector multiplication (GEMV). Different dataflows, such as Weight Stationary, Output Stationary, Input Stationary, and Row Stationary, can be considered when designing the PE array. 
 
 (Hint: The weight stationary is more complicated than output stationary.)
 ```{note}
@@ -24,6 +24,46 @@ In this lab, we will use Verilog to implement PEs and a small systolic array com
 
 2. You will be asked to put your systolic array on FPGA in ***lab 5***, so please make sure that your systolic array is a synthesizable circuit.
 ```
+
+## Background
+---
+### Weight Stationary
+In the weight staionary dataflow, each PE's register stores the weight values and remains stationary during MACs. Input activations are propagated through the PE array and multiplied by the locally stored weights. The generated partial sums are then forwarded to other PEs or accumulated outside the PE.
+
+each PE performs:
+
+$psum\_{out}=psum\_{in}+input\_{in}\times weight\_{local}$
+
+![Weight Stationary](images/lab3/WS.png)
+
+
+### Output Stationary
+In the output stationary dataflow, each PE's register stores the partial sum of an output value and keeps it stationary during MACs. Input activations and weights are propagated through the PE array and multiplied inside the PE. The partial sum is accumulated locally until the output value is completed.
+
+each PE performs:
+
+$psum\_{local}=psum\_{local}+input\times weight$
+
+![Output Stationary](images/lab3/OS.png)
+
+### Input Stationary
+In the input stationary dataflow, each PE's register stores an input activation and keeps it stationary during MACs. Different weights are propagated through the PE array and multiplied by the locally stored input value. The generated partial sums are then forwarded to other PEs or accumulated for the corresponding outputs.
+
+each PE performs:
+
+$psum\_{out}=psum\_{in}+input\_{local}\times weight\_{in}$
+
+![Input Stationary](images/lab3/IS.png)
+
+### Row Stationary
+In the row stationary dataflow, each PE performs part of a row convolution while reusing kernel values and overlapping input activations locally. Input activations are shifted or propagated between neighboring PEs to reuse the overlapping data of adjacent convolution windows. The generated partial sums are accumulated across PEs to produce the final convolution output.
+
+A 1D row convolution can be expressed as:
+$psum[x] = \sum_{k=0}^{N-1} input[x+k] \times weight[k]$
+
+![Row Stationary](images/lab3/RS.png)
+
+
 
 ## Systolic Array Implementation
 ---
@@ -41,14 +81,13 @@ The goals of this lab are to familiarize you with the concepts of dataflows in s
 
 You need to perform Convolution using the row stationary method with correct functional simulation using Processing Elements (PEs). That is, this design should perform 2D convolution between an M × M 8-bit matrix and an N × N 8-bit kernel.
 
-Your design should be written in Verilog. There is no limitation on how you implement your design.
+
 Your PEs shouldn’t exceed 4 × 4, and a 2D systolic array architecture is recommended.
 The design uses 8-bit input data and 32-bit accumulated data. Please be careful with bit-width issues.
 The total global buffer size is (1024 + 256 × 2) KiB.
 #### lab 3-2
-You need to perform GEMV using any one of the stationary methods with correct functional simulation using PEs. This design should perform multiplication between an M × K 4-bit matrix and a K × 1 8-bit vector.
+You need to perform GEMV with your method, using correct functional simulation with PEs. This design should perform multiplication between an M × K 4-bit matrix and a K × 1 8-bit vector.
 
-Your design should be written in Verilog. There is no limitation on how you implement your design.
 Your PEs shouldn’t exceed 4 × 4. The design uses 4-bit matrix data, 8-bit vector data, and 32-bit accumulated data. Please be careful with bit-width issues.
 The total global buffer size is (1024 + 256 + 128) KiB.
 
@@ -96,18 +135,18 @@ If you have the licence of `VCS` and want faster simulation, you may use the `Ma
 **Tabel 2: The SRAM interface of A and B SRAM**
 |  I/O   | Signal name  | Bit width | Description                                  |
 |  ----  | ----         | ----      |  ----                                        |     
-| Input  | wr_en        | 1         | The write enable signal.                     |
-| Input  | index        | 16        | The address of the sram to be read or write. |
-| Input  | data_in      | 32        | The data input to write to the SRAM          |
-| Output | data_out     | 32        | The data output from the SRAM                |
+| Input  | `wr_en`        | 1         | The write enable signal.                     |
+| Input  | `index`        | 16        | The address of the sram to be read or write. |
+| Input  | `data_in`      | 32        | The data input to write to the SRAM          |
+| Output | `data_out`     | 32        | The data output from the SRAM                |
 
 **Tabel 3: The SRAM interface of C SRAM**
 |  I/O   | Signal name  | Bit width | Description                                  |
 |  ----  | ----         | ----      |  ----                                        |     
-| Input  | wr_en        | 1         | The write enable signal.                     |
-| Input  | index        | 16        | The address of the sram to be read or write. |
-| Input  | data_in      | 128       | The data input to write to the SRAM          |
-| Output | data_out     | 128       | The data output from the SRAM                |
+| Input  | `wr_en`        | 1         | The write enable signal.                     |
+| Input  | `index`        | 16        | The address of the sram to be read or write. |
+| Input  | `data_in`      | 128       | The data input to write to the SRAM          |
+| Output | `data_out`     | 128       | The data output from the SRAM                |
 ``` {note}
 The 128-bit data input stands for 4 * 32-bit values, allowing 4 elements to be written simultaneously to the C SRAM.
 ```
@@ -144,10 +183,10 @@ The 128-bit data input stands for 4 * 32-bit values, allowing 4 elements to be w
 **Table 4: The SRAM Interface of C SRAM**
 |  I/O   | Signal name  | Bit width | Description                                  |
 |  ----  | ----         | ----      |  ----                                        |     
-| Input  | wr_en        | 1         | The write enable signal.                     |
-| Input  | index        | 16        | The address of the sram to be read or write. |
-| Input  | data_in      | 128       | The data input to write to the SRAM          |
-| Output | data_out     | 128       | The data output from the SRAM  
+| Input  | `wr_en`        | 1         | The write enable signal.                     |
+| Input  | `index`        | 16        | The address of the sram to be read or write. |
+| Input  | `data_in`      | 128       | The data input to write to the SRAM          |
+| Output | `data_out`     | 128       | The data output from the SRAM  
 
 ### Rules
 
