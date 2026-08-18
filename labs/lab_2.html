@@ -530,8 +530,8 @@ $<span class="w"> </span>cp<span class="w"> </span><span class="se">\</span>
 <li><p>Strongly recommend viewing the entire structure of the .tflite file for this lab. You can visualize the layer graph by uploading it to <a class="reference external" href="https://netron.app/">Netron</a>.</p></li>
 <li><p>Identify the parameters that will influence your implementation of the custom operation.</p></li>
 </ol>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;playground_util/print_params.h&quot;</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;cfu.h&quot;</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">"playground_util/print_params.h"</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">"cfu.h"</span>
 <span class="cm">/* ... */</span>
 <span class="kr">inline</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">ConvPerChannel</span><span class="p">(</span>
 <span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">ConvParams</span><span class="o">&amp;</span><span class="w"> </span><span class="n">params</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">int32_t</span><span class="o">*</span><span class="w"> </span><span class="n">output_multiplier</span><span class="p">,</span>
@@ -541,14 +541,14 @@ $<span class="w"> </span>cp<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">int32_t</span><span class="o">*</span><span class="w"> </span><span class="n">bias_data</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">RuntimeShape</span><span class="o">&amp;</span><span class="w"> </span><span class="n">output_shape</span><span class="p">,</span>
 <span class="w">    </span><span class="kt">int8_t</span><span class="o">*</span><span class="w"> </span><span class="n">output_data</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="c1">// Format is:</span>
-<span class="w">  </span><span class="c1">// &quot;padding_type&quot;, &quot;padding_width&quot;, &quot;padding_height&quot;, &quot;padding_width_offset&quot;,</span>
-<span class="w">  </span><span class="c1">// &quot;padding_height_offset&quot;, &quot;stride_width&quot;, &quot;stride_height&quot;,</span>
-<span class="w">  </span><span class="c1">// &quot;dilation_width_factor&quot;, &quot;dilation_height_factor&quot;, &quot;input_offset&quot;,</span>
-<span class="w">  </span><span class="c1">// &quot;weights_offset&quot;, &quot;output_offset&quot;, &quot;output_multiplier&quot;, &quot;output_shift&quot;,</span>
-<span class="w">  </span><span class="c1">// &quot;quantized_activation_min&quot;, &quot;quantized_activation_max&quot;,</span>
-<span class="w">  </span><span class="c1">// &quot;input_batches&quot;, &quot;input_height&quot;, &quot;input_width&quot;, &quot;input_depth&quot;,</span>
-<span class="w">  </span><span class="c1">// &quot;filter_output_depth&quot;, &quot;filter_height&quot;, &quot;filter_width&quot;, &quot;filter_input_depth&quot;,</span>
-<span class="w">  </span><span class="c1">// &quot;output_batches&quot;, &quot;output_height&quot;, &quot;output_width&quot;, &quot;output_depth&quot;,</span>
+<span class="w">  </span><span class="c1">// "padding_type", "padding_width", "padding_height", "padding_width_offset",</span>
+<span class="w">  </span><span class="c1">// "padding_height_offset", "stride_width", "stride_height",</span>
+<span class="w">  </span><span class="c1">// "dilation_width_factor", "dilation_height_factor", "input_offset",</span>
+<span class="w">  </span><span class="c1">// "weights_offset", "output_offset", "output_multiplier", "output_shift",</span>
+<span class="w">  </span><span class="c1">// "quantized_activation_min", "quantized_activation_max",</span>
+<span class="w">  </span><span class="c1">// "input_batches", "input_height", "input_width", "input_depth",</span>
+<span class="w">  </span><span class="c1">// "filter_output_depth", "filter_height", "filter_width", "filter_input_depth",</span>
+<span class="w">  </span><span class="c1">// "output_batches", "output_height", "output_width", "output_depth",</span>
 <span class="w">  </span><span class="n">print_conv_params</span><span class="p">(</span><span class="n">params</span><span class="p">,</span><span class="w"> </span><span class="n">input_shape</span><span class="p">,</span><span class="w"> </span><span class="n">filter_shape</span><span class="p">,</span><span class="w"> </span><span class="n">output_shape</span><span class="p">);</span>
 
 <span class="w">  </span><span class="cm">/* ... */</span>

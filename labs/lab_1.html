@@ -634,13 +634,13 @@ Make <code class="docutils literal notranslate"><span class="pre">NPU</span></co
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Platform/sw/app/tflm_runner.cc</span>
 <span class="cm">/*...*/</span>
 
-<span class="n">printf</span><span class="p">(</span><span class="s">&quot;Inference complete.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="n">printf</span><span class="p">(</span><span class="s">"Inference complete.</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
 
 <span class="c1">// show value of output data. </span>
-<span class="n">printf</span><span class="p">(</span><span class="s">&quot;Output Data:</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="n">printf</span><span class="p">(</span><span class="s">"Output Data:</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
 <span class="kt">uint32_t</span><span class="o">*</span><span class="w"> </span><span class="n">out_raw_bits</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">uint32_t</span><span class="o">*</span><span class="p">)</span><span class="n">output</span><span class="o">-&gt;</span><span class="n">data</span><span class="p">.</span><span class="n">f</span><span class="p">;</span>
 <span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">12</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;%-9d: 0x%08X</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">out_raw_bits</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+<span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">"%-9d: 0x%08X</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">out_raw_bits</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
 <span class="p">}</span>
 <span class="c1">//</span>
 

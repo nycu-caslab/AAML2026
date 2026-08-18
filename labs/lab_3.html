@@ -358,6 +358,13 @@
                 <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#goal-of-this-lab">Goal of this lab</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#introduction">Introduction</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#background">Background</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#weight-stationary">Weight Stationary</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#output-stationary">Output Stationary</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#input-stationary">Input Stationary</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#row-stationary">Row Stationary</a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#systolic-array-implementation">Systolic Array Implementation</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#prerequisite">Prerequisite</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#requirements">Requirements</a><ul class="nav section-nav flex-column">
@@ -423,7 +430,7 @@
 <h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">#</a></h2>
 <hr class="docutils" />
 <p>The systolic array used by Google Tensor Processing Unit (TPU) accelerates the matrix computation by using the dataflow operation. The systolic array contains multiple processing elements (PEs), each of them is responsible for the multiply–and-accumulate (MAC) operation. It can performs multiple elements in a matrix simultaneously and achieves high computational throughput.</p>
-<p>In this lab, we will use Verilog to implement PEs and a small systolic array composed of multiple PEs to accelerate convolution and general matrix vector multiplication (GEMV). Different stationary dataflows, such as Weight Stationary , Output Stationary , and Row Stationary, can be considered when designing the PE array.</p>
+<p>In this lab, we will use Verilog to implement PEs and a small systolic array composed of multiple PEs to accelerate convolution and general matrix vector multiplication (GEMV). Different dataflows, such as Weight Stationary, Output Stationary, Input Stationary, and Row Stationary, can be considered when designing the PE array.</p>
 <p>(Hint: The weight stationary is more complicated than output stationary.)</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -432,6 +439,38 @@
 <li><p>You will be asked to put your systolic array on FPGA in <em><strong>lab 5</strong></em>, so please make sure that your systolic array is a synthesizable circuit.</p></li>
 </ol>
 </div>
+</section>
+<section id="background">
+<h2>Background<a class="headerlink" href="#background" title="Link to this heading">#</a></h2>
+<hr class="docutils" />
+<section id="weight-stationary">
+<h3>Weight Stationary<a class="headerlink" href="#weight-stationary" title="Link to this heading">#</a></h3>
+<p>In the weight staionary dataflow, each PE’s register stores the weight values and remains stationary during MACs. Input activations are propagated through the PE array and multiplied by the locally stored weights. The generated partial sums are then forwarded to other PEs or accumulated outside the PE.</p>
+<p>each PE performs:</p>
+<p>$psum_{out}=psum_{in}+input_{in}\times weight_{local}$</p>
+<p><img alt="Weight Stationary" src="../_images/WS.png" /></p>
+</section>
+<section id="output-stationary">
+<h3>Output Stationary<a class="headerlink" href="#output-stationary" title="Link to this heading">#</a></h3>
+<p>In the output stationary dataflow, each PE’s register stores the partial sum of an output value and keeps it stationary during MACs. Input activations and weights are propagated through the PE array and multiplied inside the PE. The partial sum is accumulated locally until the output value is completed.</p>
+<p>each PE performs:</p>
+<p>$psum_{local}=psum_{local}+input\times weight$</p>
+<p><img alt="Output Stationary" src="../_images/OS.png" /></p>
+</section>
+<section id="input-stationary">
+<h3>Input Stationary<a class="headerlink" href="#input-stationary" title="Link to this heading">#</a></h3>
+<p>In the input stationary dataflow, each PE’s register stores an input activation and keeps it stationary during MACs. Different weights are propagated through the PE array and multiplied by the locally stored input value. The generated partial sums are then forwarded to other PEs or accumulated for the corresponding outputs.</p>
+<p>each PE performs:</p>
+<p>$psum_{out}=psum_{in}+input_{local}\times weight_{in}$</p>
+<p><img alt="Input Stationary" src="../_images/IS.png" /></p>
+</section>
+<section id="row-stationary">
+<h3>Row Stationary<a class="headerlink" href="#row-stationary" title="Link to this heading">#</a></h3>
+<p>In the row stationary dataflow, each PE performs part of a row convolution while reusing kernel values and overlapping input activations locally. Input activations are shifted or propagated between neighboring PEs to reuse the overlapping data of adjacent convolution windows. The generated partial sums are accumulated across PEs to produce the final convolution output.</p>
+<p>A 1D row convolution can be expressed as:
+$psum[x] = \sum_{k=0}^{N-1} input[x+k] \times weight[k]$</p>
+<p><img alt="Row Stationary" src="../_images/RS.png" /></p>
+</section>
 </section>
 <section id="systolic-array-implementation">
 <h2>Systolic Array Implementation<a class="headerlink" href="#systolic-array-implementation" title="Link to this heading">#</a></h2>
@@ -451,16 +490,14 @@
 <section id="lab-3-1">
 <h4>lab 3-1<a class="headerlink" href="#lab-3-1" title="Link to this heading">#</a></h4>
 <p>You need to perform Convolution using the row stationary method with correct functional simulation using Processing Elements (PEs). That is, this design should perform 2D convolution between an M × M 8-bit matrix and an N × N 8-bit kernel.</p>
-<p>Your design should be written in Verilog. There is no limitation on how you implement your design.
-Your PEs shouldn’t exceed 4 × 4, and a 2D systolic array architecture is recommended.
+<p>Your PEs shouldn’t exceed 4 × 4, and a 2D systolic array architecture is recommended.
 The design uses 8-bit input data and 32-bit accumulated data. Please be careful with bit-width issues.
 The total global buffer size is (1024 + 256 × 2) KiB.</p>
 </section>
 <section id="lab-3-2">
 <h4>lab 3-2<a class="headerlink" href="#lab-3-2" title="Link to this heading">#</a></h4>
-<p>You need to perform GEMV using any one of the stationary methods with correct functional simulation using PEs. This design should perform multiplication between an M × K 4-bit matrix and a K × 1 8-bit vector.</p>
-<p>Your design should be written in Verilog. There is no limitation on how you implement your design.
-Your PEs shouldn’t exceed 4 × 4. The design uses 4-bit matrix data, 8-bit vector data, and 32-bit accumulated data. Please be careful with bit-width issues.
+<p>You need to perform GEMV with your method, using correct functional simulation with PEs. This design should perform multiplication between an M × K 4-bit matrix and a K × 1 8-bit vector.</p>
+<p>Your PEs shouldn’t exceed 4 × 4. The design uses 4-bit matrix data, 8-bit vector data, and 32-bit accumulated data. Please be careful with bit-width issues.
 The total global buffer size is (1024 + 256 + 128) KiB.</p>
 </section>
 </section>
@@ -553,22 +590,22 @@ If you have the licence of <code class="docutils literal notranslate"><span clas
 </thead>
 <tbody>
 <tr class="row-even"><td><p>Input</p></td>
-<td><p>wr_en</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">wr_en</span></code></p></td>
 <td><p>1</p></td>
 <td><p>The write enable signal.</p></td>
 </tr>
 <tr class="row-odd"><td><p>Input</p></td>
-<td><p>index</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">index</span></code></p></td>
 <td><p>16</p></td>
 <td><p>The address of the sram to be read or write.</p></td>
 </tr>
 <tr class="row-even"><td><p>Input</p></td>
-<td><p>data_in</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">data_in</span></code></p></td>
 <td><p>32</p></td>
 <td><p>The data input to write to the SRAM</p></td>
 </tr>
 <tr class="row-odd"><td><p>Output</p></td>
-<td><p>data_out</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">data_out</span></code></p></td>
 <td><p>32</p></td>
 <td><p>The data output from the SRAM</p></td>
 </tr>
@@ -586,22 +623,22 @@ If you have the licence of <code class="docutils literal notranslate"><span clas
 </thead>
 <tbody>
 <tr class="row-even"><td><p>Input</p></td>
-<td><p>wr_en</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">wr_en</span></code></p></td>
 <td><p>1</p></td>
 <td><p>The write enable signal.</p></td>
 </tr>
 <tr class="row-odd"><td><p>Input</p></td>
-<td><p>index</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">index</span></code></p></td>
 <td><p>16</p></td>
 <td><p>The address of the sram to be read or write.</p></td>
 </tr>
 <tr class="row-even"><td><p>Input</p></td>
-<td><p>data_in</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">data_in</span></code></p></td>
 <td><p>128</p></td>
 <td><p>The data input to write to the SRAM</p></td>
 </tr>
 <tr class="row-odd"><td><p>Output</p></td>
-<td><p>data_out</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">data_out</span></code></p></td>
 <td><p>128</p></td>
 <td><p>The data output from the SRAM</p></td>
 </tr>
@@ -740,22 +777,22 @@ If you have the licence of <code class="docutils literal notranslate"><span clas
 </thead>
 <tbody>
 <tr class="row-even"><td><p>Input</p></td>
-<td><p>wr_en</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">wr_en</span></code></p></td>
 <td><p>1</p></td>
 <td><p>The write enable signal.</p></td>
 </tr>
 <tr class="row-odd"><td><p>Input</p></td>
-<td><p>index</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">index</span></code></p></td>
 <td><p>16</p></td>
 <td><p>The address of the sram to be read or write.</p></td>
 </tr>
 <tr class="row-even"><td><p>Input</p></td>
-<td><p>data_in</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">data_in</span></code></p></td>
 <td><p>128</p></td>
 <td><p>The data input to write to the SRAM</p></td>
 </tr>
 <tr class="row-odd"><td><p>Output</p></td>
-<td><p>data_out</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">data_out</span></code></p></td>
 <td><p>128</p></td>
 <td><p>The data output from the SRAM</p></td>
 </tr>
@@ -1101,6 +1138,13 @@ If you have the licence of <code class="docutils literal notranslate"><span clas
     <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#goal-of-this-lab">Goal of this lab</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#introduction">Introduction</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#background">Background</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#weight-stationary">Weight Stationary</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#output-stationary">Output Stationary</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#input-stationary">Input Stationary</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#row-stationary">Row Stationary</a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#systolic-array-implementation">Systolic Array Implementation</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#prerequisite">Prerequisite</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#requirements">Requirements</a><ul class="nav section-nav flex-column">

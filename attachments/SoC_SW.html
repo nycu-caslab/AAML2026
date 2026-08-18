@@ -396,8 +396,8 @@ make<span class="w"> </span>run<span class="w"> </span><span class="nv">MODEL_FI
 <span class="nv">TENSOR_ARENA_SIZE</span><span class="o">=</span><span class="m">262144</span>
 <span class="nv">USE_SOFTWARE_CFU</span><span class="o">=</span><span class="m">1</span>
 <span class="nv">TARGET_PREFIX</span><span class="o">=</span>riscv64-unknown-elf
-<span class="nv">APP_DEFINES</span><span class="o">=</span><span class="s2">&quot;-DMY_FLAG=1&quot;</span>
-<span class="nv">APP_EXTRA_SRCS</span><span class="o">=</span><span class="s2">&quot;project/my_extra_file.cc&quot;</span>
+<span class="nv">APP_DEFINES</span><span class="o">=</span><span class="s2">"-DMY_FLAG=1"</span>
+<span class="nv">APP_EXTRA_SRCS</span><span class="o">=</span><span class="s2">"project/my_extra_file.cc"</span>
 </pre></div>
 </div>
 <p>For repeated local settings, copy <code class="docutils literal notranslate"><span class="pre">project.mk.example</span></code> to <code class="docutils literal notranslate"><span class="pre">project.mk</span></code> and edit
@@ -433,7 +433,7 @@ add semantic helpers in <code class="docutils literal notranslate"><span class="
 <span class="p">}</span>
 
 <span class="k">const</span><span class="w"> </span><span class="n">MenuItem</span><span class="w"> </span><span class="n">kUserItems</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="n">MENU_ITEM</span><span class="p">(</span><span class="sc">&#39;m&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;my test&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">do_my_test</span><span class="p">),</span>
+<span class="w">    </span><span class="n">MENU_ITEM</span><span class="p">(</span><span class="sc">'m'</span><span class="p">,</span><span class="w"> </span><span class="s">"my test"</span><span class="p">,</span><span class="w"> </span><span class="n">do_my_test</span><span class="p">),</span>
 <span class="w">    </span><span class="n">MENU_END</span><span class="p">,</span>
 <span class="p">};</span>
 </pre></div>

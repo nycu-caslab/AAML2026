@@ -435,18 +435,18 @@ $<span class="w"> </span>unzip<span class="w"> </span>lab4_model.zip
 </ol>
 <p>After that, just like we did in lab 1, we should modify some files to add the new models:</p>
 <p><code class="docutils literal notranslate"><span class="pre">CFU-Playground/common/src/models/models.c</span></code></p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;models/ds_cnn_stream_fe/ds_cnn.h&quot;</span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">"models/ds_cnn_stream_fe/ds_cnn.h"</span>
 <span class="c1">// add codes below</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;models/mobileViT_xxs/mobileViT.h&quot;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">"models/mobileViT_xxs/mobileViT.h"</span>
 
 <span class="p">...</span>
 
 <span class="cp">#if defined(INCLUDE_MODEL_DS_CNN_STREAM_FE)</span>
-<span class="w">        </span><span class="n">MENU_ITEM</span><span class="p">(</span><span class="n">AUTO_INC_CHAR</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Ds cnn stream fe&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ds_cnn_stream_fe_menu</span><span class="p">),</span>
+<span class="w">        </span><span class="n">MENU_ITEM</span><span class="p">(</span><span class="n">AUTO_INC_CHAR</span><span class="p">,</span><span class="w"> </span><span class="s">"Ds cnn stream fe"</span><span class="p">,</span><span class="w"> </span><span class="n">ds_cnn_stream_fe_menu</span><span class="p">),</span>
 <span class="cp">#endif</span>
 <span class="c1">// add codes below</span>
 <span class="cp">#if defined(INCLUDE_MODEL_MOBILE_VIT_XXS)</span>
-<span class="w">        </span><span class="n">MENU_ITEM</span><span class="p">(</span><span class="n">AUTO_INC_CHAR</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;MobileViT xxs&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">mobileViT_xxs_menu</span><span class="p">),</span>
+<span class="w">        </span><span class="n">MENU_ITEM</span><span class="p">(</span><span class="n">AUTO_INC_CHAR</span><span class="p">,</span><span class="w"> </span><span class="s">"MobileViT xxs"</span><span class="p">,</span><span class="w"> </span><span class="n">mobileViT_xxs_menu</span><span class="p">),</span>
 <span class="cp">#endif</span>
 </pre></div>
 </div>
@@ -466,7 +466,7 @@ $<span class="w"> </span>unzip<span class="w"> </span>lab4_model.zip
 </pre></div>
 </div>
 <p>After completing these steps, you should be able to run the MobileViT model and the Tests in the <code class="docutils literal notranslate"><span class="pre">Project</span> <span class="pre">menu</span></code>.</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>make<span class="w"> </span>prog<span class="w"> </span><span class="nv">EXTRA_LITEX_ARGS</span><span class="o">=</span><span class="s2">&quot;--cpu-variant=perf+cfu&quot;</span>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>make<span class="w"> </span>prog<span class="w"> </span><span class="nv">EXTRA_LITEX_ARGS</span><span class="o">=</span><span class="s2">"--cpu-variant=perf+cfu"</span>
 $<span class="w"> </span>make<span class="w"> </span>load
 </pre></div>
 </div>
