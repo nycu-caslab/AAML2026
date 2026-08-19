@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Lab 2 : Quantization and SIMD MAC &#8212; CSIC30066: Accelerator Architectures for Machine Learning</title>
+    <title>Lab 2: AXI4 Burst Reads for a SIMD CFU &#8212; CSIC30066: Accelerator Architectures for Machine Learning</title>
   
   
   
@@ -196,7 +196,7 @@
 <ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="lab_0.html">Lab 0 : Environment Setup</a></li>
 <li class="toctree-l1"><a class="reference internal" href="lab_1.html">Lab 1 : Aligned AXI Data on SIMD</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Lab 2 : Quantization and SIMD MAC</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Lab 2: AXI4 Burst Reads for a SIMD CFU</a></li>
 <li class="toctree-l1"><a class="reference internal" href="lab_3.html">Lab 3 : Systolic Array</a></li>
 <li class="toctree-l1"><a class="reference internal" href="lab_4.html">Lab 4 : Elementwise Unit</a></li>
 <li class="toctree-l1"><a class="reference internal" href="lab_5.html">Lab 5 : Systolic Array with im2col for Convolution</a></li>
@@ -346,7 +346,7 @@
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Lab 2 : Quantization and SIMD MAC</h1>
+    <h1>Lab 2: AXI4 Burst Reads for a SIMD CFU</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -356,19 +356,30 @@
             </div>
             <nav aria-label="Page">
                 <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#goal-of-this-lab">Goal of this lab</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#introduction">Introduction</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#running-quantized-model-10">Running Quantized Model - 10%</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#simd-mac-instruction-80">SIMD MAC Instruction - 80%</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#accelerate-convolution-60">Accelerate Convolution - 60%</a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#cfu-v">cfu.v</a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#conv-h">conv.h</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#learning-goals">Learning goals</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grading">Grading</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#prerequisites-and-setup">Prerequisites and setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#files-and-submission-boundary">Files and submission boundary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#required-software-contract">Required software contract</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#part-1-axi4-read-burst-engine-and-dot-service-20">Part 1: AXI4 read burst engine and dot service (20%)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#required-transfer-domain">Required transfer domain</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#axi-protocol-requirements">AXI protocol requirements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#software-verification">Software verification</a></li>
 </ul>
 </li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#accelerate-fully-connected-20">Accelerate Fully Connected - 20%</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#part-2-tflm-convolution-integration-20">Part 2: TFLM convolution integration (20%)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Software verification</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#run-the-ds-cnn-stream-fe-model">Run the <code class="docutils literal notranslate"><span class="pre">ds_cnn_stream_fe</span></code> model</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#questions-in-the-demo-10">Questions in the Demo - 10%</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#latency-and-accelerator-resource-efficiency-40">Latency and accelerator-resource efficiency (40%)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#available-hardware-and-maximum-usage">Available hardware and maximum usage</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#latency-efficiency">Latency efficiency</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ranking">Ranking</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#demo-and-questions-20">Demo and questions (20%)</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#submission">Submission</a></li>
 </ul>
             </nav>
@@ -381,258 +392,363 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="lab-2-quantization-and-simd-mac">
-<h1>Lab 2 : Quantization and SIMD MAC<a class="headerlink" href="#lab-2-quantization-and-simd-mac" title="Link to this heading">#</a></h1>
-<section id="goal-of-this-lab">
-<h2>Goal of this lab<a class="headerlink" href="#goal-of-this-lab" title="Link to this heading">#</a></h2>
-<hr class="docutils" />
-<ul class="simple">
-<li><p><a class="reference internal" href="#running-quantized-model-10"><span class="xref myst">Running Quantized Model - 10%</span></a></p></li>
-<li><p><a class="reference internal" href="#simd-mac-instruction-80"><span class="xref myst">SIMD MAC Instruction - 80%</span></a></p></li>
-<li><p><a class="reference internal" href="#questions-in-the-demo-10"><span class="xref myst">Questions in the Demo - 10%</span></a></p></li>
-</ul>
-</section>
+  <section id="lab-2-axi4-burst-reads-for-a-simd-cfu">
+<h1>Lab 2: AXI4 Burst Reads for a SIMD CFU<a class="headerlink" href="#lab-2-axi4-burst-reads-for-a-simd-cfu" title="Link to this heading">#</a></h1>
 <section id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">#</a></h2>
-<hr class="docutils" />
-<p>In the previous lab, we successfully ran the float32 Keyword Spotting (KWS) model on CFU-Playground. In this lab, we will focus on running a quantized int8 KWS model and leverage the benefits of quantization to achieve acceleration.</p>
+<p>In Lab 1, the NPU fetched one 32-bit word per custom instruction. In this lab, one software command must start an AXI4 INCR read burst and retain multiple beats in accelerator-local storage. You will reuse those burst-loaded operands in a self-designed compute datapath and accelerate the int8 convolution used by <code class="docutils literal notranslate"><span class="pre">ds_cnn_stream_fe.tflite</span></code> in Lab 1.</p>
+<p>The compute instruction encoding and internal microarchitecture are your choice while the external visible behavior is fixed.</p>
 </section>
-<section id="running-quantized-model-10">
-<h2>Running Quantized Model - 10%<a class="headerlink" href="#running-quantized-model-10" title="Link to this heading">#</a></h2>
-<hr class="docutils" />
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>CFU-Playground/proj
-$<span class="w"> </span>cp<span class="w"> </span>-r<span class="w"> </span>&lt;lab1<span class="w"> </span>proj<span class="w"> </span>folder&gt;/*<span class="w"> </span>&lt;lab2<span class="w"> </span>proj<span class="w"> </span>folder&gt;
-$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>&lt;lab2<span class="w"> </span>proj<span class="w"> </span>folder&gt;
+<section id="learning-goals">
+<h2>Learning goals<a class="headerlink" href="#learning-goals" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>implement an AXI4 read burst using the VALID/READY protocol</p></li>
+<li><p>interpret <code class="docutils literal notranslate"><span class="pre">ARLEN</span></code> and <code class="docutils literal notranslate"><span class="pre">RLAST</span></code> correctly and tolerate bus stalls</p></li>
+<li><p>buffer and reuse data instead of issuing repeated single-word reads</p></li>
+<li><p>define a stable hardware/software interface for custom instructions</p></li>
+<li><p>compare latency and FPGA resource cost under a reproducible flow</p></li>
+</ul>
+</section>
+<section id="grading">
+<h2>Grading<a class="headerlink" href="#grading" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Component</p></th>
+<th class="head text-right"><p>Weight</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>AXI4 burst engine and dot-product service</p></td>
+<td class="text-right"><p>20%</p></td>
+</tr>
+<tr class="row-odd"><td><p>TFLM convolution and model correctness</p></td>
+<td class="text-right"><p>20%</p></td>
+</tr>
+<tr class="row-even"><td><p>Latency and accelerator-resource efficiency</p></td>
+<td class="text-right"><p>40%</p></td>
+</tr>
+<tr class="row-odd"><td><p>Demo and questions</p></td>
+<td class="text-right"><p>20%</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="prerequisites-and-setup">
+<h2>Prerequisites and setup<a class="headerlink" href="#prerequisites-and-setup" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Vivado 2024.1</p></li>
+<li><p>RISC-V toolchain</p></li>
+<li><p>Python 3 with <code class="docutils literal notranslate"><span class="pre">pyserial</span></code></p></li>
+<li><p>Verilator and a host C++11 compiler</p></li>
+<li><p>Model file <code class="docutils literal notranslate"><span class="pre">ds_cnn_stream_fe.tflite</span></code> and its profile from Lab1</p></li>
+</ul>
+<p>From the repository root, run this preflight before editing RTL:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>vivado<span class="w"> </span>-version
+verilator<span class="w"> </span>--version
+c++<span class="w"> </span>--version
+riscv64-unknown-elf-g++<span class="w"> </span>--version
+python3<span class="w"> </span>-c<span class="w"> </span><span class="s2">"import serial"</span>
+make<span class="w"> </span>-C<span class="w"> </span>Platform/sw<span class="w"> </span>validate
+make<span class="w"> </span>-C<span class="w"> </span>Platform/sw<span class="w"> </span>check-env<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="nv">MODEL_FILE</span><span class="o">=</span>ds_cnn_stream_fe.tflite<span class="w"> </span><span class="nv">MODEL_PROFILE</span><span class="o">=</span>ds_cnn_stream_fe
 </pre></div>
 </div>
-<p>Quantizing a float model to int8 can be quite complex and is not the primary focus of this lab. Therefore, we have provided the quantized model for you. You can simply replace <code class="docutils literal notranslate"><span class="pre">CFU-Playground/common/src/models/ds_cnn_stream_fe/ds_cnn_stream_fe.tflite</span></code> with the new model provided below.</p>
+<p>Use the course setup instructions if one of these commands fails.</p>
+</section>
+<section id="files-and-submission-boundary">
+<h2>Files and submission boundary<a class="headerlink" href="#files-and-submission-boundary" title="Link to this heading">#</a></h2>
+<p>You may modify:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Platform/hw/srcs/NPU.v</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Platform/sw/project/lab2_api.h</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Platform/sw/project/lab2_api.cc</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Platform/sw/tflm_patches/tensorflow/lite/kernels/internal/reference/integer_ops/conv.h</span></code></p></li>
+</ul>
+<p>You may add helper Verilog modules under <code class="docutils literal notranslate"><span class="pre">Platform/hw/srcs/</span></code> and helper C/C++ files under <code class="docutils literal notranslate"><span class="pre">Platform/sw/project/</span></code>. Do not replace or rename the <code class="docutils literal notranslate"><span class="pre">NPU</span></code> module. Preserve its complete port list, active-low <code class="docutils literal notranslate"><span class="pre">rst_n</span></code> behavior, and CPU/AXI signal directions so the existing block design still elaborates.</p>
+<p><code class="docutils literal notranslate"><span class="pre">NPU.v</span></code> is starter code, not a golden implementation. Write your own accelerator after all the environmental check passed.</p>
 <blockquote>
-<div><p><a class="reference external" href="https://drive.google.com/file/d/1CgEhJm0IoaXx3ULrn-Dfuw3LH83SnFlV/view?usp=sharing">ds_cnn_stream_fe.tflite</a></p>
+<div><p>[!IMPORTANT]
+Your submitted project must build and run without source edits. Keep the required API signatures below even if you change every underlying <code class="docutils literal notranslate"><span class="pre">funct3</span></code>/<code class="docutils literal notranslate"><span class="pre">funct7</span></code> value.</p>
 </div></blockquote>
-<p>Ensure that the <code class="docutils literal notranslate"><span class="pre">ds_cnn_stream_fe</span></code> model is included in the project’s Makefile. Additionally, you may want to include the <code class="docutils literal notranslate"><span class="pre">pdti8</span></code> model to verify if your design can pass the golden test.</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="c1"># Uncomment to include specified model in built binary</span>
-<span class="nv">DEFINES</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span>INCLUDE_MODEL_PDTI8
-<span class="c1">#DEFINES += INCLUDE_MODEL_MICRO_SPEECH</span>
-<span class="c1">#DEFINES += INCLUDE_MODEL_MAGIC_WAND</span>
-<span class="c1">#DEFINES += INCLUDE_MODEL_MNV2</span>
-<span class="c1">#DEFINES += INCLUDE_MODEL_HPS</span>
-<span class="c1">#DEFINES += INCLUDE_MODEL_MLCOMMONS_TINY_V01_ANOMD</span>
-<span class="c1">#DEFINES += INCLUDE_MODEL_MLCOMMONS_TINY_V01_IMGC</span>
-<span class="c1">#DEFINES += INCLUDE_MODEL_MLCOMMONS_TINY_V01_KWS</span>
-<span class="c1">#DEFINES += INCLUDE_MODEL_MLCOMMONS_TINY_V01_VWW</span>
-<span class="nv">DEFINES</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span>INCLUDE_MODEL_DS_CNN_STREAM_FE
-</pre></div>
-</div>
-<p>Build and load the hardware and software to test.</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>make<span class="w"> </span>clean
-$<span class="w"> </span>make<span class="w"> </span>prog
-$<span class="w"> </span>make<span class="w"> </span>load
-</pre></div>
-</div>
-<p>The result should look like the image below. As with the previous lab, the predicted results should also be correct.</p>
-<p><img alt="alt text" src="../_images/quantized.png" /></p>
-<p>You should observe a significant reduction in the number of cycles, as the quantized fixed-point model eliminates the need for complex floating-point calculations. However, we can further enhance performance by leveraging another benefit of quantization: reduced bit width.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>The quantized fixed-point Convolution utilizes the <code class="docutils literal notranslate"><span class="pre">conv.h</span></code> kernel found in <code class="docutils literal notranslate"><span class="pre">tensorflow/lite/kernels/internal/reference/integer_ops</span></code>, while the float32 Convolution from the previous lab uses <code class="docutils literal notranslate"><span class="pre">tensorflow/lite/kernels/internal/reference/conv.h</span></code>. These kernels differ, so if you notice that your cycle counter does not function correctly with the quantized model, there is no need for concern.</p>
-</div>
 </section>
-<section id="simd-mac-instruction-80">
-<h2>SIMD MAC Instruction - 80%<a class="headerlink" href="#simd-mac-instruction-80" title="Link to this heading">#</a></h2>
-<hr class="docutils" />
-<section id="accelerate-convolution-60">
-<h3>Accelerate Convolution - 60%<a class="headerlink" href="#accelerate-convolution-60" title="Link to this heading">#</a></h3>
-<div class="admonition hint">
-<p class="admonition-title">Hint</p>
-<p><a class="reference external" href="https://cfu-playground.readthedocs.io/en/latest/step-by-step.html">The Step-by-Step Guide to Building an ML Accelerator</a><br />
-You can refer to the tutorial provided in the link, but the design in the tutorial cannot be directly applied to the model we provided. This means that <strong>if you copy the tutorial exactly, your program is likely to not function correctly</strong>. Please properly profile the model we have provided and use this to design an accelerator that suits this model.</p>
-</div>
-<p>The main principle of SIMD (Single Instruction, Multiple Data) instructions involves processing multiple data with a single instruction. In the int8 convolution, each filter and input value spans 8 bits. Utilizing a custom CFU operation, we can employ two 32-bit wide registers. This setup enables the execution of four simultaneous MAC (Multiply-Accumulate) operations in a single cycle.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>              <span class="mi">7</span> <span class="n">bits</span>
-         <span class="o">+--------------+</span>
-<span class="n">funct7</span> <span class="o">=</span> <span class="o">|</span> <span class="p">(</span><span class="nb">bool</span><span class="p">)</span> <span class="n">reset</span> <span class="o">|</span>
-         <span class="o">+--------------+</span>
-
-              <span class="n">int8_t</span>           <span class="n">int8_t</span>           <span class="n">int8_t</span>           <span class="n">int8_t</span>
-         <span class="o">+----------------+----------------+----------------+----------------+</span>
-   <span class="n">in0</span> <span class="o">=</span> <span class="o">|</span> <span class="n">input_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="o">|</span> <span class="n">input_data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>  <span class="o">|</span> <span class="n">input_data</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>  <span class="o">|</span> <span class="n">input_data</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>  <span class="o">|</span>
-         <span class="o">+----------------+----------------+----------------+----------------+</span>
-
-              <span class="n">int8_t</span>           <span class="n">int8_t</span>           <span class="n">int8_t</span>           <span class="n">int8_t</span>
-         <span class="o">+----------------+----------------+----------------+----------------+</span>
-   <span class="n">in1</span> <span class="o">=</span> <span class="o">|</span> <span class="n">filter_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">|</span> <span class="n">filter_data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">|</span> <span class="n">filter_data</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">|</span> <span class="n">filter_data</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">|</span>
-         <span class="o">+----------------+----------------+----------------+----------------+</span>
-
-                                        <span class="n">int32_t</span>
-         <span class="o">+----------------------------------------------------------------------+</span>
-<span class="n">output</span> <span class="o">=</span> <span class="o">|</span> <span class="n">output</span> <span class="o">+</span> <span class="p">(</span><span class="n">input_data</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="n">offset</span><span class="p">)</span> <span class="o">*</span> <span class="n">filter_data</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">|</span>
-         <span class="o">+----------------------------------------------------------------------+</span>
+<section id="required-software-contract">
+<h2>Required software contract<a class="headerlink" href="#required-software-contract" title="Link to this heading">#</a></h2>
+<p>The public and grading software calls the following function declared in <code class="docutils literal notranslate"><span class="pre">Platform/sw/project/lab2_api.h</span></code>:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="kt">int32_t</span><span class="w"> </span><span class="nf">hw_simd_mac</span><span class="p">(</span><span class="kt">int8_t</span><span class="o">*</span><span class="w"> </span><span class="n">ptr1</span><span class="p">,</span><span class="w"> </span><span class="kt">int8_t</span><span class="o">*</span><span class="w"> </span><span class="n">ptr2</span><span class="p">,</span><span class="w"> </span><span class="kt">int8_t</span><span class="w"> </span><span class="n">input_offset</span><span class="p">,</span><span class="w"> </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">N</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>Feel free to use the templates below or write your own.</p>
-<section id="cfu-v">
-<h4>cfu.v<a class="headerlink" href="#cfu-v" title="Link to this heading">#</a></h4>
-<div class="highlight-verilog notranslate"><div class="highlight"><pre><span></span><span class="k">module</span><span class="w"> </span><span class="n">Cfu</span><span class="w"> </span><span class="p">(</span>
-<span class="w">    </span><span class="k">input</span><span class="w">               </span><span class="n">cmd_valid</span><span class="p">,</span>
-<span class="w">    </span><span class="k">output</span><span class="w">              </span><span class="n">cmd_ready</span><span class="p">,</span>
-<span class="w">    </span><span class="k">input</span><span class="w">      </span><span class="p">[</span><span class="mh">9</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span><span class="w">    </span><span class="n">cmd_payload_function_id</span><span class="p">,</span>
-<span class="w">    </span><span class="k">input</span><span class="w">      </span><span class="p">[</span><span class="mh">31</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span><span class="w">   </span><span class="n">cmd_payload_inputs_0</span><span class="p">,</span>
-<span class="w">    </span><span class="k">input</span><span class="w">      </span><span class="p">[</span><span class="mh">31</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span><span class="w">   </span><span class="n">cmd_payload_inputs_1</span><span class="p">,</span>
-<span class="w">    </span><span class="k">output</span><span class="w"> </span><span class="kt">reg</span><span class="w">          </span><span class="n">rsp_valid</span><span class="p">,</span>
-<span class="w">    </span><span class="k">input</span><span class="w">               </span><span class="n">rsp_ready</span><span class="p">,</span>
-<span class="w">    </span><span class="k">output</span><span class="w"> </span><span class="kt">reg</span><span class="w"> </span><span class="p">[</span><span class="mh">31</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span><span class="w">   </span><span class="n">rsp_payload_outputs_0</span><span class="p">,</span>
-<span class="w">    </span><span class="k">input</span><span class="w">               </span><span class="n">reset</span><span class="p">,</span>
-<span class="w">    </span><span class="k">input</span><span class="w">               </span><span class="n">clk</span>
-<span class="p">);</span>
-
-<span class="w">    </span><span class="kt">reg</span><span class="w"> </span><span class="p">[</span><span class="mh">8</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="n">InputOffset</span><span class="p">,</span><span class="w"> </span><span class="n">FilterOffset</span><span class="p">;</span>
-
-<span class="w">    </span><span class="c1">// SIMD multiply step:</span>
-<span class="w">    </span><span class="kt">wire</span><span class="w"> </span><span class="k">signed</span><span class="w"> </span><span class="p">[</span><span class="mh">15</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="n">prod_0</span><span class="p">,</span><span class="w"> </span><span class="n">prod_1</span><span class="p">,</span><span class="w"> </span><span class="n">prod_2</span><span class="p">,</span><span class="w"> </span><span class="n">prod_3</span><span class="p">;</span>
-<span class="w">    </span><span class="k">assign</span><span class="w"> </span><span class="n">prod_0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>
-<span class="w">    </span><span class="k">assign</span><span class="w"> </span><span class="n">prod_1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>
-<span class="w">    </span><span class="k">assign</span><span class="w"> </span><span class="n">prod_2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>
-<span class="w">    </span><span class="k">assign</span><span class="w"> </span><span class="n">prod_3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>
-
-<span class="w">    </span><span class="kt">wire</span><span class="w"> </span><span class="k">signed</span><span class="w"> </span><span class="p">[</span><span class="mh">31</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span><span class="w"> </span><span class="n">sum_prods</span><span class="p">;</span>
-<span class="w">    </span><span class="k">assign</span><span class="w"> </span><span class="n">sum_prods</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">prod_0</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">prod_1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">prod_2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">prod_3</span><span class="p">;</span>
-
-<span class="w">    </span><span class="c1">// Only not ready for a command when we have a response.</span>
-<span class="w">    </span><span class="k">assign</span><span class="w"> </span><span class="n">cmd_ready</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">~</span><span class="n">rsp_valid</span><span class="p">;</span>
-
-<span class="w">    </span><span class="k">always</span><span class="w"> </span><span class="p">@(</span><span class="k">posedge</span><span class="w"> </span><span class="n">clk</span><span class="p">)</span><span class="w"> </span><span class="k">begin</span>
-<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="k">begin</span>
-
-<span class="w">        </span><span class="k">end</span>
-
-<span class="w">    </span><span class="k">end</span><span class="w">	         </span>
-<span class="k">endmodule</span>
+<p>Keep this signature and its C linkage unchanged, and implement it in <code class="docutils literal notranslate"><span class="pre">Platform/sw/project/lab2_api.cc</span></code>. The buffers are read-only from the accelerator’s point of view.</p>
+<p>For every valid call, return the exact signed 32-bit result:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">((</span><span class="n">ptr1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">input_offset</span><span class="p">)</span><span class="o">*</span><span class="n">ptr2</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">))</span>
 </pre></div>
 </div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p><a class="reference external" href="https://cfu-playground.readthedocs.io/en/latest/interface.html">Details and Use Cases of the CPU &lt;-&gt; CFU interface</a><br />
-For the handshake interface of CPU and CFU, you can refer to this guide. In this lab, the simplest one is OK, but in the following labs, you might use others.
-For the handshake interface between the CPU and CFU, please refer to this guide. For this lab, the simplest one is enough. However, for the following labs, you may need to explore other options.</p>
+<p>You can check function <code class="docutils literal notranslate"><span class="pre">ConvPerChannel</span></code> in file <code class="docutils literal notranslate"><span class="pre">tflite-micro/tensorflow/lite/kernels/internal/reference/integer_ops/conv.h</span></code> for more detail.</p>
+<p>The required input domain is:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Property</p></th>
+<th class="head"><p>Required domain</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ptr1[i]</span></code>, <code class="docutils literal notranslate"><span class="pre">ptr2[i]</span></code></p></td>
+<td><p>Signed two’s-complement int8 values</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">input_offset</span></code></p></td>
+<td><p>Signed int8 value from <code class="docutils literal notranslate"><span class="pre">-128</span></code> through <code class="docutils literal notranslate"><span class="pre">127</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">N</span></code></p></td>
+<td><p>Every integer from <code class="docutils literal notranslate"><span class="pre">1</span></code> through <code class="docutils literal notranslate"><span class="pre">256</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Pointer alignment</p></td>
+<td><p>Each pointer may independently have byte offset <code class="docutils literal notranslate"><span class="pre">0</span></code>, <code class="docutils literal notranslate"><span class="pre">1</span></code>, <code class="docutils literal notranslate"><span class="pre">2</span></code>, or <code class="docutils literal notranslate"><span class="pre">3</span></code> from a 4-byte boundary</p></td>
+</tr>
+<tr class="row-even"><td><p>Buffer access</p></td>
+<td><p>Each pointer supplies at least <code class="docutils literal notranslate"><span class="pre">N</span></code> readable bytes; the function must not modify them</p></td>
+</tr>
+<tr class="row-odd"><td><p>Return value</p></td>
+<td><p>Exact signed 32-bit result for the formula above</p></td>
+</tr>
+</tbody>
+</table>
 </div>
+<p>Accumulate and return the result as signed 32-bit data.</p>
+<p>The CUSTOM-0 encoding behind <code class="docutils literal notranslate"><span class="pre">hw_simd_mac</span></code> is your design. You may choose the <code class="docutils literal notranslate"><span class="pre">funct3</span></code> and <code class="docutils literal notranslate"><span class="pre">funct7</span></code> values, command sequence, local-buffer organization, state machine, and SIMD width. Use the helpers in <code class="docutils literal notranslate"><span class="pre">Platform/sw/app/cfu.h</span></code>.</p>
+<p>The multiplication and main accumulation must be performed by custom hardware using operand data read through AXI4 bursts. A CPU loop that calculates the dot product, including one hidden inside <code class="docutils literal notranslate"><span class="pre">hw_simd_mac</span></code>, does not satisfy the assignment. Software may copy or pad operands into legal staging buffers, clean cache lines, issue custom instructions, and combine accelerator partial results.</p>
 </section>
-<section id="conv-h">
-<h4>conv.h<a class="headerlink" href="#conv-h" title="Link to this heading">#</a></h4>
-<p>Add the integer version of Covolution to your project.</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>mkdir<span class="w"> </span>-p<span class="w"> </span>src/tensorflow/lite/kernels/internal/reference/integer_ops
-$<span class="w"> </span>cp<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>../../third_party/tflite-micro/tensorflow/lite/kernels/internal/reference/integer_ops/conv.h<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>src/tensorflow/lite/kernels/internal/reference/integer_ops/conv.h
+<section id="part-1-axi4-read-burst-engine-and-dot-service-20">
+<h2>Part 1: AXI4 read burst engine and dot service (20%)<a class="headerlink" href="#part-1-axi4-read-burst-engine-and-dot-service-20" title="Link to this heading">#</a></h2>
+<p>Implement the read-burst engine and SIMD multiply-accumulate datapath in <code class="docutils literal notranslate"><span class="pre">Platform/hw/srcs/NPU.v</span></code>, then implement <code class="docutils literal notranslate"><span class="pre">hw_simd_mac</span></code> in <code class="docutils literal notranslate"><span class="pre">Platform/sw/project/lab2_api.cc</span></code> using your custom instructions. The NPU must fetch both operand vectors through its AXI master and use the fetched bytes in the returned dot product. AXI writes are not required for Lab 2.</p>
+<section id="required-transfer-domain">
+<h3>Required transfer domain<a class="headerlink" href="#required-transfer-domain" title="Link to this heading">#</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">N</span></code> in the software ABI is an element count measured in bytes, not an AXI word count. Use <code class="docutils literal notranslate"><span class="pre">B</span></code> below for the number of 32-bit AXI beats in one load. Every burst issued for Lab 2 must satisfy:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Property</p></th>
+<th class="head"><p>Requirement</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Direction</p></td>
+<td><p>Read only</p></td>
+</tr>
+<tr class="row-odd"><td><p>AXI data width</p></td>
+<td><p>32 bits</p></td>
+</tr>
+<tr class="row-even"><td><p>Burst type</p></td>
+<td><p>INCR (<code class="docutils literal notranslate"><span class="pre">ARBURST</span> <span class="pre">=</span> <span class="pre">2'b01</span></code>)</p></td>
+</tr>
+<tr class="row-odd"><td><p>Beat size</p></td>
+<td><p>4 bytes (<code class="docutils literal notranslate"><span class="pre">ARSIZE</span> <span class="pre">=</span> <span class="pre">3'b010</span></code>)</p></td>
+</tr>
+<tr class="row-even"><td><p>Length</p></td>
+<td><p>2 through 64 beats</p></td>
+</tr>
+<tr class="row-odd"><td><p>AXI start address</p></td>
+<td><p>4-byte aligned address in <code class="docutils literal notranslate"><span class="pre">0x6000_0000..0x67ff_ffff</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>Local capacity</p></td>
+<td><p>Enough local storage or streaming state for 256 bytes from each operand</p></td>
+</tr>
+<tr class="row-odd"><td><p>Outstanding requests</p></td>
+<td><p>One is sufficient</p></td>
+</tr>
+<tr class="row-even"><td><p>4-KiB boundary</p></td>
+<td><p>An individual burst must not cross it</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>AXI encodes a burst of <code class="docutils literal notranslate"><span class="pre">B</span></code> beats as <code class="docutils literal notranslate"><span class="pre">ARLEN</span> <span class="pre">=</span> <span class="pre">B</span> <span class="pre">-</span> <span class="pre">1</span></code>. Each AXI burst issues one address handshake with:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>ARADDR  = legal aligned source or staging address
+ARLEN   = B - 1
+ARSIZE  = 3'b010
+ARBURST = 2'b01
 </pre></div>
 </div>
-<p>Here are some tips for the next steps:</p>
-<ol class="arabic simple">
-<li><p>Strongly recommend viewing the entire structure of the .tflite file for this lab. You can visualize the layer graph by uploading it to <a class="reference external" href="https://netron.app/">Netron</a>.</p></li>
-<li><p>Identify the parameters that will influence your implementation of the custom operation.</p></li>
-</ol>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">"playground_util/print_params.h"</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">"cfu.h"</span>
-<span class="cm">/* ... */</span>
-<span class="kr">inline</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">ConvPerChannel</span><span class="p">(</span>
-<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">ConvParams</span><span class="o">&amp;</span><span class="w"> </span><span class="n">params</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">int32_t</span><span class="o">*</span><span class="w"> </span><span class="n">output_multiplier</span><span class="p">,</span>
-<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">int32_t</span><span class="o">*</span><span class="w"> </span><span class="n">output_shift</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">RuntimeShape</span><span class="o">&amp;</span><span class="w"> </span><span class="n">input_shape</span><span class="p">,</span>
-<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">int8_t</span><span class="o">*</span><span class="w"> </span><span class="n">input_data</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">RuntimeShape</span><span class="o">&amp;</span><span class="w"> </span><span class="n">filter_shape</span><span class="p">,</span>
-<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">int8_t</span><span class="o">*</span><span class="w"> </span><span class="n">filter_data</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">RuntimeShape</span><span class="o">&amp;</span><span class="w"> </span><span class="n">bias_shape</span><span class="p">,</span>
-<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="kt">int32_t</span><span class="o">*</span><span class="w"> </span><span class="n">bias_data</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">RuntimeShape</span><span class="o">&amp;</span><span class="w"> </span><span class="n">output_shape</span><span class="p">,</span>
-<span class="w">    </span><span class="kt">int8_t</span><span class="o">*</span><span class="w"> </span><span class="n">output_data</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="c1">// Format is:</span>
-<span class="w">  </span><span class="c1">// "padding_type", "padding_width", "padding_height", "padding_width_offset",</span>
-<span class="w">  </span><span class="c1">// "padding_height_offset", "stride_width", "stride_height",</span>
-<span class="w">  </span><span class="c1">// "dilation_width_factor", "dilation_height_factor", "input_offset",</span>
-<span class="w">  </span><span class="c1">// "weights_offset", "output_offset", "output_multiplier", "output_shift",</span>
-<span class="w">  </span><span class="c1">// "quantized_activation_min", "quantized_activation_max",</span>
-<span class="w">  </span><span class="c1">// "input_batches", "input_height", "input_width", "input_depth",</span>
-<span class="w">  </span><span class="c1">// "filter_output_depth", "filter_height", "filter_width", "filter_input_depth",</span>
-<span class="w">  </span><span class="c1">// "output_batches", "output_height", "output_width", "output_depth",</span>
-<span class="w">  </span><span class="n">print_conv_params</span><span class="p">(</span><span class="n">params</span><span class="p">,</span><span class="w"> </span><span class="n">input_shape</span><span class="p">,</span><span class="w"> </span><span class="n">filter_shape</span><span class="p">,</span><span class="w"> </span><span class="n">output_shape</span><span class="p">);</span>
-
-<span class="w">  </span><span class="cm">/* ... */</span>
+<p>A legal request satisfies:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>address[1:0] == 0
+address[11:0] + 4 * B &lt;= 4096
+0x6000_0000 &lt;= address
+address + 4 * B &lt;= 0x6800_0000
+2 &lt;= B &lt;= 64
 </pre></div>
 </div>
-<div class="admonition important">
-<p class="admonition-title">Important</p>
-<p>Use <code class="docutils literal notranslate"><span class="pre">print_conv_params(params,</span> <span class="pre">input_shape,</span> <span class="pre">filter_shape,</span> <span class="pre">output_shape)</span></code> to show the parameters of every convolution layer.</p>
-</div>
-<ol class="arabic simple" start="3">
-<li><p>Replace some parts of original operations with <code class="docutils literal notranslate"><span class="pre">cfu_op0</span></code>, and don’t forget to add <code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&quot;cfu.h&quot;</span></code> in the file.</p></li>
-</ol>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">out_channel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">out_channel</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">output_depth</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">out_channel</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span>
-<span class="w">    </span><span class="p">...</span>
-
-<span class="w">    </span><span class="kt">int32_t</span><span class="w"> </span><span class="n">acc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>
-
-<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">filter_y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">filter_y</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">filter_height</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">filter_y</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">in_y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">in_y_origin</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">dilation_height_factor</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">filter_y</span><span class="p">;</span>
-<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">filter_x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">filter_x</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">filter_width</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">filter_x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">in_x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">in_x_origin</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">dilation_width_factor</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">filter_x</span><span class="p">;</span>
-
-<span class="w">            </span><span class="c1">// Zero padding by omitting the areas outside the image.</span>
-<span class="w">            </span><span class="k">const</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">is_point_inside_image</span><span class="w"> </span><span class="o">=</span>
-<span class="w">                </span><span class="p">(</span><span class="n">in_x</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">(</span><span class="n">in_x</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">input_width</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">(</span><span class="n">in_y</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span>
-<span class="w">                </span><span class="p">(</span><span class="n">in_y</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">input_height</span><span class="p">);</span>
-
-<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">is_point_inside_image</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">                </span><span class="k">continue</span><span class="p">;</span>
-<span class="w">            </span><span class="p">}</span>
-
-<span class="w">            </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">                </span>
-<span class="w">            </span><span class="p">}</span>
-<span class="w">        </span><span class="p">}</span>
-<span class="w">    </span><span class="p">}</span>
-
-<span class="w">    </span><span class="p">...</span>
-<span class="p">}</span>
+<p>Your hardware design must handle independently unaligned pointers, arbitrary <code class="docutils literal notranslate"><span class="pre">N</span></code>, the final partial word, the <code class="docutils literal notranslate"><span class="pre">N=1..4</span></code> cases that still require a real multi-beat burst, and the misaligned <code class="docutils literal notranslate"><span class="pre">N=256</span></code> case without issuing an illegal 65-beat request. Replacing a multi-beat burst with repeated single-beat requests does not satisfy this lab. Write bursts, unaligned AXI starts, multiple outstanding requests, and hardware that splits a crossing request at a 4-KiB boundary may be used to avoid those cases.</p>
+</section>
+<section id="axi-protocol-requirements">
+<h3>AXI protocol requirements<a class="headerlink" href="#axi-protocol-requirements" title="Link to this heading">#</a></h3>
+<p>Your burst engine must satisfy all of the following:</p>
+<ul class="simple">
+<li><p>Assert <code class="docutils literal notranslate"><span class="pre">ARVALID</span></code> with a legal address and the required control values, and keep them stable until <code class="docutils literal notranslate"><span class="pre">ARVALID</span> <span class="pre">&amp;&amp;</span> <span class="pre">ARREADY</span></code>.</p></li>
+<li><p>Accept a read beat only when <code class="docutils literal notranslate"><span class="pre">RVALID</span> <span class="pre">&amp;&amp;</span> <span class="pre">RREADY</span></code>.</p></li>
+<li><p>Accept exactly <code class="docutils literal notranslate"><span class="pre">B</span></code> beats in address order and interpret each 32-bit beat in little-endian byte order.</p></li>
+<li><p>Do not assume that <code class="docutils literal notranslate"><span class="pre">ARREADY</span></code> or <code class="docutils literal notranslate"><span class="pre">RVALID</span></code> remains high continuously.</p></li>
+<li><p>Complete a successful load only after accepting beat <code class="docutils literal notranslate"><span class="pre">B</span></code> with <code class="docutils literal notranslate"><span class="pre">RLAST</span></code>; an early <code class="docutils literal notranslate"><span class="pre">RLAST</span></code>, a missing <code class="docutils literal notranslate"><span class="pre">RLAST</span></code> on beat <code class="docutils literal notranslate"><span class="pre">B</span></code>, an incorrect beat count, or a non-OKAY <code class="docutils literal notranslate"><span class="pre">RRESP</span></code> is an error and must assert <code class="docutils literal notranslate"><span class="pre">NPU_exception</span></code>.</p></li>
+<li><p>An early <code class="docutils literal notranslate"><span class="pre">RLAST</span></code> may finish the command immediately with <code class="docutils literal notranslate"><span class="pre">NPU_done</span></code> and <code class="docutils literal notranslate"><span class="pre">NPU_exception</span></code> asserted. If beat <code class="docutils literal notranslate"><span class="pre">B</span></code> arrives without <code class="docutils literal notranslate"><span class="pre">RLAST</span></code>, stop writing local operand storage, accept and discard later beats until <code class="docutils literal notranslate"><span class="pre">RLAST</span></code>, then finish with <code class="docutils literal notranslate"><span class="pre">NPU_done</span></code> and <code class="docutils literal notranslate"><span class="pre">NPU_exception</span></code> asserted.</p></li>
+<li><p>Keep <code class="docutils literal notranslate"><span class="pre">NPU_exception</span></code> low for a valid command and clear the previous command’s status before accepting a new command.</p></li>
+<li><p>Pulse <code class="docutils literal notranslate"><span class="pre">NPU_done</span></code> exactly once for each completed custom command and do not leave it asserted while idle.</p></li>
+<li><p>Return to a clean idle state after reset and accept back-to-back commands.</p></li>
+<li><p>While reset is asserted, drive <code class="docutils literal notranslate"><span class="pre">M_AXI_ARVALID</span></code>, <code class="docutils literal notranslate"><span class="pre">M_AXI_AWVALID</span></code>, <code class="docutils literal notranslate"><span class="pre">M_AXI_WVALID</span></code>, <code class="docutils literal notranslate"><span class="pre">NPU_done</span></code>, and <code class="docutils literal notranslate"><span class="pre">NPU_exception</span></code> low.</p></li>
+<li><p>Do not write beyond the storage reserved for the current operand or corrupt operand data that is not the destination of the current load.</p></li>
+</ul>
+</section>
+<section id="software-verification">
+<h3>Software verification<a class="headerlink" href="#software-verification" title="Link to this heading">#</a></h3>
+<p>After changing RTL, program the FPGA and upload the model-free firmware from the repository root:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>-C<span class="w"> </span>Platform<span class="w"> </span>prog
+make<span class="w"> </span>-C<span class="w"> </span>Platform<span class="w"> </span>run
 </pre></div>
 </div>
-<p>The SIMD MAC implementation on the Convolution should achieve at least a 10x speedup compared to the KWS model composed of FP32 and executed in a serial manner. The prediction on labels should also be correct.</p>
-<a class="reference internal image-reference" href="../_images/conv_result.png"><img alt="../_images/conv_result.png" src="../_images/conv_result.png" style="width: 300px;" />
-</a>
-<p>To get full score, the cycles of inferencing the quantized model should not beyond 2500M, and the prediction of all 5 labels should be correct.</p>
+<p>Press <code class="docutils literal notranslate"><span class="pre">CPU</span> <span class="pre">RESET</span></code> after the upload, press <code class="docutils literal notranslate"><span class="pre">2</span></code> to enter the Lab 2 submenu, and run both entries:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Main menu -&gt; Lab 2: AXI burst accelerator -&gt; Lab2 set tests (key t)
+Main menu -&gt; Lab 2: AXI burst accelerator -&gt; Lab2 random tests (key r)
+</pre></div>
+</div>
+<p>The test code writes the input arrays and then calls <code class="docutils literal notranslate"><span class="pre">hw_simd_mac</span></code>; it does not clean them first, so cache cleaning is part of the service implementation.</p>
 </section>
 </section>
-<section id="accelerate-fully-connected-20">
-<h3>Accelerate Fully Connected - 20%<a class="headerlink" href="#accelerate-fully-connected-20" title="Link to this heading">#</a></h3>
-<p>In this part, please use the technique of SIMD MAC to accelerate the Fully Connected Layer.</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>cp<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>../../third_party/tflite-micro/tensorflow/lite/kernels/internal/reference/integer_ops/fully_connected.h<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>src/tensorflow/lite/kernels/internal/reference/integer_ops/fully_connected.h
+<section id="part-2-tflm-convolution-integration-20">
+<h2>Part 2: TFLM convolution integration (20%)<a class="headerlink" href="#part-2-tflm-convolution-integration-20" title="Link to this heading">#</a></h2>
+<p>Modify the int8 <code class="docutils literal notranslate"><span class="pre">ConvPerChannel</span></code> implementation in:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Platform/sw/tflm_patches/tensorflow/lite/kernels/internal/reference/integer_ops/conv.h
 </pre></div>
 </div>
-<p>The model uses per-channel fully connected layer; therefore, the function you need to modify is the third one in <code class="docutils literal notranslate"><span class="pre">fully_connected.h</span></code>. After implementing acceleration, the execution <code class="docutils literal notranslate"><span class="pre">ticks</span></code> of your function should be <code class="docutils literal notranslate"><span class="pre">fewer</span> <span class="pre">than</span> <span class="pre">35</span></code>.</p>
-<a class="reference internal image-reference" href="../_images/before.png"><img alt="../_images/before.png" src="../_images/before.png" style="width: 200px;" />
-</a>
-<a class="reference internal image-reference" href="../_images/after.png"><img alt="../_images/after.png" src="../_images/after.png" style="width: 200px;" />
-</a>
+<p>Include <code class="docutils literal notranslate"><span class="pre">lab2_api.h</span></code> and replace existing software implementations that can be accelerated with calls to <code class="docutils literal notranslate"><span class="pre">hw_simd_mac</span></code>.</p>
+<p>CPU code may still perform loop control, address calculation, padding checks, bias addition, requantization, output offset, and clamping, but the input/filter channel products must contribute through <code class="docutils literal notranslate"><span class="pre">hw_simd_mac</span></code>.</p>
+<p>Your accelerated kernel must preserve the reference behavior for:</p>
+<ul class="simple">
+<li><p>signed int8 input and filter values</p></li>
+<li><p>grouped-convolution input-channel offsets</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">input_offset</span></code> within the published int8 service domain and arbitrary input-channel counts</p></li>
+<li><p>stride, dilation, and omitted out-of-image padding positions</p></li>
+<li><p>bias addition</p></li>
+<li><p>per-channel multiplier and shift</p></li>
+<li><p>output offset and activation clamping</p></li>
+<li><p>output indexing and all tensor shapes</p></li>
+</ul>
+<section id="id1">
+<h3>Software verification<a class="headerlink" href="#id1" title="Link to this heading">#</a></h3>
+<p>First upload the model-free firmware and run the existing golden convolution cases:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>-C<span class="w"> </span>Platform<span class="w"> </span>run
+</pre></div>
+</div>
+<p>After pressing <code class="docutils literal notranslate"><span class="pre">CPU</span> <span class="pre">RESET</span></code>, select:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Main menu -&gt; Lab 1: single-transaction accelerator -&gt; Basic convolution tests (key 4)
+</pre></div>
+</div>
+<p>All three cases must report <code class="docutils literal notranslate"><span class="pre">[PASS]</span></code>.</p>
+</section>
+<section id="run-the-ds-cnn-stream-fe-model">
+<h3>Run the <code class="docutils literal notranslate"><span class="pre">ds_cnn_stream_fe</span></code> model<a class="headerlink" href="#run-the-ds-cnn-stream-fe-model" title="Link to this heading">#</a></h3>
+<p>After the test passed, recompile the software with following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>run<span class="w"> </span>-C<span class="w"> </span>Platform/sw<span class="w"> </span><span class="nv">MODEL_FILE</span><span class="o">=</span>ds_cnn_stream_fe.tflite<span class="w"> </span><span class="nv">MODEL_PROFILE</span><span class="o">=</span>ds_cnn_stream_fe<span class="w"> </span>
+</pre></div>
+</div>
+<p>It usually takes 20 min to inference. You can print out model output by yourself to check the correctness of model.</p>
 </section>
 </section>
-<section id="questions-in-the-demo-10">
-<h2>Questions in the Demo - 10%<a class="headerlink" href="#questions-in-the-demo-10" title="Link to this heading">#</a></h2>
-<p>You will be asked several questions about the concepts covered in this lab and your implementation. This section accounts for 10% of the total lab score.</p>
+<section id="latency-and-accelerator-resource-efficiency-40">
+<h2>Latency and accelerator-resource efficiency (40%)<a class="headerlink" href="#latency-and-accelerator-resource-efficiency-40" title="Link to this heading">#</a></h2>
+<p>Only submissions that complete every preceding requirement are eligible for ranking. An eligible submission must:</p>
+<ul class="simple">
+<li><p>receives <code class="docutils literal notranslate"><span class="pre">20/20</span></code> in Part 1</p></li>
+<li><p>receives <code class="docutils literal notranslate"><span class="pre">20/20</span></code> in Part 2</p></li>
+<li><p>compliance with the mandatory accelerator-command, AXI-trace, and convolution-coverage requirements in Part 2</p></li>
+<li><p>successful post-route implementation for <code class="docutils literal notranslate"><span class="pre">xc7a100tcsg324-1</span></code> with exactly one recursive <code class="docutils literal notranslate"><span class="pre">NPU</span></code> instance identified in the utilization report</p></li>
+<li><p>non-negative overall setup <code class="docutils literal notranslate"><span class="pre">WNS</span> <span class="pre">(ns)</span></code> in the final Design Timing Summary</p></li>
+</ul>
+<section id="available-hardware-and-maximum-usage">
+<h3>Available hardware and maximum usage<a class="headerlink" href="#available-hardware-and-maximum-usage" title="Link to this heading">#</a></h3>
+<p>Resource counts are taken from the recursive NPU-only final post-route utilization report; the fixed CPU, caches, DDR controller, and interconnect are excluded. Each RAMB18 counts as one-half of a BRAM36 equivalent.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Resource</p></th>
+<th class="head text-right"><p>Available on FPGA</p></th>
+<th class="head text-right"><p>Maximum NPU usage</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Slice LUT</p></td>
+<td class="text-right"><p>63,400</p></td>
+<td class="text-right"><p>63,400</p></td>
+</tr>
+<tr class="row-odd"><td><p>Flip-flop</p></td>
+<td class="text-right"><p>126,800</p></td>
+<td class="text-right"><p>126,800</p></td>
+</tr>
+<tr class="row-even"><td><p>DSP48E1</p></td>
+<td class="text-right"><p>240</p></td>
+<td class="text-right"><p>10</p></td>
+</tr>
+<tr class="row-odd"><td><p>BRAM36 equivalent</p></td>
+<td class="text-right"><p>135</p></td>
+<td class="text-right"><p>135</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="latency-efficiency">
+<h3>Latency efficiency<a class="headerlink" href="#latency-efficiency" title="Link to this heading">#</a></h3>
+<p>Let $\mathcal{T}$ be the official test set and let $C_{i,t}$ be the <code class="docutils literal notranslate"><span class="pre">interpreter.Invoke()</span></code> cycle count for student $i$ on test $t$. Every test has equal weight, and the latency used for ranking is the average:</p>
+<p>$$
+\overline{C}<em>i=\frac{1}{|\mathcal{T}|}\sum</em>{t\in\mathcal{T}}C_{i,t}.
+$$</p>
+<p>Lower $\overline{C}_i$ is better. Cached final outputs are not allowed.</p>
+</section>
+<section id="ranking">
+<h3>Ranking<a class="headerlink" href="#ranking" title="Link to this heading">#</a></h3>
+<p>Eligible submissions are ordered from the lowest to the highest average cycle count and divided into five groups as evenly as possible.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-right"><p>Level</p></th>
+<th class="head"><p>Nominal position among eligible submissions</p></th>
+<th class="head text-right"><p>Efficiency points</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-right"><p>1</p></td>
+<td><p>Top 20%</p></td>
+<td class="text-right"><p>40</p></td>
+</tr>
+<tr class="row-odd"><td class="text-right"><p>2</p></td>
+<td><p>20%-40%</p></td>
+<td class="text-right"><p>30</p></td>
+</tr>
+<tr class="row-even"><td class="text-right"><p>3</p></td>
+<td><p>40%-60%</p></td>
+<td class="text-right"><p>20</p></td>
+</tr>
+<tr class="row-odd"><td class="text-right"><p>4</p></td>
+<td><p>60%-80%</p></td>
+<td class="text-right"><p>10</p></td>
+</tr>
+<tr class="row-even"><td class="text-right"><p>5</p></td>
+<td><p>Bottom 20%</p></td>
+<td class="text-right"><p>0</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+<section id="demo-and-questions-20">
+<h2>Demo and questions (20%)<a class="headerlink" href="#demo-and-questions-20" title="Link to this heading">#</a></h2>
+<p>Prepare a short explanation of your implementation, including how you use aligned staging when a source address is not directly legal for the burst interface. Be ready to reproduce your results and answer questions about the following areas:</p>
+<ul class="simple">
+<li><p>AXI4 handshakes, burst state machine, stalls, <code class="docutils literal notranslate"><span class="pre">RLAST</span></code>, and error handling</p></li>
+<li><p>TFLM convolution mapping, aligned staging, and cache coherence</p></li>
+</ul>
 </section>
 <section id="submission">
 <h2>Submission<a class="headerlink" href="#submission" title="Link to this heading">#</a></h2>
-<p>You need to hand in your <strong>CFU-Playground project folder</strong> without the <code class="docutils literal notranslate"><span class="pre">build</span></code> folder and renamed with your student ID.</p>
-<p>Please organize your submission files into a zip archive structured as follows:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>YourID.zip
-    └── YourID/
-        ├── src/
-        │    ├── folder... 
-        │    └── files...
-        ├── cfu.v
-        └── Makefile
-</pre></div>
-</div>
-<div class="admonition important">
-<p class="admonition-title">Important</p>
-<p>TAs should be able to run your project without any modification. If TAs cannot compile or run your code, <strong>you can’t get any scores even if you passed the DEMO</strong>. Also, <strong>PLAGIARISM is not allowed</strong>.</p>
-</div>
+<p>Submit the source repository (or source-only archive requested on the course page) and a PDF report named <code class="docutils literal notranslate"><span class="pre">[id]-aaml-lab2.pdf</span></code> of at most two pages. Do not include <code class="docutils literal notranslate"><span class="pre">Platform/build/</span></code>, a generated Vivado project, or other reproducible build output. The report must contain your instruction mapping, accelerator/FSM diagram, convolution mapping, cache-coherence strategy, public-test results, inference cycles, post-route resources, and WNS.</p>
+<blockquote>
+<div><p>[!IMPORTANT]
+If the project cannot be compiled or run using the documented commands, Parts 1 and 2 and the efficiency section receive zero; only the 20-point demo can be assessed. Follow the course collaboration policy; plagiarism is not allowed.</p>
+</div></blockquote>
 </section>
 </section>
 
@@ -683,19 +799,30 @@ $<span class="w"> </span>cp<span class="w"> </span><span class="se">\</span>
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#goal-of-this-lab">Goal of this lab</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#introduction">Introduction</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#running-quantized-model-10">Running Quantized Model - 10%</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#simd-mac-instruction-80">SIMD MAC Instruction - 80%</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#accelerate-convolution-60">Accelerate Convolution - 60%</a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#cfu-v">cfu.v</a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#conv-h">conv.h</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#learning-goals">Learning goals</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grading">Grading</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#prerequisites-and-setup">Prerequisites and setup</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#files-and-submission-boundary">Files and submission boundary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#required-software-contract">Required software contract</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#part-1-axi4-read-burst-engine-and-dot-service-20">Part 1: AXI4 read burst engine and dot service (20%)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#required-transfer-domain">Required transfer domain</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#axi-protocol-requirements">AXI protocol requirements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#software-verification">Software verification</a></li>
 </ul>
 </li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#accelerate-fully-connected-20">Accelerate Fully Connected - 20%</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#part-2-tflm-convolution-integration-20">Part 2: TFLM convolution integration (20%)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Software verification</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#run-the-ds-cnn-stream-fe-model">Run the <code class="docutils literal notranslate"><span class="pre">ds_cnn_stream_fe</span></code> model</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#questions-in-the-demo-10">Questions in the Demo - 10%</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#latency-and-accelerator-resource-efficiency-40">Latency and accelerator-resource efficiency (40%)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#available-hardware-and-maximum-usage">Available hardware and maximum usage</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#latency-efficiency">Latency efficiency</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ranking">Ranking</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#demo-and-questions-20">Demo and questions (20%)</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#submission">Submission</a></li>
 </ul>
   </nav></div>
