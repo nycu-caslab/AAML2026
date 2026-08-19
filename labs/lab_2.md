@@ -1,253 +1,276 @@
-# Lab 2 : Quantization and SIMD MAC
-
-## Goal of this lab
----
-- [Running Quantized Model - 10%](#running-quantized-model-10)
-- [SIMD MAC Instruction - 80%](#simd-mac-instruction-80)
-- [Questions in the Demo - 10%](#questions-in-the-demo-10)
+# Lab 2: AXI4 Burst Reads for a SIMD CFU
 
 ## Introduction
----
-In the previous lab, we successfully ran the float32 Keyword Spotting (KWS) model on CFU-Playground. In this lab, we will focus on running a quantized int8 KWS model and leverage the benefits of quantization to achieve acceleration.
 
-## Running Quantized Model - 10%
----
+In Lab 1, the NPU fetched one 32-bit word per custom instruction. In this lab, one software command must start an AXI4 INCR read burst and retain multiple beats in accelerator-local storage. You will reuse those burst-loaded operands in a self-designed compute datapath and accelerate the int8 convolution used by `ds_cnn_stream_fe.tflite` in Lab 1.
+
+The compute instruction encoding and internal microarchitecture are your choice while the external visible behavior is fixed.
+
+## Learning goals
+
+- implement an AXI4 read burst using the VALID/READY protocol
+- interpret `ARLEN` and `RLAST` correctly and tolerate bus stalls
+- buffer and reuse data instead of issuing repeated single-word reads
+- define a stable hardware/software interface for custom instructions
+- compare latency and FPGA resource cost under a reproducible flow
+
+## Grading
+
+| Component | Weight |
+| --- | ---: |
+| AXI4 burst engine and dot-product service | 20% |
+| TFLM convolution and model correctness | 20% |
+| Latency and accelerator-resource efficiency | 40% |
+| Demo and questions | 20% |
+
+## Prerequisites and setup
+
+- Vivado 2024.1
+- RISC-V toolchain
+- Python 3 with `pyserial`
+- Verilator and a host C++11 compiler
+- Model file `ds_cnn_stream_fe.tflite` and its profile from Lab1
+
+From the repository root, run this preflight before editing RTL:
+
 ```sh
-$ cd CFU-Playground/proj
-$ cp -r <lab1 proj folder>/* <lab2 proj folder>
-$ cd <lab2 proj folder>
+vivado -version
+verilator --version
+c++ --version
+riscv64-unknown-elf-g++ --version
+python3 -c "import serial"
+make -C Platform/sw validate
+make -C Platform/sw check-env \
+  MODEL_FILE=ds_cnn_stream_fe.tflite MODEL_PROFILE=ds_cnn_stream_fe
 ```
 
-Quantizing a float model to int8 can be quite complex and is not the primary focus of this lab. Therefore, we have provided the quantized model for you. You can simply replace `CFU-Playground/common/src/models/ds_cnn_stream_fe/ds_cnn_stream_fe.tflite` with the new model provided below.
+Use the course setup instructions if one of these commands fails.
 
-> [ds_cnn_stream_fe.tflite](https://drive.google.com/file/d/1CgEhJm0IoaXx3ULrn-Dfuw3LH83SnFlV/view?usp=sharing)
+## Files and submission boundary
 
-Ensure that the `ds_cnn_stream_fe` model is included in the project's Makefile. Additionally, you may want to include the `pdti8` model to verify if your design can pass the golden test.
-```sh
-# Uncomment to include specified model in built binary
-DEFINES += INCLUDE_MODEL_PDTI8
-#DEFINES += INCLUDE_MODEL_MICRO_SPEECH
-#DEFINES += INCLUDE_MODEL_MAGIC_WAND
-#DEFINES += INCLUDE_MODEL_MNV2
-#DEFINES += INCLUDE_MODEL_HPS
-#DEFINES += INCLUDE_MODEL_MLCOMMONS_TINY_V01_ANOMD
-#DEFINES += INCLUDE_MODEL_MLCOMMONS_TINY_V01_IMGC
-#DEFINES += INCLUDE_MODEL_MLCOMMONS_TINY_V01_KWS
-#DEFINES += INCLUDE_MODEL_MLCOMMONS_TINY_V01_VWW
-DEFINES += INCLUDE_MODEL_DS_CNN_STREAM_FE
-```
+You may modify:
 
-Build and load the hardware and software to test.
-```sh
-$ make clean
-$ make prog
-$ make load
-```
+- `Platform/hw/srcs/NPU.v`
+- `Platform/sw/project/lab2_api.h`
+- `Platform/sw/project/lab2_api.cc`
+- `Platform/sw/tflm_patches/tensorflow/lite/kernels/internal/reference/integer_ops/conv.h`
 
-The result should look like the image below. As with the previous lab, the predicted results should also be correct.
+You may add helper Verilog modules under `Platform/hw/srcs/` and helper C/C++ files under `Platform/sw/project/`. Do not replace or rename the `NPU` module. Preserve its complete port list, active-low `rst_n` behavior, and CPU/AXI signal directions so the existing block design still elaborates.
 
-![alt text](images/lab2/quantized.png)
+`NPU.v` is starter code, not a golden implementation. Write your own accelerator after all the environmental check passed.
 
-You should observe a significant reduction in the number of cycles, as the quantized fixed-point model eliminates the need for complex floating-point calculations. However, we can further enhance performance by leveraging another benefit of quantization: reduced bit width.
+> [!IMPORTANT]
+> Your submitted project must build and run without source edits. Keep the required API signatures below even if you change every underlying `funct3`/`funct7` value.
 
-```{note}
-The quantized fixed-point Convolution utilizes the `conv.h` kernel found in `tensorflow/lite/kernels/internal/reference/integer_ops`, while the float32 Convolution from the previous lab uses `tensorflow/lite/kernels/internal/reference/conv.h`. These kernels differ, so if you notice that your cycle counter does not function correctly with the quantized model, there is no need for concern.
-```
+## Required software contract
 
-## SIMD MAC Instruction - 80%
----
-### Accelerate Convolution - 60%
-
-```{hint}
-[The Step-by-Step Guide to Building an ML Accelerator](https://cfu-playground.readthedocs.io/en/latest/step-by-step.html)  
-You can refer to the tutorial provided in the link, but the design in the tutorial cannot be directly applied to the model we provided. This means that **if you copy the tutorial exactly, your program is likely to not function correctly**. Please properly profile the model we have provided and use this to design an accelerator that suits this model.
-```
-
-The main principle of SIMD (Single Instruction, Multiple Data) instructions involves processing multiple data with a single instruction. In the int8 convolution, each filter and input value spans 8 bits. Utilizing a custom CFU operation, we can employ two 32-bit wide registers. This setup enables the execution of four simultaneous MAC (Multiply-Accumulate) operations in a single cycle.
-
-```
-              7 bits
-         +--------------+
-funct7 = | (bool) reset |
-         +--------------+
-
-              int8_t           int8_t           int8_t           int8_t
-         +----------------+----------------+----------------+----------------+
-   in0 = | input_data[0]  | input_data[1]  | input_data[2]  | input_data[3]  |
-         +----------------+----------------+----------------+----------------+
-
-              int8_t           int8_t           int8_t           int8_t
-         +----------------+----------------+----------------+----------------+
-   in1 = | filter_data[0] | filter_data[1] | filter_data[2] | filter_data[3] |
-         +----------------+----------------+----------------+----------------+
-
-                                        int32_t
-         +----------------------------------------------------------------------+
-output = | output + (input_data[0, 1, 2, 3] + offset) * filter_data[0, 1, 2, 3] |
-         +----------------------------------------------------------------------+
-```
-
-Feel free to use the templates below or write your own.
-
-#### cfu.v
-```verilog
-module Cfu (
-    input               cmd_valid,
-    output              cmd_ready,
-    input      [9:0]    cmd_payload_function_id,
-    input      [31:0]   cmd_payload_inputs_0,
-    input      [31:0]   cmd_payload_inputs_1,
-    output reg          rsp_valid,
-    input               rsp_ready,
-    output reg [31:0]   rsp_payload_outputs_0,
-    input               reset,
-    input               clk
-);
-
-    reg [8:0] InputOffset, FilterOffset;
-
-    // SIMD multiply step:
-    wire signed [15:0] prod_0, prod_1, prod_2, prod_3;
-    assign prod_0 = 
-    assign prod_1 = 
-    assign prod_2 = 
-    assign prod_3 = 
-
-    wire signed [31:0] sum_prods;
-    assign sum_prods = prod_0 + prod_1 + prod_2 + prod_3;
-
-    // Only not ready for a command when we have a response.
-    assign cmd_ready = ~rsp_valid;
-
-    always @(posedge clk) begin
-        if () begin
-
-        end
-
-    end	         
-endmodule
-```
-
-```{note}
-[Details and Use Cases of the CPU <-> CFU interface](https://cfu-playground.readthedocs.io/en/latest/interface.html)  
-For the handshake interface of CPU and CFU, you can refer to this guide. In this lab, the simplest one is OK, but in the following labs, you might use others.
-For the handshake interface between the CPU and CFU, please refer to this guide. For this lab, the simplest one is enough. However, for the following labs, you may need to explore other options.
-```
-
-#### conv.h
-
-Add the integer version of Covolution to your project.
-```sh
-$ mkdir -p src/tensorflow/lite/kernels/internal/reference/integer_ops
-$ cp \
-  ../../third_party/tflite-micro/tensorflow/lite/kernels/internal/reference/integer_ops/conv.h \
-  src/tensorflow/lite/kernels/internal/reference/integer_ops/conv.h
-```
-
-Here are some tips for the next steps:
-1. Strongly recommend viewing the entire structure of the .tflite file for this lab. You can visualize the layer graph by uploading it to [Netron](https://netron.app/).
-2. Identify the parameters that will influence your implementation of the custom operation.
+The public and grading software calls the following function declared in `Platform/sw/project/lab2_api.h`:
 
 ```cpp
-#include "playground_util/print_params.h"
-#include "cfu.h"
-/* ... */
-inline void ConvPerChannel(
-    const ConvParams& params, const int32_t* output_multiplier,
-    const int32_t* output_shift, const RuntimeShape& input_shape,
-    const int8_t* input_data, const RuntimeShape& filter_shape,
-    const int8_t* filter_data, const RuntimeShape& bias_shape,
-    const int32_t* bias_data, const RuntimeShape& output_shape,
-    int8_t* output_data) {
-  // Format is:
-  // "padding_type", "padding_width", "padding_height", "padding_width_offset",
-  // "padding_height_offset", "stride_width", "stride_height",
-  // "dilation_width_factor", "dilation_height_factor", "input_offset",
-  // "weights_offset", "output_offset", "output_multiplier", "output_shift",
-  // "quantized_activation_min", "quantized_activation_max",
-  // "input_batches", "input_height", "input_width", "input_depth",
-  // "filter_output_depth", "filter_height", "filter_width", "filter_input_depth",
-  // "output_batches", "output_height", "output_width", "output_depth",
-  print_conv_params(params, input_shape, filter_shape, output_shape);
-
-  /* ... */
-```
-```{important}
-Use `print_conv_params(params, input_shape, filter_shape, output_shape)` to show the parameters of every convolution layer.
+int32_t hw_simd_mac(int8_t* ptr1, int8_t* ptr2, int8_t input_offset, uint32_t N);
 ```
 
-3. Replace some parts of original operations with `cfu_op0`, and don't forget to add `#include "cfu.h"` in the file.
-```cpp
-for (int out_channel = 0; out_channel < output_depth; ++out_channel) {
-    
-    ...
+Keep this signature and its C linkage unchanged, and implement it in `Platform/sw/project/lab2_api.cc`. The buffers are read-only from the accelerator's point of view.
 
-    int32_t acc = 
+For every valid call, return the exact signed 32-bit result:
 
-    for (int filter_y = 0; filter_y < filter_height; ++filter_y) {
-        const int in_y = in_y_origin + dilation_height_factor * filter_y;
-        for (int filter_x = 0; filter_x < filter_width; ++filter_x) {
-            const int in_x = in_x_origin + dilation_width_factor * filter_x;
-
-            // Zero padding by omitting the areas outside the image.
-            const bool is_point_inside_image =
-                (in_x >= 0) && (in_x < input_width) && (in_y >= 0) &&
-                (in_y < input_height);
-
-            if (!is_point_inside_image) {
-                continue;
-            }
-
-            for ( ) {
-                
-            }
-        }
-    }
-
-    ...
-}
+```python
+result = sum((ptr1[i] + input_offset)*ptr2[i] for i in range(N))
 ```
 
-The SIMD MAC implementation on the Convolution should achieve at least a 10x speedup compared to the KWS model composed of FP32 and executed in a serial manner. The prediction on labels should also be correct.
+You can check function `ConvPerChannel` in file `tflite-micro/tensorflow/lite/kernels/internal/reference/integer_ops/conv.h` for more detail.
 
-<img src="images/lab2/conv_result.png" width="300px">
+The required input domain is:
 
-To get full score, the cycles of inferencing the quantized model should not beyond 2500M, and the prediction of all 5 labels should be correct.
+| Property | Required domain |
+| --- | --- |
+| `ptr1[i]`, `ptr2[i]` | Signed two's-complement int8 values |
+| `input_offset` | Signed int8 value from `-128` through `127` |
+| `N` | Every integer from `1` through `256` |
+| Pointer alignment | Each pointer may independently have byte offset `0`, `1`, `2`, or `3` from a 4-byte boundary |
+| Buffer access | Each pointer supplies at least `N` readable bytes; the function must not modify them |
+| Return value | Exact signed 32-bit result for the formula above |
 
-### Accelerate Fully Connected - 20%
+Accumulate and return the result as signed 32-bit data.
 
-In this part, please use the technique of SIMD MAC to accelerate the Fully Connected Layer. 
+The CUSTOM-0 encoding behind `hw_simd_mac` is your design. You may choose the `funct3` and `funct7` values, command sequence, local-buffer organization, state machine, and SIMD width. Use the helpers in `Platform/sw/app/cfu.h`.
+
+The multiplication and main accumulation must be performed by custom hardware using operand data read through AXI4 bursts. A CPU loop that calculates the dot product, including one hidden inside `hw_simd_mac`, does not satisfy the assignment. Software may copy or pad operands into legal staging buffers, clean cache lines, issue custom instructions, and combine accelerator partial results.
+
+## Part 1: AXI4 read burst engine and dot service (20%)
+
+Implement the read-burst engine and SIMD multiply-accumulate datapath in `Platform/hw/srcs/NPU.v`, then implement `hw_simd_mac` in `Platform/sw/project/lab2_api.cc` using your custom instructions. The NPU must fetch both operand vectors through its AXI master and use the fetched bytes in the returned dot product. AXI writes are not required for Lab 2.
+
+### Required transfer domain
+
+`N` in the software ABI is an element count measured in bytes, not an AXI word count. Use `B` below for the number of 32-bit AXI beats in one load. Every burst issued for Lab 2 must satisfy:
+
+| Property | Requirement |
+| --- | --- |
+| Direction | Read only |
+| AXI data width | 32 bits |
+| Burst type | INCR (`ARBURST = 2'b01`) |
+| Beat size | 4 bytes (`ARSIZE = 3'b010`) |
+| Length | 2 through 64 beats |
+| AXI start address | 4-byte aligned address in `0x6000_0000..0x67ff_ffff` |
+| Local capacity | Enough local storage or streaming state for 256 bytes from each operand |
+| Outstanding requests | One is sufficient |
+| 4-KiB boundary | An individual burst must not cross it |
+
+AXI encodes a burst of `B` beats as `ARLEN = B - 1`. Each AXI burst issues one address handshake with:
+
+```text
+ARADDR  = legal aligned source or staging address
+ARLEN   = B - 1
+ARSIZE  = 3'b010
+ARBURST = 2'b01
+```
+
+A legal request satisfies:
+
+```text
+address[1:0] == 0
+address[11:0] + 4 * B <= 4096
+0x6000_0000 <= address
+address + 4 * B <= 0x6800_0000
+2 <= B <= 64
+```
+
+Your hardware design must handle independently unaligned pointers, arbitrary `N`, the final partial word, the `N=1..4` cases that still require a real multi-beat burst, and the misaligned `N=256` case without issuing an illegal 65-beat request. Replacing a multi-beat burst with repeated single-beat requests does not satisfy this lab. Write bursts, unaligned AXI starts, multiple outstanding requests, and hardware that splits a crossing request at a 4-KiB boundary may be used to avoid those cases.
+
+### AXI protocol requirements
+
+Your burst engine must satisfy all of the following:
+
+- Assert `ARVALID` with a legal address and the required control values, and keep them stable until `ARVALID && ARREADY`.
+- Accept a read beat only when `RVALID && RREADY`.
+- Accept exactly `B` beats in address order and interpret each 32-bit beat in little-endian byte order.
+- Do not assume that `ARREADY` or `RVALID` remains high continuously.
+- Complete a successful load only after accepting beat `B` with `RLAST`; an early `RLAST`, a missing `RLAST` on beat `B`, an incorrect beat count, or a non-OKAY `RRESP` is an error and must assert `NPU_exception`.
+- An early `RLAST` may finish the command immediately with `NPU_done` and `NPU_exception` asserted. If beat `B` arrives without `RLAST`, stop writing local operand storage, accept and discard later beats until `RLAST`, then finish with `NPU_done` and `NPU_exception` asserted.
+- Keep `NPU_exception` low for a valid command and clear the previous command's status before accepting a new command.
+- Pulse `NPU_done` exactly once for each completed custom command and do not leave it asserted while idle.
+- Return to a clean idle state after reset and accept back-to-back commands.
+- While reset is asserted, drive `M_AXI_ARVALID`, `M_AXI_AWVALID`, `M_AXI_WVALID`, `NPU_done`, and `NPU_exception` low.
+- Do not write beyond the storage reserved for the current operand or corrupt operand data that is not the destination of the current load.
+
+### Software verification
+
+After changing RTL, program the FPGA and upload the model-free firmware from the repository root:
 
 ```sh
-$ cp \
-  ../../third_party/tflite-micro/tensorflow/lite/kernels/internal/reference/integer_ops/fully_connected.h \
-  src/tensorflow/lite/kernels/internal/reference/integer_ops/fully_connected.h
+make -C Platform prog
+make -C Platform run
 ```
 
-The model uses per-channel fully connected layer; therefore, the function you need to modify is the third one in `fully_connected.h`. After implementing acceleration, the execution `ticks` of your function should be `fewer than 35`.
+Press `CPU RESET` after the upload, press `2` to enter the Lab 2 submenu, and run both entries:
 
-<img src="images/lab2/before.png" width="200px">
-<img src="images/lab2/after.png" width="200px">
+```text
+Main menu -> Lab 2: AXI burst accelerator -> Lab2 set tests (key t)
+Main menu -> Lab 2: AXI burst accelerator -> Lab2 random tests (key r)
+```
 
-## Questions in the Demo - 10%
+The test code writes the input arrays and then calls `hw_simd_mac`; it does not clean them first, so cache cleaning is part of the service implementation.
 
-You will be asked several questions about the concepts covered in this lab and your implementation. This section accounts for 10% of the total lab score.
+## Part 2: TFLM convolution integration (20%)
+
+Modify the int8 `ConvPerChannel` implementation in:
+
+```text
+Platform/sw/tflm_patches/tensorflow/lite/kernels/internal/reference/integer_ops/conv.h
+```
+
+Include `lab2_api.h` and replace existing software implementations that can be accelerated with calls to `hw_simd_mac`.
+
+CPU code may still perform loop control, address calculation, padding checks, bias addition, requantization, output offset, and clamping, but the input/filter channel products must contribute through `hw_simd_mac`.
+
+Your accelerated kernel must preserve the reference behavior for:
+
+- signed int8 input and filter values
+- grouped-convolution input-channel offsets
+- `input_offset` within the published int8 service domain and arbitrary input-channel counts
+- stride, dilation, and omitted out-of-image padding positions
+- bias addition
+- per-channel multiplier and shift
+- output offset and activation clamping
+- output indexing and all tensor shapes
+
+### Software verification
+
+First upload the model-free firmware and run the existing golden convolution cases:
+
+```sh
+make -C Platform run
+```
+
+After pressing `CPU RESET`, select:
+
+```text
+Main menu -> Lab 1: single-transaction accelerator -> Basic convolution tests (key 4)
+```
+All three cases must report `[PASS]`.
+
+### Run the `ds_cnn_stream_fe` model
+
+After the test passed, recompile the software with following command:
+```bash
+make run -C Platform/sw MODEL_FILE=ds_cnn_stream_fe.tflite MODEL_PROFILE=ds_cnn_stream_fe 
+```
+It usually takes 20 min to inference. You can print out model output by yourself to check the correctness of model.
+
+## Latency and accelerator-resource efficiency (40%)
+
+Only submissions that complete every preceding requirement are eligible for ranking. An eligible submission must:
+- receives `20/20` in Part 1
+- receives `20/20` in Part 2
+- compliance with the mandatory accelerator-command, AXI-trace, and convolution-coverage requirements in Part 2
+- successful post-route implementation for `xc7a100tcsg324-1` with exactly one recursive `NPU` instance identified in the utilization report
+- non-negative overall setup `WNS (ns)` in the final Design Timing Summary
+
+### Available hardware and maximum usage
+
+Resource counts are taken from the recursive NPU-only final post-route utilization report; the fixed CPU, caches, DDR controller, and interconnect are excluded. Each RAMB18 counts as one-half of a BRAM36 equivalent.
+
+| Resource | Available on FPGA | Maximum NPU usage |
+| --- | ---: | ---: |
+| Slice LUT | 63,400 | 63,400 |
+| Flip-flop | 126,800 | 126,800 |
+| DSP48E1 | 240 | 10 |
+| BRAM36 equivalent | 135 | 135 |
+
+### Latency efficiency
+
+Let $\mathcal{T}$ be the official test set and let $C_{i,t}$ be the `interpreter.Invoke()` cycle count for student $i$ on test $t$. Every test has equal weight, and the latency used for ranking is the average:
+
+$$
+\overline{C}_i=\frac{1}{|\mathcal{T}|}\sum_{t\in\mathcal{T}}C_{i,t}.
+$$
+
+Lower $\overline{C}_i$ is better. Cached final outputs are not allowed.
+
+### Ranking
+
+Eligible submissions are ordered from the lowest to the highest average cycle count and divided into five groups as evenly as possible.
+
+| Level | Nominal position among eligible submissions | Efficiency points |
+| ---: | --- | ---: |
+| 1 | Top 20% | 40 |
+| 2 | 20%-40% | 30 |
+| 3 | 40%-60% | 20 |
+| 4 | 60%-80% | 10 |
+| 5 | Bottom 20% | 0 |
+
+## Demo and questions (20%)
+
+Prepare a short explanation of your implementation, including how you use aligned staging when a source address is not directly legal for the burst interface. Be ready to reproduce your results and answer questions about the following areas:
+
+- AXI4 handshakes, burst state machine, stalls, `RLAST`, and error handling
+- TFLM convolution mapping, aligned staging, and cache coherence
 
 ## Submission
 
-You need to hand in your **CFU-Playground project folder** without the `build` folder and renamed with your student ID. 
+Submit the source repository (or source-only archive requested on the course page) and a PDF report named `[id]-aaml-lab2.pdf` of at most two pages. Do not include `Platform/build/`, a generated Vivado project, or other reproducible build output. The report must contain your instruction mapping, accelerator/FSM diagram, convolution mapping, cache-coherence strategy, public-test results, inference cycles, post-route resources, and WNS.
 
-Please organize your submission files into a zip archive structured as follows:
-```
-YourID.zip
-    └── YourID/
-        ├── src/
-        │    ├── folder... 
-        │    └── files...
-        ├── cfu.v
-        └── Makefile
-```
+> [!IMPORTANT]
+> If the project cannot be compiled or run using the documented commands, Parts 1 and 2 and the efficiency section receive zero; only the 20-point demo can be assessed. Follow the course collaboration policy; plagiarism is not allowed.
 
-```{important}
-TAs should be able to run your project without any modification. If TAs cannot compile or run your code, **you can't get any scores even if you passed the DEMO**. Also, **PLAGIARISM is not allowed**.
-```
