@@ -358,7 +358,11 @@
                 <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#introduction">Introduction</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#goal-of-this-lab">Goal of this lab</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#background">Background</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#background">Background</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#axi-protocol-basics">AXI Protocol Basics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#address-alignment-and-unaligned-access">Address Alignment and Unaligned Access</a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grading">Grading</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#prerequisites-and-setup">Prerequisites and setup</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#add-ds-cnn-stream-fe-into-platform">Add <code class="docutils literal notranslate"><span class="pre">ds_cnn_stream_fe</span></code> into platform</a></li>
@@ -408,6 +412,31 @@
 </section>
 <section id="background">
 <h2>Background<a class="headerlink" href="#background" title="Link to this heading">#</a></h2>
+<section id="axi-protocol-basics">
+<h3>AXI Protocol Basics<a class="headerlink" href="#axi-protocol-basics" title="Link to this heading">#</a></h3>
+<p>The AXI protocol is a high-performance, high-bandwidth memory-mapped bus interface used in this platform. The NPU acts as an AXI4 master to directly access DRAM without CPU intervention.</p>
+<p>Key signals and handshake rules you will encounter in <code class="docutils literal notranslate"><span class="pre">NPU.v</span></code></p>
+<ul class="simple">
+<li><p><strong>Channels</strong>: Read Address (AR), Read Data (R), Write Address (AW), Write Data (W), and Write Response (B).</p></li>
+<li><p><strong>Handshake</strong>: Each channel uses a two-way VALID / READY mechanism. A transfer occurs only when both VALID and READY are asserted in the same clock cycle. Refer to the handshake wave diagram(AXI burst read/write provided) below for better understanding of the handshake process.</p></li>
+</ul>
+<p><img alt="AXI Read" src="../_images/AXI_read_waveform.png" />
+<img alt="AXI Write" src="../_images/AXI_write_waveform.png" /></p>
+<ul class="simple">
+<li><p><strong>Single Transaction</strong>: In lab 1, we focus on single-beat (non-burst) 4-byte read/write transfers. You must drive the address channel, wait for the data channel, and properly handle the handshake signals to complete one transaction.</p></li>
+</ul>
+<p>You can also refer to the supplementary slide in lab 0 for learn more detail on AXI</p>
+<blockquote>
+<div><p><a class="reference external" href="https://docs.google.com/presentation/d/1PH9ZFxNuDXuPgTCY71MiiTLlWc80MGeT7lYO-IY-NLg/edit?usp=sharing">Learn more about AXI</a></p>
+</div></blockquote>
+</section>
+<section id="address-alignment-and-unaligned-access">
+<h3>Address Alignment and Unaligned Access<a class="headerlink" href="#address-alignment-and-unaligned-access" title="Link to this heading">#</a></h3>
+<p>Since we are dealing with 8-bit data elements, memory addresses are not always 4-byte aligned. You must design your <code class="docutils literal notranslate"><span class="pre">NPU.v</span></code> in the way that can handle both aligned and unaligned access.</p>
+<p><strong>Aligned Address</strong>: A 4-byte transfer is aligned when address[1:0] == 2’b00. In this case, a single AXI read/write cycle fetches the exact 4 bytes.</p>
+<p><strong>Unaligned Address</strong>: When address[1:0] != 2’b00, issuing a single 4-byte AXI request to an unaligned address may cause an AXI exception.</p>
+<p>For more information on how to handle aligned and unaligned accesses, read the <strong>Adavance Exercise 1 - AXI Address Aligned</strong> section.</p>
+</section>
 </section>
 <section id="grading">
 <h2>Grading<a class="headerlink" href="#grading" title="Link to this heading">#</a></h2>
@@ -787,7 +816,11 @@ Make <code class="docutils literal notranslate"><span class="pre">NPU</span></co
     <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#introduction">Introduction</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#goal-of-this-lab">Goal of this lab</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#background">Background</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#background">Background</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#axi-protocol-basics">AXI Protocol Basics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#address-alignment-and-unaligned-access">Address Alignment and Unaligned Access</a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grading">Grading</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#prerequisites-and-setup">Prerequisites and setup</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#add-ds-cnn-stream-fe-into-platform">Add <code class="docutils literal notranslate"><span class="pre">ds_cnn_stream_fe</span></code> into platform</a></li>

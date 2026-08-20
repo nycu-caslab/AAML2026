@@ -13,7 +13,31 @@ In this lab, you will focus on AXI single transation and SIMD MAC operands. Then
 - Run full TFLM model in platform: know how to add model into this platform.
 
 ## Background
+### AXI Protocol Basics
+The AXI protocol is a high-performance, high-bandwidth memory-mapped bus interface used in this platform. The NPU acts as an AXI4 master to directly access DRAM without CPU intervention.
 
+Key signals and handshake rules you will encounter in `NPU.v`
+- **Channels**: Read Address (AR), Read Data (R), Write Address (AW), Write Data (W), and Write Response (B).
+- **Handshake**: Each channel uses a two-way VALID / READY mechanism. A transfer occurs only when both VALID and READY are asserted in the same clock cycle. Refer to the handshake wave diagram(AXI burst read/write provided) below for better understanding of the handshake process.
+
+![AXI Read](images/lab1/AXI_read_waveform.png)
+![AXI Write](images/lab1/AXI_write_waveform.png)
+
+- **Single Transaction**: In lab 1, we focus on single-beat (non-burst) 4-byte read/write transfers. You must drive the address channel, wait for the data channel, and properly handle the handshake signals to complete one transaction.
+
+You can also refer to the supplementary slide in lab 0 for learn more detail on AXI
+> [Learn more about AXI](https://docs.google.com/presentation/d/1PH9ZFxNuDXuPgTCY71MiiTLlWc80MGeT7lYO-IY-NLg/edit?usp=sharing)
+
+
+
+### Address Alignment and Unaligned Access
+Since we are dealing with 8-bit data elements, memory addresses are not always 4-byte aligned. You must design your `NPU.v` in the way that can handle both aligned and unaligned access. 
+
+**Aligned Address**: A 4-byte transfer is aligned when address[1:0] == 2'b00. In this case, a single AXI read/write cycle fetches the exact 4 bytes.
+
+**Unaligned Address**: When address[1:0] != 2'b00, issuing a single 4-byte AXI request to an unaligned address may cause an AXI exception.
+
+For more information on how to handle aligned and unaligned accesses, read the **Adavance Exercise 1 - AXI Address Aligned** section.
 
 
 ## Grading
