@@ -359,6 +359,12 @@
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#introduction">Introduction</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#goal-of-this-lab">Goal of this lab</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#background">Background</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grading">Grading</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#prerequisites-and-setup">Prerequisites and setup</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#add-ds-cnn-stream-fe-into-platform">Add <code class="docutils literal notranslate"><span class="pre">ds_cnn_stream_fe</span></code> into platform</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#files-and-submission-boundary">Files and submission boundary</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#basic-exercise-axi-single-transaction-simd-60">Basic Exercise - AXI Single Transaction &amp; SIMD - 60%</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#axi-single-transaction">1. AXI Single Transaction</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#simd-mac">2. SIMD MAC</a></li>
@@ -393,14 +399,85 @@
 <h2>Goal of this lab<a class="headerlink" href="#goal-of-this-lab" title="Link to this heading">#</a></h2>
 <hr class="docutils" />
 <ul class="simple">
-<li><p><a class="reference internal" href="#basic-exercise-axi-single-transaction-simd-60"><span class="xref myst">Basic Exercise - AXI Single Transaction &amp; SIMD MAC - 60%</span></a></p></li>
-<li><p><a class="reference internal" href="#adavance-exercise-1-axi-address-aligned-15"><span class="xref myst">Adavance Exercise 1 - AXI Address Aligned - 15%</span></a></p></li>
-<li><p><a class="reference internal" href="#adavance-exercise-2-running-tflm-model-inference-10"><span class="xref myst">Adavance Exercise 2 - Running Full TFLM Model - 10%</span></a></p></li>
-<li><p><a class="reference internal" href="#question-in-demo-15"><span class="xref myst">Questions in the Demo - 15%</span></a></p></li>
+<li><p>Know function about AXI I/O and control them to achieve AXI single transaction.</p></li>
+<li><p>Use custom SIMD MAC to acclerated convolution.</p></li>
+<li><p>Understand cache block operaction to maintain cache coherence.</p></li>
+<li><p>Understand how to handle misaligned address condition in AXI single transaction.</p></li>
+<li><p>Run full TFLM model in platform: know how to add model into this platform.</p></li>
 </ul>
 </section>
 <section id="background">
 <h2>Background<a class="headerlink" href="#background" title="Link to this heading">#</a></h2>
+</section>
+<section id="grading">
+<h2>Grading<a class="headerlink" href="#grading" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Component</p></th>
+<th class="head text-right"><p>Weight</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>AXI Single Transatction</p></td>
+<td class="text-right"><p>60%</p></td>
+</tr>
+<tr class="row-odd"><td><p>AXI Address Aligned</p></td>
+<td class="text-right"><p>15%</p></td>
+</tr>
+<tr class="row-even"><td><p>Running Full TFLM Model</p></td>
+<td class="text-right"><p>10%</p></td>
+</tr>
+<tr class="row-odd"><td><p>Demo and questions</p></td>
+<td class="text-right"><p>15%</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="prerequisites-and-setup">
+<h2>Prerequisites and setup<a class="headerlink" href="#prerequisites-and-setup" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Vivado 2024.1</p></li>
+<li><p>RISC-V toolchain</p></li>
+<li><p>Python 3 with <code class="docutils literal notranslate"><span class="pre">pyserial</span></code></p></li>
+</ul>
+<section id="add-ds-cnn-stream-fe-into-platform">
+<h3>Add <code class="docutils literal notranslate"><span class="pre">ds_cnn_stream_fe</span></code> into platform<a class="headerlink" href="#add-ds-cnn-stream-fe-into-platform" title="Link to this heading">#</a></h3>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You can download .tflite file and input data from below links.</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://drive.google.com/file/d/1CgEhJm0IoaXx3ULrn-Dfuw3LH83SnFlV/view?usp=sharing">ds_cnn_stream_fe.tflite</a></p></li>
+<li><p><a class="reference external" href="https://raw.githubusercontent.com/nycu-caslab/AAML2026/refs/heads/main/lab1_util/ds_cnn_stream_fe_profile.cc">ds_cnn_stream_fe_profile.cc</a></p></li>
+<li><p><a class="reference external" href="https://drive.google.com/drive/folders/1rY7SDD1qh-EXn8nqex7QDDvqbSiz7Ki_">input file</a></p></li>
+</ul>
+</div>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>Add .tflite, profile.cc into <code class="docutils literal notranslate"><span class="pre">Platform/sw/models/</span></code>,and input data into <code class="docutils literal notranslate"><span class="pre">Platform/sw</span></code>.</p></li>
+<li><p>Register TFLM OP in <code class="docutils literal notranslate"><span class="pre">tflm_ops.cc</span></code>, and modify <code class="docutils literal notranslate"><span class="pre">kTflmResolverOpCount</span></code> in <code class="docutils literal notranslate"><span class="pre">tflm_ops.h</span></code> with number of register OP.</p></li>
+<li><p>Set parameter in <code class="docutils literal notranslate"><span class="pre">project.mk</span></code> file (<code class="docutils literal notranslate"><span class="pre">MODEL_FILE</span></code>, <code class="docutils literal notranslate"><span class="pre">MODEL_PROFILE</span></code>, <code class="docutils literal notranslate"><span class="pre">TENSOR_ARENA_SIZE</span></code>), and add file of input data into <code class="docutils literal notranslate"><span class="pre">APP_EXTRA_SRCS</span></code>.</p></li>
+</ol>
+</div></blockquote>
+<div class="admonition hint">
+<p class="admonition-title">Hint</p>
+<ul class="simple">
+<li><p>You can use website in reference to know what TFLM OP will be used in model.</p></li>
+<li><p>You can set <code class="docutils literal notranslate"><span class="pre">TENSOR_ARENA_SIZE</span></code> as 1MB.</p></li>
+</ul>
+</div>
+</section>
+</section>
+<section id="files-and-submission-boundary">
+<h2>Files and submission boundary<a class="headerlink" href="#files-and-submission-boundary" title="Link to this heading">#</a></h2>
+<p>You may modify:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Platform/sw/tflm_patches/tensorflow/lite/kernels/internal/reference/integer_ops/conv.h</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Platform/sw/project/accel_ops.h</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Platform/hw/srcs/NPU.v</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tflm_ops.h</span></code>, <code class="docutils literal notranslate"><span class="pre">tflm_ops.cc</span></code>, <code class="docutils literal notranslate"><span class="pre">tflm_runners.cc</span></code></p></li>
+</ul>
+<p>You can add .v file in <code class="docutils literal notranslate"><span class="pre">Platform/hw/srcs</span></code> for submodule in your NPU.</p>
 </section>
 <section id="basic-exercise-axi-single-transaction-simd-60">
 <h2>Basic Exercise - AXI Single Transaction &amp; SIMD - 60%<a class="headerlink" href="#basic-exercise-axi-single-transaction-simd-60" title="Link to this heading">#</a></h2>
@@ -500,7 +577,7 @@
 </div>
 <div class="admonition hint">
 <p class="admonition-title">Hint</p>
-<p>This part does not have any test. You can write your test function and add it into user menu to test correction of SIMD instruction.</p>
+<p>This part does not have any test. You can write your test function and add it into menu to test correction of SIMD instruction.</p>
 </div>
 <blockquote>
 <div><p>TODO:
@@ -607,34 +684,14 @@ Make <code class="docutils literal notranslate"><span class="pre">NPU</span></co
 <h2>Adavance Exercise 2 - Running TFLM Model Inference - 10%<a class="headerlink" href="#adavance-exercise-2-running-tflm-model-inference-10" title="Link to this heading">#</a></h2>
 <hr class="docutils" />
 <p>In this part, We use <code class="docutils literal notranslate"><span class="pre">ds_cnn_stream_fe</span></code> as our benchmark model. Then, compare runtime cycles to show performance improve on accelerated version convolution.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>You can download .tflite file and input data from below links.</p>
-<ul class="simple">
-<li><p><a class="reference external" href="https://drive.google.com/file/d/1CgEhJm0IoaXx3ULrn-Dfuw3LH83SnFlV/view?usp=sharing">ds_cnn_stream_fe.tflite</a></p></li>
-<li><p><a class="reference external" href="https://raw.githubusercontent.com/nycu-caslab/AAML2026/refs/heads/main/lab1_util/ds_cnn_stream_fe_profile.cc">ds_cnn_stream_fe_profile.cc</a></p></li>
-<li><p><a class="reference external" href="https://drive.google.com/drive/folders/1rY7SDD1qh-EXn8nqex7QDDvqbSiz7Ki_">input file</a></p></li>
-</ul>
-</div>
 <blockquote>
 <div><p>TODO:</p>
 <ol class="arabic simple">
-<li><p>Add .tflite, profile.cc, and input data into platform</p></li>
-<li><p>Register TFLM Ops in <code class="docutils literal notranslate"><span class="pre">tflm_ops.cc</span></code>, and modify <code class="docutils literal notranslate"><span class="pre">kTflmResolverOpCount</span></code> in <code class="docutils literal notranslate"><span class="pre">tflm_ops.h</span></code> with number of register op. You can check website in reference to know what op would be used in model.</p></li>
-<li><p>Set parameter in <code class="docutils literal notranslate"><span class="pre">project.mk</span></code> file (<code class="docutils literal notranslate"><span class="pre">MODEL_FILE</span></code>, <code class="docutils literal notranslate"><span class="pre">MODEL_PROFILE</span></code>, <code class="docutils literal notranslate"><span class="pre">TENSOR_ARENA_SIZE</span></code>), and add file of input data into <code class="docutils literal notranslate"><span class="pre">APP_EXTRA_SRCS</span></code>.</p></li>
 <li><p>Add below code to show outupt data after inference complete.</p></li>
 <li><p>Select “TFLM Inference, Verification, and Cycles” in main menu.</p></li>
-<li><p>Compare result between orignal version and accelerated version.</p></li>
+<li><p>Compare result between orignal version and accelerated version. If your result is match with original version, your implement is correct.</p></li>
 </ol>
 </div></blockquote>
-<div class="admonition hint">
-<p class="admonition-title">Hint</p>
-<ul class="simple">
-<li><p>You can use website in reference to know what TFLM OP will be used in model.</p></li>
-<li><p>You can set <code class="docutils literal notranslate"><span class="pre">TENSOR_ARENA_SIZE</span></code> as 1MB.</p></li>
-<li><p>You can see your output is same as orignal version if your implement is correct.</p></li>
-</ul>
-</div>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Platform/sw/app/tflm_runner.cc</span>
 <span class="cm">/*...*/</span>
 
@@ -653,11 +710,12 @@ Make <code class="docutils literal notranslate"><span class="pre">NPU</span></co
 </div>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
-<p>If your result is match than original version convolution and runtime cycles is less, you can get score in this part.</p>
+<p>If your result is match and runtime cycles is less than original version convolution, you can get score in this part.</p>
 </div>
 <p>This is result of label1 output:</p>
 <a class="reference internal image-reference" href="../_images/tflm_label1_output.png"><img alt="../_images/tflm_label1_output.png" src="../_images/tflm_label1_output.png" style="width: 400px;" />
 </a>
+<p>You can also compare two version output of others input in <code class="docutils literal notranslate"><span class="pre">labels</span></code> to verify correction.</p>
 </section>
 <section id="question-in-demo-15">
 <h2>Question in Demo - 15%<a class="headerlink" href="#question-in-demo-15" title="Link to this heading">#</a></h2>
@@ -730,6 +788,12 @@ Make <code class="docutils literal notranslate"><span class="pre">NPU</span></co
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#introduction">Introduction</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#goal-of-this-lab">Goal of this lab</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#background">Background</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grading">Grading</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#prerequisites-and-setup">Prerequisites and setup</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#add-ds-cnn-stream-fe-into-platform">Add <code class="docutils literal notranslate"><span class="pre">ds_cnn_stream_fe</span></code> into platform</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#files-and-submission-boundary">Files and submission boundary</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#basic-exercise-axi-single-transaction-simd-60">Basic Exercise - AXI Single Transaction &amp; SIMD - 60%</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#axi-single-transaction">1. AXI Single Transaction</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#simd-mac">2. SIMD MAC</a></li>
