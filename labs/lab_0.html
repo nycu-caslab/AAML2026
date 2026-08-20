@@ -435,6 +435,16 @@
 <li><p>Custom-0 is an opcode retained by the official</p></li>
 <li><p>NPU can be controlled by function3 and function7</p></li>
 </ul>
+<p><strong>Adding A Custom Instruction</strong></p>
+<ol class="arabic simple">
+<li><p>Choose a <code class="docutils literal notranslate"><span class="pre">funct3/funct7</span></code> pair. <code class="docutils literal notranslate"><span class="pre">cfu_op0</span></code>..<code class="docutils literal notranslate"><span class="pre">cfu_op7</span></code> select <code class="docutils literal notranslate"><span class="pre">funct3=0..7</span></code></p></li>
+<li><p>Add a readable wrapper in <code class="docutils literal notranslate"><span class="pre">project/accel_ops.h</span></code></p></li>
+<li><p>Implement the hardware behavior in <code class="docutils literal notranslate"><span class="pre">../hw/srcs/NPU.v</span></code>, or start from <code class="docutils literal notranslate"><span class="pre">../hw/templates/custom_accelerator_template.v</span></code></p></li>
+<li><p>Implement the software fallback in <code class="docutils literal notranslate"><span class="pre">app/software_cfu.cc</span></code></p></li>
+<li><p>Add a functional or cycle-counting test in <code class="docutils literal notranslate"><span class="pre">project/accel_tests.cc</span></code> or another project source, then register it in the appropriate Lab submenu in <code class="docutils literal notranslate"><span class="pre">project/proj_menu.cc</span></code></p></li>
+</ol>
+<p>Build with <code class="docutils literal notranslate"><span class="pre">USE_SOFTWARE_CFU=1</span></code> when you want to test the software fallback without issuing <code class="docutils literal notranslate"><span class="pre">CUSTOM-0</span></code> instructions.<br />
+Use <code class="docutils literal notranslate"><span class="pre">templates/custom_instruction_template.cc</span></code> for a standalone performance test skeleton. After adding template-based code, run <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">validate</span></code>; if the extension adds a new menu item, register its function in the appropriate Lab submenu in <code class="docutils literal notranslate"><span class="pre">project/proj_menu.cc</span></code>.</p>
 </section>
 <section id="npu-block">
 <h3>NPU (block)<a class="headerlink" href="#npu-block" title="Link to this heading">#</a></h3>

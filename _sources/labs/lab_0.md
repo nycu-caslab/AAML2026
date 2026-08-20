@@ -30,6 +30,16 @@ The official specification reserves blank opcodes (such as custom-0), allowing d
 - Custom-0 is an opcode retained by the official
 - NPU can be controlled by function3 and function7
 
+**Adding A Custom Instruction**
+1. Choose a `funct3/funct7` pair. `cfu_op0`..`cfu_op7` select `funct3=0..7`
+2. Add a readable wrapper in `project/accel_ops.h`
+3. Implement the hardware behavior in `../hw/srcs/NPU.v`, or start from `../hw/templates/custom_accelerator_template.v`
+4. Implement the software fallback in `app/software_cfu.cc`
+5. Add a functional or cycle-counting test in `project/accel_tests.cc` or another project source, then register it in the appropriate Lab submenu in `project/proj_menu.cc`  
+
+Build with `USE_SOFTWARE_CFU=1` when you want to test the software fallback without issuing `CUSTOM-0` instructions.  
+Use `templates/custom_instruction_template.cc` for a standalone performance test skeleton. After adding template-based code, run `make validate`; if the extension adds a new menu item, register its function in the appropriate Lab submenu in `project/proj_menu.cc`.
+
 ### NPU (block)
 In this platform, `NPU` is the name of the customizable accelerator block connected to the RISC-V CPU. The CPU still runs the application and the TFLM interpreter and remains responsible for program control. Software explicitly invokes the NPU only for selected compute-intensive operations.
 
