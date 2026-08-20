@@ -513,7 +513,8 @@ Your submitted project must build and run without source edits. Keep the require
 </tbody>
 </table>
 </div>
-<p>Accumulate and return the result as signed 32-bit data.</p>
+<p>It’s guaranteed that at most two AXI data transfer is needed.
+Accumulate and return the result as signed 32-bit data.</p>
 <p>The CUSTOM-0 encoding behind <code class="docutils literal notranslate"><span class="pre">hw_simd_mac</span></code> is your design. You may choose the <code class="docutils literal notranslate"><span class="pre">funct3</span></code> and <code class="docutils literal notranslate"><span class="pre">funct7</span></code> values, command sequence, local-buffer organization, state machine, and SIMD width. Use the helpers in <code class="docutils literal notranslate"><span class="pre">Platform/sw/app/cfu.h</span></code>.</p>
 <p>The multiplication and main accumulation must be performed by custom hardware using operand data read through AXI4 bursts. A CPU loop that calculates the dot product, including one hidden inside <code class="docutils literal notranslate"><span class="pre">hw_simd_mac</span></code>, does not satisfy the assignment. Software may copy or pad operands into legal staging buffers, clean cache lines, issue custom instructions, and combine accelerator partial results.</p>
 </section>

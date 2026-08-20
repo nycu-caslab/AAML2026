@@ -91,6 +91,7 @@ The required input domain is:
 | Buffer access | Each pointer supplies at least `N` readable bytes; the function must not modify them |
 | Return value | Exact signed 32-bit result for the formula above |
 
+It's guaranteed that at most two AXI data transfer is needed.
 Accumulate and return the result as signed 32-bit data.
 
 The CUSTOM-0 encoding behind `hw_simd_mac` is your design. You may choose the `funct3` and `funct7` values, command sequence, local-buffer organization, state machine, and SIMD width. Use the helpers in `Platform/sw/app/cfu.h`.
