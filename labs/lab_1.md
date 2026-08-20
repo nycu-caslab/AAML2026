@@ -6,14 +6,59 @@ In this lab, you will focus on AXI single transation and SIMD MAC operands. Then
 
 ## Goal of this lab
 ---
-- [Basic Exercise - AXI Single Transaction & SIMD MAC - 60%](#basic-exercise-axi-single-transaction-simd-60)
-- [Adavance Exercise 1 - AXI Address Aligned - 15%](#adavance-exercise-1-axi-address-aligned-15)
-- [Adavance Exercise 2 - Running Full TFLM Model - 10%](#adavance-exercise-2-running-tflm-model-inference-10)
-- [Questions in the Demo - 15%](#question-in-demo-15)
+- Know function about AXI I/O and control them to achieve AXI single transaction. 
+- Use custom SIMD MAC to acclerated convolution.
+- Understand cache block operaction to maintain cache coherence.
+- Understand how to handle misaligned address condition in AXI single transaction. 
+- Run full TFLM model in platform: know how to add model into this platform.
 
 ## Background
 
 
+
+## Grading
+
+| Component | Weight |
+| --- | ---: |
+| AXI Single Transatction | 60% |
+| AXI Address Aligned | 15% |
+| Running Full TFLM Model | 10% |
+| Demo and questions | 15% |
+
+## Prerequisites and setup
+
+- Vivado 2024.1
+- RISC-V toolchain
+- Python 3 with `pyserial`
+
+### Add `ds_cnn_stream_fe` into platform
+
+```{note}
+You can download .tflite file and input data from below links.
+
+- [ds_cnn_stream_fe.tflite](https://drive.google.com/file/d/1CgEhJm0IoaXx3ULrn-Dfuw3LH83SnFlV/view?usp=sharing)
+- [ds_cnn_stream_fe_profile.cc](https://raw.githubusercontent.com/nycu-caslab/AAML2026/refs/heads/main/lab1_util/ds_cnn_stream_fe_profile.cc)
+- [input file](https://drive.google.com/drive/folders/1rY7SDD1qh-EXn8nqex7QDDvqbSiz7Ki_)
+```
+
+> 1. Add .tflite, profile.cc into `Platform/sw/models/`,and input data into `Platform/sw`.
+> 2. Register TFLM OP in `tflm_ops.cc`, and modify `kTflmResolverOpCount` in `tflm_ops.h` with number of register OP.
+> 3. Set parameter in `project.mk` file (`MODEL_FILE`, `MODEL_PROFILE`, `TENSOR_ARENA_SIZE`), and add file of input data into `APP_EXTRA_SRCS`.
+
+```{hint}
+- You can use website in reference to know what TFLM OP will be used in model. 
+- You can set `TENSOR_ARENA_SIZE` as 1MB.
+```
+
+## Files and submission boundary
+
+You may modify: 
+- `Platform/sw/tflm_patches/tensorflow/lite/kernels/internal/reference/integer_ops/conv.h`
+- `Platform/sw/project/accel_ops.h` 
+- `Platform/hw/srcs/NPU.v`
+- `tflm_ops.h`, `tflm_ops.cc`, `tflm_runners.cc`
+
+You can add .v file in `Platform/hw/srcs` for submodule in your NPU. 
 
 ## Basic Exercise - AXI Single Transaction & SIMD - 60%
 ---
@@ -91,7 +136,7 @@ output = | output + (input_data[0, 1, 2, 3] + offset) * filter_data[0, 1, 2, 3] 
 ```
 
 ```{hint}
-This part does not have any test. You can write your test function and add it into user menu to test correction of SIMD instruction. 
+This part does not have any test. You can write your test function and add it into menu to test correction of SIMD instruction. 
 ```
 
 > TODO: 
@@ -198,27 +243,10 @@ Correct Result (Test 4 and 5):
 
 In this part, We use `ds_cnn_stream_fe` as our benchmark model. Then, compare runtime cycles to show performance improve on accelerated version convolution.
 
-```{note}
-You can download .tflite file and input data from below links.
-
-- [ds_cnn_stream_fe.tflite](https://drive.google.com/file/d/1CgEhJm0IoaXx3ULrn-Dfuw3LH83SnFlV/view?usp=sharing)
-- [ds_cnn_stream_fe_profile.cc](https://raw.githubusercontent.com/nycu-caslab/AAML2026/refs/heads/main/lab1_util/ds_cnn_stream_fe_profile.cc)
-- [input file](https://drive.google.com/drive/folders/1rY7SDD1qh-EXn8nqex7QDDvqbSiz7Ki_)
-```
-
 > TODO: 
-> 1. Add .tflite, profile.cc, and input data into platform
-> 2. Register TFLM Ops in `tflm_ops.cc`, and modify `kTflmResolverOpCount` in `tflm_ops.h` with number of register op. You can check website in reference to know what op would be used in model.
-> 3. Set parameter in `project.mk` file (`MODEL_FILE`, `MODEL_PROFILE`, `TENSOR_ARENA_SIZE`), and add file of input data into `APP_EXTRA_SRCS`.
-> 4. Add below code to show outupt data after inference complete.
-> 5. Select "TFLM Inference, Verification, and Cycles" in main menu. 
-> 6. Compare result between orignal version and accelerated version.
-
-```{hint}
-- You can use website in reference to know what TFLM OP will be used in model. 
-- You can set `TENSOR_ARENA_SIZE` as 1MB.
-- You can see your output is same as orignal version if your implement is correct.
-```
+> 1. Add below code to show outupt data after inference complete.
+> 2. Select "TFLM Inference, Verification, and Cycles" in main menu. 
+> 3. Compare result between orignal version and accelerated version. If your result is match with original version, your implement is correct.
 
 ```cpp
 // Platform/sw/app/tflm_runner.cc
@@ -238,12 +266,14 @@ for (int i = 0; i < 12; i++) {
 ```
 
 ```{important}
-If your result is match than original version convolution and runtime cycles is less, you can get score in this part.
+If your result is match and runtime cycles is less than original version convolution, you can get score in this part.
 ```
 
 This is result of label1 output: 
 
 <img src="images/lab1/tflm_label1_output.png" width="400px">
+
+You can also compare two version output of others input in `labels` to verify correction.
 
 ## Question in Demo - 15%
 ---
