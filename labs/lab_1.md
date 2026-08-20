@@ -25,7 +25,7 @@ Key signals and handshake rules you will encounter in `NPU.v`
 
 - **Single Transaction**: In lab 1, we focus on single-beat (non-burst) 4-byte read/write transfers. You must drive the address channel, wait for the data channel, and properly handle the handshake signals to complete one transaction.
 
-You can also refer to the supplementary slide in lab 0 for learn more detail on AXI
+You can also refer to the supplementary slides from lab 0 for more details about AXI.
 > [Learn more about AXI](https://docs.google.com/presentation/d/1PH9ZFxNuDXuPgTCY71MiiTLlWc80MGeT7lYO-IY-NLg/edit?usp=sharing)
 
 
