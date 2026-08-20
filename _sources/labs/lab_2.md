@@ -92,12 +92,13 @@ The required input domain is:
 | Buffer access | Each pointer supplies at least `N` readable bytes; the function must not modify them |
 | Return value | Exact signed 32-bit result for the formula above |
 
-It's guaranteed that at most two AXI data transfer is needed.
-Accumulate and return the result as signed 32-bit data.
+It's guaranteed that at most two AXI burst transactions are needed.
 
-The CUSTOM-0 encoding behind `hw_simd_mac` is your design. You may choose the `funct3` and `funct7` values, command sequence, local-buffer organization, state machine, and SIMD width. Use the helpers in `Platform/sw/app/cfu.h`.
+The CUSTOM-0 encoding behind `hw_simd_mac` is your design. You may choose the `funct3` and `funct7` values, command sequence, local-buffer organization, state machine, and SIMD width.
+Use the helpers in `Platform/sw/app/cfu.h`.
 
-The multiplication and main accumulation must be performed by custom hardware using operand data read through AXI4 bursts. A CPU loop that calculates the dot product, including one hidden inside `hw_simd_mac`, does not satisfy the assignment. Software may copy or pad operands into legal staging buffers, clean cache lines, issue custom instructions, and combine accelerator partial results.
+The multiplication and main accumulation must be performed by custom hardware using operand data read through AXI4 bursts. A CPU loop that calculates the dot product, including one hidden inside `hw_simd_mac`, does not satisfy the assignment.  
+Software may prepare the arguments of custom instructions, clean cache lines and issue custom instructions.
 
 ## Part 1: AXI4 read burst engine and dot service (20%)
 
@@ -138,7 +139,7 @@ address + 4 * B <= 0x6800_0000
 2 <= B <= 64
 ```
 
-Your hardware design must handle independently unaligned pointers, arbitrary `N`, the final partial word, the `N=1..4` cases that still require a real multi-beat burst, and the misaligned `N=256` case without issuing an illegal 65-beat request. Replacing a multi-beat burst with repeated single-beat requests does not satisfy this lab. Write bursts, unaligned AXI starts, multiple outstanding requests, and hardware that splits a crossing request at a 4-KiB boundary may be used to avoid those cases.
+Your hardware design must handle independently unaligned pointers, arbitrary `N`, the final partial word, the `N=1..4` cases that still require a real multi-beat burst, and the misaligned `N=256` case without issuing an illegal 65-beat request. Replacing a multi-beat burst with repeated single-beat requests does not satisfy this lab.
 
 ### AXI protocol requirements
 

@@ -515,10 +515,11 @@ make<span class="w"> </span>-C<span class="w"> </span>Platform/sw<span class="w"
 </tbody>
 </table>
 </div>
-<p>It’s guaranteed that at most two AXI data transfer is needed.
-Accumulate and return the result as signed 32-bit data.</p>
-<p>The CUSTOM-0 encoding behind <code class="docutils literal notranslate"><span class="pre">hw_simd_mac</span></code> is your design. You may choose the <code class="docutils literal notranslate"><span class="pre">funct3</span></code> and <code class="docutils literal notranslate"><span class="pre">funct7</span></code> values, command sequence, local-buffer organization, state machine, and SIMD width. Use the helpers in <code class="docutils literal notranslate"><span class="pre">Platform/sw/app/cfu.h</span></code>.</p>
-<p>The multiplication and main accumulation must be performed by custom hardware using operand data read through AXI4 bursts. A CPU loop that calculates the dot product, including one hidden inside <code class="docutils literal notranslate"><span class="pre">hw_simd_mac</span></code>, does not satisfy the assignment. Software may copy or pad operands into legal staging buffers, clean cache lines, issue custom instructions, and combine accelerator partial results.</p>
+<p>It’s guaranteed that at most two AXI burst transactions are needed.</p>
+<p>The CUSTOM-0 encoding behind <code class="docutils literal notranslate"><span class="pre">hw_simd_mac</span></code> is your design. You may choose the <code class="docutils literal notranslate"><span class="pre">funct3</span></code> and <code class="docutils literal notranslate"><span class="pre">funct7</span></code> values, command sequence, local-buffer organization, state machine, and SIMD width.
+Use the helpers in <code class="docutils literal notranslate"><span class="pre">Platform/sw/app/cfu.h</span></code>.</p>
+<p>The multiplication and main accumulation must be performed by custom hardware using operand data read through AXI4 bursts. A CPU loop that calculates the dot product, including one hidden inside <code class="docutils literal notranslate"><span class="pre">hw_simd_mac</span></code>, does not satisfy the assignment.<br />
+Software may prepare the arguments of custom instructions, clean cache lines and issue custom instructions.</p>
 </section>
 <section id="part-1-axi4-read-burst-engine-and-dot-service-20">
 <h2>Part 1: AXI4 read burst engine and dot service (20%)<a class="headerlink" href="#part-1-axi4-read-burst-engine-and-dot-service-20" title="Link to this heading">#</a></h2>
@@ -578,7 +579,7 @@ address + 4 * B &lt;= 0x6800_0000
 2 &lt;= B &lt;= 64
 </pre></div>
 </div>
-<p>Your hardware design must handle independently unaligned pointers, arbitrary <code class="docutils literal notranslate"><span class="pre">N</span></code>, the final partial word, the <code class="docutils literal notranslate"><span class="pre">N=1..4</span></code> cases that still require a real multi-beat burst, and the misaligned <code class="docutils literal notranslate"><span class="pre">N=256</span></code> case without issuing an illegal 65-beat request. Replacing a multi-beat burst with repeated single-beat requests does not satisfy this lab. Write bursts, unaligned AXI starts, multiple outstanding requests, and hardware that splits a crossing request at a 4-KiB boundary may be used to avoid those cases.</p>
+<p>Your hardware design must handle independently unaligned pointers, arbitrary <code class="docutils literal notranslate"><span class="pre">N</span></code>, the final partial word, the <code class="docutils literal notranslate"><span class="pre">N=1..4</span></code> cases that still require a real multi-beat burst, and the misaligned <code class="docutils literal notranslate"><span class="pre">N=256</span></code> case without issuing an illegal 65-beat request. Replacing a multi-beat burst with repeated single-beat requests does not satisfy this lab.</p>
 </section>
 <section id="axi-protocol-requirements">
 <h3>AXI protocol requirements<a class="headerlink" href="#axi-protocol-requirements" title="Link to this heading">#</a></h3>
