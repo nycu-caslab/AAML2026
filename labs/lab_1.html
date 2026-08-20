@@ -356,8 +356,9 @@
             </div>
             <nav aria-label="Page">
                 <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#goal-of-this-lab">Goal of this lab</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#introduction">Introduction</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#goal-of-this-lab">Goal of this lab</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#background">Background</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#basic-exercise-axi-single-transaction-simd-60">Basic Exercise - AXI Single Transaction &amp; SIMD - 60%</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#axi-single-transaction">1. AXI Single Transaction</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#simd-mac">2. SIMD MAC</a></li>
@@ -383,6 +384,11 @@
                   
   <section id="lab-1-aligned-axi-data-on-simd">
 <h1>Lab 1 : Aligned AXI Data on SIMD<a class="headerlink" href="#lab-1-aligned-axi-data-on-simd" title="Link to this heading">#</a></h1>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">#</a></h2>
+<hr class="docutils" />
+<p>In this lab, you will focus on AXI single transation and SIMD MAC operands. Then, we use these custom instruction in convolution part to reduce runtime of model reference. We use <code class="docutils literal notranslate"><span class="pre">ds_cnn_stream_fe</span></code> model to compare convolution between our accelerated version and orignal software-only version.</p>
+</section>
 <section id="goal-of-this-lab">
 <h2>Goal of this lab<a class="headerlink" href="#goal-of-this-lab" title="Link to this heading">#</a></h2>
 <hr class="docutils" />
@@ -393,10 +399,8 @@
 <li><p><a class="reference internal" href="#question-in-demo-15"><span class="xref myst">Questions in the Demo - 15%</span></a></p></li>
 </ul>
 </section>
-<section id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">#</a></h2>
-<hr class="docutils" />
-<p>In this lab, you will focus on AXI single transation and SIMD MAC operands. Then, we use these custom instruction in convolution part to reduce runtime of model reference. We use <code class="docutils literal notranslate"><span class="pre">ds_cnn_stream_fe</span></code> model to compare convolution between our accelerated version and orignal software-only version.</p>
+<section id="background">
+<h2>Background<a class="headerlink" href="#background" title="Link to this heading">#</a></h2>
 </section>
 <section id="basic-exercise-axi-single-transaction-simd-60">
 <h2>Basic Exercise - AXI Single Transaction &amp; SIMD - 60%<a class="headerlink" href="#basic-exercise-axi-single-transaction-simd-60" title="Link to this heading">#</a></h2>
@@ -445,7 +449,7 @@
 <li><p>If you want more information about custom instruction of software, you can trace these files, “accel_ops.h”, “accel_ops.cc”, and “accel_test.cc”.</p></li>
 <li><p>Verification:</p>
 <ol class="arabic simple">
-<li><p>Run “Accelerator functional test” in project menu.</p></li>
+<li><p>Run “Functional tests: scalar and AXI single transactions” in lab1 menu.</p></li>
 <li><p>If result show “AXI read” and “AXI write” pass, this part is correct.</p></li>
 </ol>
 </li>
@@ -584,7 +588,7 @@ Make <code class="docutils literal notranslate"><span class="pre">NPU</span></co
 </div></blockquote>
 <p>Verfication:</p>
 <ol class="arabic simple">
-<li><p>Run “Accelerator functional test” in project menu.</p></li>
+<li><p>Run “Functional tests: scalar and AXI single transactions” in lab1 menu.</p></li>
 <li><p>If you pass “Unaligned AXI Read” and “Unaligned AXI Write”, your implement is correct.</p></li>
 </ol>
 <p>Correct Result (Test 4 and 5):</p>
@@ -616,10 +620,10 @@ Make <code class="docutils literal notranslate"><span class="pre">NPU</span></co
 <div><p>TODO:</p>
 <ol class="arabic simple">
 <li><p>Add .tflite, profile.cc, and input data into platform</p></li>
-<li><p>Register TFLM Ops in <code class="docutils literal notranslate"><span class="pre">tflm_ops.cc</span></code>, and modify <code class="docutils literal notranslate"><span class="pre">kTflmResolverOpCount</span></code> in <code class="docutils literal notranslate"><span class="pre">tflm_ops.h</span></code> with number of register op.</p></li>
+<li><p>Register TFLM Ops in <code class="docutils literal notranslate"><span class="pre">tflm_ops.cc</span></code>, and modify <code class="docutils literal notranslate"><span class="pre">kTflmResolverOpCount</span></code> in <code class="docutils literal notranslate"><span class="pre">tflm_ops.h</span></code> with number of register op. You can check website in reference to know what op would be used in model.</p></li>
 <li><p>Set parameter in <code class="docutils literal notranslate"><span class="pre">project.mk</span></code> file (<code class="docutils literal notranslate"><span class="pre">MODEL_FILE</span></code>, <code class="docutils literal notranslate"><span class="pre">MODEL_PROFILE</span></code>, <code class="docutils literal notranslate"><span class="pre">TENSOR_ARENA_SIZE</span></code>), and add file of input data into <code class="docutils literal notranslate"><span class="pre">APP_EXTRA_SRCS</span></code>.</p></li>
 <li><p>Add below code to show outupt data after inference complete.</p></li>
-<li><p>Select “TFLM Inference, Verification, and Cycles” from the project menu.</p></li>
+<li><p>Select “TFLM Inference, Verification, and Cycles” in main menu.</p></li>
 <li><p>Compare result between orignal version and accelerated version.</p></li>
 </ol>
 </div></blockquote>
@@ -627,7 +631,7 @@ Make <code class="docutils literal notranslate"><span class="pre">NPU</span></co
 <p class="admonition-title">Hint</p>
 <ul class="simple">
 <li><p>You can use website in reference to know what TFLM OP will be used in model.</p></li>
-<li><p>You can set <code class="docutils literal notranslate"><span class="pre">TENSOR_ARENA_SIZE</span></code> as 1MB to avoid</p></li>
+<li><p>You can set <code class="docutils literal notranslate"><span class="pre">TENSOR_ARENA_SIZE</span></code> as 1MB.</p></li>
 <li><p>You can see your output is same as orignal version if your implement is correct.</p></li>
 </ul>
 </div>
@@ -665,7 +669,7 @@ Make <code class="docutils literal notranslate"><span class="pre">NPU</span></co
 <hr class="docutils" />
 <div class="admonition important">
 <p class="admonition-title">Important</p>
-<p>TAs should be able to run your project without any modification. If TAs cannot compile or run your code, <strong>you can’t get any scores even if you passed the DEMO</strong>. Also, <strong>PLAGIARISM is not allowed</strong>.</p>
+<p>Submit source repository without <code class="docutils literal notranslate"><span class="pre">Platform/build/</span></code>. TAs should be able to run your project without any modification. If TAs cannot compile or run your code, <strong>you can’t get any scores even if you passed the DEMO</strong>. Also, <strong>PLAGIARISM is not allowed</strong>.</p>
 </div>
 </section>
 <section id="reference">
@@ -723,8 +727,9 @@ Make <code class="docutils literal notranslate"><span class="pre">NPU</span></co
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#goal-of-this-lab">Goal of this lab</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#introduction">Introduction</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#goal-of-this-lab">Goal of this lab</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#background">Background</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#basic-exercise-axi-single-transaction-simd-60">Basic Exercise - AXI Single Transaction &amp; SIMD - 60%</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#axi-single-transaction">1. AXI Single Transaction</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#simd-mac">2. SIMD MAC</a></li>
