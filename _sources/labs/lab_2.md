@@ -1,4 +1,4 @@
-# Lab 2: AXI4 Burst Reads for a SIMD CFU
+# Lab 2: AXI4 Burst Reads for a SIMD
 
 ## Introduction
 

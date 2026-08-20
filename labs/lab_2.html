@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Lab 2: AXI4 Burst Reads for a SIMD CFU &#8212; CSIC30066: Accelerator Architectures for Machine Learning</title>
+    <title>Lab 2: AXI4 Burst Reads for a SIMD &#8212; CSIC30066: Accelerator Architectures for Machine Learning</title>
   
   
   
@@ -198,7 +198,7 @@
 <ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="lab_0.html">Lab 0 : Environment Setup</a></li>
 <li class="toctree-l1"><a class="reference internal" href="lab_1.html">Lab 1 : Aligned AXI Data on SIMD</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Lab 2: AXI4 Burst Reads for a SIMD CFU</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Lab 2: AXI4 Burst Reads for a SIMD</a></li>
 <li class="toctree-l1"><a class="reference internal" href="lab_3.html">Lab 3 : Systolic Array</a></li>
 <li class="toctree-l1"><a class="reference internal" href="lab_4.html">Lab 4 : Elementwise Unit</a></li>
 <li class="toctree-l1"><a class="reference internal" href="lab_5.html">Lab 5 : Systolic Array with im2col for Convolution</a></li>
@@ -348,7 +348,7 @@
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Lab 2: AXI4 Burst Reads for a SIMD CFU</h1>
+    <h1>Lab 2: AXI4 Burst Reads for a SIMD</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -394,8 +394,8 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="lab-2-axi4-burst-reads-for-a-simd-cfu">
-<h1>Lab 2: AXI4 Burst Reads for a SIMD CFU<a class="headerlink" href="#lab-2-axi4-burst-reads-for-a-simd-cfu" title="Link to this heading">#</a></h1>
+  <section class="tex2jax_ignore mathjax_ignore" id="lab-2-axi4-burst-reads-for-a-simd">
+<h1>Lab 2: AXI4 Burst Reads for a SIMD<a class="headerlink" href="#lab-2-axi4-burst-reads-for-a-simd" title="Link to this heading">#</a></h1>
 <section id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">#</a></h2>
 <p>In Lab 1, the NPU fetched one 32-bit word per custom instruction. In this lab, one software command must start an AXI4 INCR read burst and retain multiple beats in accelerator-local storage. You will reuse those burst-loaded operands in a self-designed compute datapath and accelerate the int8 convolution used by <code class="docutils literal notranslate"><span class="pre">ds_cnn_stream_fe.tflite</span></code> in Lab 1.</p>
