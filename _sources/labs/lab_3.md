@@ -1,6 +1,6 @@
 # Lab 3 : Systolic Array
 ---
-## Goal of this lab
+<!-- ## Goal of this lab
 ---
 - [Row Stationary Exercise #1 - 10%](#row-stationary-exercise-1---10) 
 - [Row Stationary Exercise #2 - 10%](#row-stationary-exercise-2---10) 
@@ -8,14 +8,14 @@
 - [Row Stationary Exercise #4 - 20%](#row-stationary-exercise-4---20)
 - [GEMV Basic Exercise - 30%](#gemv-basic-exercise---30) 
 - [GEMV Performance Challenge - 10%](#gemv-performance-challenge---10)
-
+ -->
 
 
 ## Introduction
 ---
 The systolic array used by Google Tensor Processing Unit (TPU) accelerates the matrix computation by using the dataflow operation. The systolic array contains multiple processing elements (PEs), each of them is responsible for the multiply–and-accumulate (MAC) operation. It can performs multiple elements in a matrix simultaneously and achieves high computational throughput.
 
-In this lab, we will use Verilog to implement PEs and a small systolic array composed of multiple PEs to accelerate convolution and general matrix vector multiplication (GEMV). Different dataflows, such as Weight Stationary, Output Stationary, Input Stationary, and Row Stationary, can be considered when designing the PE array. 
+In this lab, we will use Verilog to implement PEs and a small systolic array composed of multiple PEs to accelerate convolution and general matrix-vector multiplication (GEMV). Different dataflows, such as Weight Stationary, Output Stationary, Input Stationary, and Row Stationary, can be considered when designing the PE array. 
 
 (Hint: The weight stationary is more complicated than output stationary.)
 ```{note}
@@ -25,14 +25,27 @@ In this lab, we will use Verilog to implement PEs and a small systolic array com
 2. You will be asked to put your systolic array on FPGA in ***lab 5***, so please make sure that your systolic array is a synthesizable circuit.
 ```
 
+## Learning goals
+- Implement 2D convolution on a systolic array using the Row Stationary dataflow.
+- Implement GEMV on a systolic array using a dataflow of your choice.
+- Optimize the GEMV architecture and dataflow to reduce the total execution cycle count.
+
+## Grading
+
+| Component | Description | Weight |
+| --- | --- | ---: |
+| [Row Stationary Exercise #1](#row-stationary-exercise-1---10)  | 2D convolution with fixed `M = 7`, `N = 4` | 10% |
+| [Row Stationary Exercise #2](#row-stationary-exercise-2---10) | 2D convolution with fixed `M = 10`, `N = 5` | 10% |
+| [Row Stationary Exercise #3](#row-stationary-exercise-3---20) | General 2D convolution with random `1 <= N <= M <= 254` | 20% |
+| [Row Stationary Exercise #4](#row-stationary-exercise-4---20) | 2D convolution with advanced test cases | 20% |
+| [GEMV Basic Exercise](#gemv-basic-exercise---30)  | Functional correctness of GEMV | 30% |
+| [GEMV Performance Challenge](#gemv-performance-challenge---10) | Performance ranking based on total execution cycle count | 10% |
+| **Total** |  | **100%** |
+
 ## Background
 ---
 ### Weight Stationary
-In the weight staionary dataflow, each PE's register stores the weight values and remains stationary during MACs. Input activations are propagated through the PE array and multiplied by the locally stored weights. The generated partial sums are then forwarded to other PEs or accumulated outside the PE.
-
-each PE performs:
-
-$psum\_{out}=psum\_{in}+input\_{in}\times weight\_{local}$
+In the weight stationary dataflow, each PE's register stores the weight values and remains stationary during MACs. Input activations are propagated through the PE array and multiplied by the locally stored weights. The generated partial sums are then forwarded to other PEs or accumulated outside the PE.
 
 ![Weight Stationary](images/lab3/WS.png)
 
@@ -40,26 +53,16 @@ $psum\_{out}=psum\_{in}+input\_{in}\times weight\_{local}$
 ### Output Stationary
 In the output stationary dataflow, each PE's register stores the partial sum of an output value and keeps it stationary during MACs. Input activations and weights are propagated through the PE array and multiplied inside the PE. The partial sum is accumulated locally until the output value is completed.
 
-each PE performs:
-
-$psum\_{local}=psum\_{local}+input\times weight$
 
 ![Output Stationary](images/lab3/OS.png)
 
 ### Input Stationary
 In the input stationary dataflow, each PE's register stores an input activation and keeps it stationary during MACs. Different weights are propagated through the PE array and multiplied by the locally stored input value. The generated partial sums are then forwarded to other PEs or accumulated for the corresponding outputs.
 
-each PE performs:
-
-$psum\_{out}=psum\_{in}+input\_{local}\times weight\_{in}$
-
 ![Input Stationary](images/lab3/IS.png)
 
 ### Row Stationary
 In the row stationary dataflow, each PE performs part of a row convolution while reusing kernel values and overlapping input activations locally. Input activations are shifted or propagated between neighboring PEs to reuse the overlapping data of adjacent convolution windows. The generated partial sums are accumulated across PEs to produce the final convolution output.
-
-A 1D row convolution can be expressed as:
-$psum[x] = \sum_{k=0}^{N-1} input[x+k] \times weight[k]$
 
 ![Row Stationary](images/lab3/RS.png)
 
@@ -67,7 +70,7 @@ $psum[x] = \sum_{k=0}^{N-1} input[x+k] \times weight[k]$
 
 ## Systolic Array Implementation
 ---
-The goals of this lab are to familiarize you with the concepts of dataflows in systolic array architectures. This will get you hand-on experience with dataflow routing and processing elements implementations. In this lab, you only need to construct the TPU module.
+The goals of this lab are to familiarize you with the concepts of dataflows in systolic array architectures. This will get you hands-on experience with dataflow routing and processing element implementations. In this lab, you only need to construct the TPU module.
 
 ### Prerequisite
 
@@ -120,19 +123,19 @@ If you have the licence of `VCS` and want faster simulation, you may use the `Ma
 
 <img src="images/lab3/block_diagram-2.png" width="560px">
 
-**Tabel 1: The Control Signals**
+**Table 1: The Control Signals**
 | I/O    | Signal name | Bit width | Description                                                                                                               |
 | ------ | ----------- | --------: | ------------------------------------------------------------------------------------------------------------------------- |
 | Input  | `clk`       |         1 | The clock signal                                                                                                          |
 | Input  | `rst_n`     |         1 | The reset signal, which is active low                                                                                     |
-| Input  | `in_valid`  |         1 | The input is valid when in_valid is high and will only high for one cycle |
+| Input  | `in_valid`  |         1 | The input is valid when in_valid is high and will only be high for one cycle |
 | Input  | `M`         |         8 | Dimension `M` of the `M × M` input feature map                                                                            |
 | Input  | `N`         |         8 | Dimension `N` of the `N × N` convolution kernel                                                                           |
 | Output | `busy`      |         1 | High when the design is busy. Pattern will check your answer when busy is low after every in_valid.                |
 
 
 
-**Tabel 2: The SRAM interface of A and B SRAM**
+**Table 2: The SRAM interface of A and B SRAM**
 |  I/O   | Signal name  | Bit width | Description                                  |
 |  ----  | ----         | ----      |  ----                                        |     
 | Input  | `wr_en`        | 1         | The write enable signal.                     |
@@ -140,7 +143,7 @@ If you have the licence of `VCS` and want faster simulation, you may use the `Ma
 | Input  | `data_in`      | 32        | The data input to write to the SRAM          |
 | Output | `data_out`     | 32        | The data output from the SRAM                |
 
-**Tabel 3: The SRAM interface of C SRAM**
+**Table 3: The SRAM interface of C SRAM**
 |  I/O   | Signal name  | Bit width | Description                                  |
 |  ----  | ----         | ----      |  ----                                        |     
 | Input  | `wr_en`        | 1         | The write enable signal.                     |
@@ -153,7 +156,7 @@ The 128-bit data input stands for 4 * 32-bit values, allowing 4 elements to be w
 
 ### lab 3-2
 
-**Tabel 1: The Control Signals**
+**Table 1: The Control Signals**
 | I/O    | Signal name | Bit width | Description                                                                                           |
 | ------ | ----------- | --------: | ----------------------------------------------------------------------------------------------------- |
 | Input  | `clk`       |         1 | The clock signal                                                                                      |
@@ -194,7 +197,7 @@ The 128-bit data input stands for 4 * 32-bit values, allowing 4 elements to be w
 
 * You may not modify `global_buffer.v`.
 
-* At the start of the simulation, the testbench will load global buffer A & B, assuming that the CPU or DMA has already prepared the data for the TPU in the global buffer. When signal `in_valid == 1`, the input size parameters (`m`, `n`, `k`) will be available for the TPU for **only one cycle**.
+* At the start of the simulation, the testbench will load global buffer A & B, assuming that the CPU or DMA has already prepared the data for the TPU in the global buffer. When signal `in_valid == 1`, the input size parameters (M, N, K) will be available for the TPU for **only one cycle**.
 
 ```{note}
 For the details of the data mapping into the global buffers, please refer to the ***[Appendix](#appendix)***. The Appendix describes the memory layouts used for the Row Stationary convolution in Lab 3-1 and the GEMV in Lab 3-2.
@@ -214,7 +217,7 @@ For the details of the data mapping into the global buffers, please refer to the
   * Padding = 0
   * Multiplication and accumulation must be performed inside the PEs.
 
-* For **Lab 3-2**, you must perform GEMV using one of the **Output Stationary, Weight Stationary, or Row Stationary** methods and a PE array.
+* For Lab 3-2, you must perform GEMV using a PE array. The dataflow is not restricted. You may use Weight Stationary, Input Stationary, Output Stationary, or any other dataflow of your choice.
 
   * You may not modify the interface of `TPU.v`.
   * Multiplication and accumulation must be performed inside the PEs. 
@@ -274,7 +277,7 @@ For the details of the data mapping into the global buffers, please refer to the
 ## Row Stationary Exercise #4 - 20%
 ---
 - Input data:
-    - Input feature map (M * M) and Kernel (N * N)
+    - Input feature map (M * M) and Kernel (N * N) where 1 <= N <= M <= 254
     - control signal (refer to details in table 1, 2, 3)
 
 - Required Output:
@@ -283,7 +286,7 @@ For the details of the data mapping into the global buffers, please refer to the
 - Steps:
     1. refer to Row Stationary Exercise #1
     2. `\lab3-1$ make verif4`
-        - Extreme test cases
+        - Advanced test cases
         
 ## GEMV Basic Exercise - 30%
 ---
