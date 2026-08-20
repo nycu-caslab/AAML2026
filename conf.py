@@ -18,7 +18,7 @@
 
 project = 'Accelerator Architectures for Machine Learning'
 html_title = 'CSIC30066: Accelerator Architectures for Machine Learning'
-copyright = '2025, NYCU CAS-Lab'
+copyright = '2026, NYCU CAS-Lab'
 author = ' NYCU CAS-Lab'
 
 # -- General configuration ---------------------------------------------------
@@ -31,7 +31,8 @@ extensions = ['myst_parser']
 myst_enable_extensions = [
     "colon_fence",
     "html_image",
-    "amsmath"
+    "amsmath",
+    "dollarmath"
 ]
 
 # Add any paths that contain templates here, relative to this directory.

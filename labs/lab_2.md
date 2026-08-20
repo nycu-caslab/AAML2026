@@ -59,8 +59,9 @@ You may add helper Verilog modules under `Platform/hw/srcs/` and helper C/C++ fi
 
 `NPU.v` is starter code, not a golden implementation. Write your own accelerator after all the environmental check passed.
 
-> [!IMPORTANT]
-> Your submitted project must build and run without source edits. Keep the required API signatures below even if you change every underlying `funct3`/`funct7` value.
+```{important}
+Your submitted project must build and run without source edits. Keep the required API signatures below even if you change every underlying `funct3`/`funct7` value.
+```
 
 ## Required software contract
 
@@ -272,6 +273,6 @@ Prepare a short explanation of your implementation, including how you use aligne
 
 Submit the source repository (or source-only archive requested on the course page) and a PDF report named `[id]-aaml-lab2.pdf` of at most two pages. Do not include `Platform/build/`, a generated Vivado project, or other reproducible build output. The report must contain your instruction mapping, accelerator/FSM diagram, convolution mapping, cache-coherence strategy, public-test results, inference cycles, post-route resources, and WNS.
 
-> [!IMPORTANT]
-> If the project cannot be compiled or run using the documented commands, Parts 1 and 2 and the efficiency section receive zero; only the 20-point demo can be assessed. Follow the course collaboration policy; plagiarism is not allowed.
-
+```{important}
+If the project cannot be compiled or run using the documented commands, Parts 1 and 2 and the efficiency section receive zero; only the 20-point demo can be assessed. Follow the course collaboration policy; plagiarism is not allowed.
+```
