@@ -1,5 +1,9 @@
 # Lab 1 : Aligned AXI Data on SIMD
 
+## Introduction
+---
+In this lab, you will focus on AXI single transation and SIMD MAC operands. Then, we use these custom instruction in convolution part to reduce runtime of model reference. We use `ds_cnn_stream_fe` model to compare convolution between our accelerated version and orignal software-only version. 
+
 ## Goal of this lab
 ---
 - [Basic Exercise - AXI Single Transaction & SIMD MAC - 60%](#basic-exercise-axi-single-transaction-simd-60)
@@ -7,10 +11,9 @@
 - [Adavance Exercise 2 - Running Full TFLM Model - 10%](#adavance-exercise-2-running-tflm-model-inference-10)
 - [Questions in the Demo - 15%](#question-in-demo-15)
 
-## Introduction
----
+## Background
 
-In this lab, you will focus on AXI single transation and SIMD MAC operands. Then, we use these custom instruction in convolution part to reduce runtime of model reference. We use `ds_cnn_stream_fe` model to compare convolution between our accelerated version and orignal software-only version. 
+
 
 ## Basic Exercise - AXI Single Transaction & SIMD - 60%
 ---
@@ -40,7 +43,7 @@ Please follow below table to design NPU AXI read/write instruction.
 - If you want more information about custom instruction of software, you can trace these files, "accel_ops.h", "accel_ops.cc", and "accel_test.cc". 
 
 - Verification: 
-    1. Run "Accelerator functional test" in project menu. 
+    1. Run "Functional tests: scalar and AXI single transactions" in lab1 menu. 
     2. If result show "AXI read" and "AXI write" pass, this part is correct.
 ```
 
@@ -175,7 +178,7 @@ For example, NPU want to read 4 bytes data in 0x6000_0002. It needs to read 0x60
 
 
 Verfication: 
-1. Run "Accelerator functional test" in project menu.
+1. Run "Functional tests: scalar and AXI single transactions" in lab1 menu. 
 2. If you pass "Unaligned AXI Read" and "Unaligned AXI Write", your implement is correct.
 
 Correct Result (Test 4 and 5): 
@@ -205,15 +208,15 @@ You can download .tflite file and input data from below links.
 
 > TODO: 
 > 1. Add .tflite, profile.cc, and input data into platform
-> 2. Register TFLM Ops in `tflm_ops.cc`, and modify `kTflmResolverOpCount` in `tflm_ops.h` with number of register op.
+> 2. Register TFLM Ops in `tflm_ops.cc`, and modify `kTflmResolverOpCount` in `tflm_ops.h` with number of register op. You can check website in reference to know what op would be used in model.
 > 3. Set parameter in `project.mk` file (`MODEL_FILE`, `MODEL_PROFILE`, `TENSOR_ARENA_SIZE`), and add file of input data into `APP_EXTRA_SRCS`.
 > 4. Add below code to show outupt data after inference complete.
-> 5. Select "TFLM Inference, Verification, and Cycles" from the project menu. 
+> 5. Select "TFLM Inference, Verification, and Cycles" in main menu. 
 > 6. Compare result between orignal version and accelerated version.
 
 ```{hint}
 - You can use website in reference to know what TFLM OP will be used in model. 
-- You can set `TENSOR_ARENA_SIZE` as 1MB to avoid 
+- You can set `TENSOR_ARENA_SIZE` as 1MB.
 - You can see your output is same as orignal version if your implement is correct.
 ```
 
@@ -251,7 +254,7 @@ You will be asked several questions about the concepts covered in this lab and y
 ---
 
 ```{important}
-TAs should be able to run your project without any modification. If TAs cannot compile or run your code, **you can't get any scores even if you passed the DEMO**. Also, **PLAGIARISM is not allowed**.
+Submit source repository without `Platform/build/`. TAs should be able to run your project without any modification. If TAs cannot compile or run your code, **you can't get any scores even if you passed the DEMO**. Also, **PLAGIARISM is not allowed**.
 ```
 
 ## Reference 
