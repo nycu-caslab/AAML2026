@@ -43,6 +43,8 @@
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'labs/lab_2';</script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -392,7 +394,7 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="lab-2-axi4-burst-reads-for-a-simd-cfu">
+  <section class="tex2jax_ignore mathjax_ignore" id="lab-2-axi4-burst-reads-for-a-simd-cfu">
 <h1>Lab 2: AXI4 Burst Reads for a SIMD CFU<a class="headerlink" href="#lab-2-axi4-burst-reads-for-a-simd-cfu" title="Link to this heading">#</a></h1>
 <section id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">#</a></h2>
@@ -467,10 +469,10 @@ make<span class="w"> </span>-C<span class="w"> </span>Platform/sw<span class="w"
 </ul>
 <p>You may add helper Verilog modules under <code class="docutils literal notranslate"><span class="pre">Platform/hw/srcs/</span></code> and helper C/C++ files under <code class="docutils literal notranslate"><span class="pre">Platform/sw/project/</span></code>. Do not replace or rename the <code class="docutils literal notranslate"><span class="pre">NPU</span></code> module. Preserve its complete port list, active-low <code class="docutils literal notranslate"><span class="pre">rst_n</span></code> behavior, and CPU/AXI signal directions so the existing block design still elaborates.</p>
 <p><code class="docutils literal notranslate"><span class="pre">NPU.v</span></code> is starter code, not a golden implementation. Write your own accelerator after all the environmental check passed.</p>
-<blockquote>
-<div><p>[!IMPORTANT]
-Your submitted project must build and run without source edits. Keep the required API signatures below even if you change every underlying <code class="docutils literal notranslate"><span class="pre">funct3</span></code>/<code class="docutils literal notranslate"><span class="pre">funct7</span></code> value.</p>
-</div></blockquote>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Your submitted project must build and run without source edits. Keep the required API signatures below even if you change every underlying <code class="docutils literal notranslate"><span class="pre">funct3</span></code>/<code class="docutils literal notranslate"><span class="pre">funct7</span></code> value.</p>
+</div>
 </section>
 <section id="required-software-contract">
 <h2>Required software contract<a class="headerlink" href="#required-software-contract" title="Link to this heading">#</a></h2>
@@ -693,11 +695,12 @@ Main menu -&gt; Lab 2: AXI burst accelerator -&gt; Lab2 random tests (key r)
 </section>
 <section id="latency-efficiency">
 <h3>Latency efficiency<a class="headerlink" href="#latency-efficiency" title="Link to this heading">#</a></h3>
-<p>Let $\mathcal{T}$ be the official test set and let $C_{i,t}$ be the <code class="docutils literal notranslate"><span class="pre">interpreter.Invoke()</span></code> cycle count for student $i$ on test $t$. Every test has equal weight, and the latency used for ranking is the average:</p>
-<p>$$
-\overline{C}<em>i=\frac{1}{|\mathcal{T}|}\sum</em>{t\in\mathcal{T}}C_{i,t}.
-$$</p>
-<p>Lower $\overline{C}_i$ is better. Cached final outputs are not allowed.</p>
+<p>Let <span class="math notranslate nohighlight">\(\mathcal{T}\)</span> be the official test set and let <span class="math notranslate nohighlight">\(C_{i,t}\)</span> be the <code class="docutils literal notranslate"><span class="pre">interpreter.Invoke()</span></code> cycle count for student <span class="math notranslate nohighlight">\(i\)</span> on test <span class="math notranslate nohighlight">\(t\)</span>. Every test has equal weight, and the latency used for ranking is the average:</p>
+<div class="math notranslate nohighlight">
+\[
+\overline{C}_i=\frac{1}{|\mathcal{T}|}\sum_{t\in\mathcal{T}}C_{i,t}.
+\]</div>
+<p>Lower <span class="math notranslate nohighlight">\(\overline{C}_i\)</span> is better. Cached final outputs are not allowed.</p>
 </section>
 <section id="ranking">
 <h3>Ranking<a class="headerlink" href="#ranking" title="Link to this heading">#</a></h3>
@@ -746,10 +749,10 @@ $$</p>
 <section id="submission">
 <h2>Submission<a class="headerlink" href="#submission" title="Link to this heading">#</a></h2>
 <p>Submit the source repository (or source-only archive requested on the course page) and a PDF report named <code class="docutils literal notranslate"><span class="pre">[id]-aaml-lab2.pdf</span></code> of at most two pages. Do not include <code class="docutils literal notranslate"><span class="pre">Platform/build/</span></code>, a generated Vivado project, or other reproducible build output. The report must contain your instruction mapping, accelerator/FSM diagram, convolution mapping, cache-coherence strategy, public-test results, inference cycles, post-route resources, and WNS.</p>
-<blockquote>
-<div><p>[!IMPORTANT]
-If the project cannot be compiled or run using the documented commands, Parts 1 and 2 and the efficiency section receive zero; only the 20-point demo can be assessed. Follow the course collaboration policy; plagiarism is not allowed.</p>
-</div></blockquote>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>If the project cannot be compiled or run using the documented commands, Parts 1 and 2 and the efficiency section receive zero; only the 20-point demo can be assessed. Follow the course collaboration policy; plagiarism is not allowed.</p>
+</div>
 </section>
 </section>
 
@@ -849,7 +852,7 @@ By  NYCU CAS-Lab
 
   <p class="copyright">
     
-      © Copyright 2025, NYCU CAS-Lab.
+      © Copyright 2026, NYCU CAS-Lab.
       <br/>
     
   </p>
