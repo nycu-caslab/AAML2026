@@ -2,7 +2,7 @@
 
 ## Introduction
 ---
-In this lab, you will focus on AXI single transation and SIMD MAC operands. Then, we use these custom instruction in convolution part to reduce runtime of model reference. We use `ds_cnn_stream_fe` model to compare convolution between our accelerated version and orignal software-only version. 
+In this lab, you will focus on AXI single transaction and SIMD MAC operands. Then, we use these custom instruction in convolution operation to reduce runtime of model inference. We use `ds_cnn_stream_fe` model to compare convolution between our accelerated version and orignal software-only version. 
 
 ## Goal of this lab
 ---
@@ -69,8 +69,9 @@ You can download .tflite file and input data from below links.
 > 2. Register TFLM OP in `tflm_ops.cc`, and modify `kTflmResolverOpCount` in `tflm_ops.h` with number of register OP.
 > 3. Set parameter in `project.mk` file (`MODEL_FILE`, `MODEL_PROFILE`, `TENSOR_ARENA_SIZE`), and add file of input data into `APP_EXTRA_SRCS`.
 
+
 ```{hint}
-- You can use website in reference to know what TFLM OP will be used in model. 
+- You can refer to the website in reference section to determine which TFLM OP will be used in model. Note that you only need to register each operator exactly once. For instance, if the model has many layers of conv2d, only register conv2d once.
 - You can set `TENSOR_ARENA_SIZE` as 1MB.
 ```
 
@@ -223,7 +224,7 @@ Because of directly accessing memory without D-cache, you needs to consider abou
 
 ### 4. Check Result Correction
 
-You can run "Basic Convolution Test" in project menu. This test only have have address aligned condition. 
+You can run "Basic Convolution Test" in project menu. This test only has address aligned condition. 
 
 <img src="images/lab1/basic_conv_test.png" width="450px">
 
@@ -292,8 +293,11 @@ for (int i = 0; i < 12; i++) {
 ```{important}
 If your result is match and runtime cycles is less than original version convolution, you can get score in this part.
 ```
+This is the result of label1 output using the baseline software only convolution:
 
-This is result of label1 output: 
+<img src="images/lab1/tflm_inference_advanced_exercise2_baseline.png" width="400px">
+
+This is the result of label1 output after adding simd + AXI: 
 
 <img src="images/lab1/tflm_label1_output.png" width="400px">
 
@@ -313,4 +317,4 @@ Submit source repository without `Platform/build/`. TAs should be able to run yo
 
 ## Reference 
 
-- [Netron](https://netron.app/) : You can visulaize the layer graph of .tflite file by this website. 
+- [Netron](https://netron.app/) : You can visualize the layer graph of .tflite file by this website. 
