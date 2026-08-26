@@ -397,7 +397,7 @@
 <section id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">#</a></h2>
 <hr class="docutils" />
-<p>In this lab, you will focus on AXI single transation and SIMD MAC operands. Then, we use these custom instruction in convolution part to reduce runtime of model reference. We use <code class="docutils literal notranslate"><span class="pre">ds_cnn_stream_fe</span></code> model to compare convolution between our accelerated version and orignal software-only version.</p>
+<p>In this lab, you will focus on AXI single transaction and SIMD MAC operands. Then, we use these custom instruction in convolution operation to reduce runtime of model inference. We use <code class="docutils literal notranslate"><span class="pre">ds_cnn_stream_fe</span></code> model to compare convolution between our accelerated version and orignal software-only version.</p>
 </section>
 <section id="goal-of-this-lab">
 <h2>Goal of this lab<a class="headerlink" href="#goal-of-this-lab" title="Link to this heading">#</a></h2>
@@ -491,7 +491,7 @@
 <div class="admonition hint">
 <p class="admonition-title">Hint</p>
 <ul class="simple">
-<li><p>You can use website in reference to know what TFLM OP will be used in model.</p></li>
+<li><p>You can refer to the website in reference section to determine which TFLM OP will be used in model. Note that you only need to register each operator exactly once. For instance, if the model has many layers of conv2d, only register conv2d once.</p></li>
 <li><p>You can set <code class="docutils literal notranslate"><span class="pre">TENSOR_ARENA_SIZE</span></code> as 1MB.</p></li>
 </ul>
 </div>
@@ -670,7 +670,7 @@ Make <code class="docutils literal notranslate"><span class="pre">NPU</span></co
 </section>
 <section id="check-result-correction">
 <h3>4. Check Result Correction<a class="headerlink" href="#check-result-correction" title="Link to this heading">#</a></h3>
-<p>You can run “Basic Convolution Test” in project menu. This test only have have address aligned condition.</p>
+<p>You can run “Basic Convolution Test” in project menu. This test only has address aligned condition.</p>
 <a class="reference internal image-reference" href="../_images/basic_conv_test.png"><img alt="../_images/basic_conv_test.png" src="../_images/basic_conv_test.png" style="width: 450px;" />
 </a>
 <p>If you pass all testcase, you can get full score of basic part.</p>
@@ -741,7 +741,10 @@ Make <code class="docutils literal notranslate"><span class="pre">NPU</span></co
 <p class="admonition-title">Important</p>
 <p>If your result is match and runtime cycles is less than original version convolution, you can get score in this part.</p>
 </div>
-<p>This is result of label1 output:</p>
+<p>This is the result of label1 output using the baseline software only convolution:</p>
+<a class="reference internal image-reference" href="../_images/tflm_inference_advanced_exercise2_baseline.png"><img alt="../_images/tflm_inference_advanced_exercise2_baseline.png" src="../_images/tflm_inference_advanced_exercise2_baseline.png" style="width: 400px;" />
+</a>
+<p>This is the result of label1 output after adding simd + AXI:</p>
 <a class="reference internal image-reference" href="../_images/tflm_label1_output.png"><img alt="../_images/tflm_label1_output.png" src="../_images/tflm_label1_output.png" style="width: 400px;" />
 </a>
 <p>You can also compare two version output of others input in <code class="docutils literal notranslate"><span class="pre">labels</span></code> to verify correction.</p>
@@ -762,7 +765,7 @@ Make <code class="docutils literal notranslate"><span class="pre">NPU</span></co
 <section id="reference">
 <h2>Reference<a class="headerlink" href="#reference" title="Link to this heading">#</a></h2>
 <ul class="simple">
-<li><p><a class="reference external" href="https://netron.app/">Netron</a> : You can visulaize the layer graph of .tflite file by this website.</p></li>
+<li><p><a class="reference external" href="https://netron.app/">Netron</a> : You can visualize the layer graph of .tflite file by this website.</p></li>
 </ul>
 </section>
 </section>
