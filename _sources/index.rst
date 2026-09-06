@@ -40,11 +40,13 @@ Lecture and Office Hours
 
 .. toctree::
     :hidden:
-    :glob:
     :maxdepth: 2
     :caption: Labs:
 
-    labs/*
+    labs/lab_0
+    labs/lab_1
+    labs/lab_2
+    labs/lab_3
 
 .. toctree::
     :hidden:
