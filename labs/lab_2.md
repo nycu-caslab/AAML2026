@@ -136,10 +136,11 @@ address[1:0] == 0
 address[11:0] + 4 * B <= 4096
 0x6000_0000 <= address
 address + 4 * B <= 0x6800_0000
-2 <= B <= 64
+1 <= B <= 64
 ```
 
 Your hardware design must handle independently unaligned pointers, arbitrary `N`, the final partial word, the `N=1..4` cases that still require a real multi-beat burst, and the misaligned `N=256` case without issuing an illegal 65-beat request. Replacing a multi-beat burst with repeated single-beat requests does not satisfy this lab.
+You can use register or bram as data buffer.
 
 ### AXI protocol requirements
 
