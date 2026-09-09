@@ -6,8 +6,8 @@
 - [Row Stationary Exercise #2 - 10%](#row-stationary-exercise-2---10) 
 - [Row Stationary Exercise #3 - 20%](#row-stationary-exercise-3---20) 
 - [Row Stationary Exercise #4 - 20%](#row-stationary-exercise-4---20)
-- [GEMV Basic Exercise - 30%](#gemv-basic-exercise---30) 
-- [GEMV Performance Challenge - 10%](#gemv-performance-challenge---10)
+- [GEMV Basic Exercise - 20%](#gemv-basic-exercise---20)
+- [GEMV Performance Challenge - 20%](#gemv-performance-challenge---20)
  -->
 
 
@@ -38,8 +38,8 @@ In this lab, we will use Verilog to implement PEs and a small systolic array com
 | [Row Stationary Exercise #2](#row-stationary-exercise-2---10) | 2D convolution with fixed `M = 10`, `N = 5` | 10% |
 | [Row Stationary Exercise #3](#row-stationary-exercise-3---20) | General 2D convolution with random `1 <= N <= M <= 254` | 20% |
 | [Row Stationary Exercise #4](#row-stationary-exercise-4---20) | 2D convolution with advanced test cases | 20% |
-| [GEMV Basic Exercise](#gemv-basic-exercise---30)  | Functional correctness of GEMV | 30% |
-| [GEMV Performance Challenge](#gemv-performance-challenge---10) | Performance ranking based on total execution cycle count | 10% |
+| [GEMV Basic Exercise](#gemv-basic-exercise---20)  | Functional correctness in hardware and hidden test cases | 20% |
+| [GEMV Performance Challenge](#gemv-performance-challenge---20) | Ranking by execution cycles, with hardware resources used as the tie-breaker | 20% |
 | **Total** |  | **100%** |
 
 ## Background
@@ -78,21 +78,54 @@ The goals of this lab are to familiarize you with the concepts of dataflows in s
 - `iverilog` or `VCS` or `irun`
 - `nWave` or `Verdi` or `GTKWave` or anything that can read `.vcd` or `.fsdb`
 - Makefile
+- Vivado 2024.1
 
-### Requirements
-#### lab 3-1
+### Requirements and Rules
+#### General Rules
 
-You need to perform Convolution using the row stationary method with correct functional simulation using Processing Elements (PEs). That is, this design should perform 2D convolution between an M × M 8-bit matrix and an N × N 8-bit kernel.
+* Use an asynchronous active-low reset architecture.
+* `in_valid` is asserted for one clock cycle. The dimension inputs are valid only during that cycle.
+* Assert `busy` in response to `in_valid` and keep it high until all output data is ready. The next test case will begin only after `busy` returns low.
+* The execution latency for each test case must not exceed 1,500,000 cycles.
+
+#### Lab 3-1
+
+You need to perform 2D convolution between an `M × M` 8-bit input feature map and an `N × N` 8-bit kernel. The design must use the Row Stationary dataflow and a PE array. Accumulated results are 32-bit values, so pay careful attention to intermediate bit widths.
+
+The following detailed requirements apply:
+
+* Implement your TPU design in `TPU.v`. You may add supporting Verilog files in the `RTL` directory.
+* You may not modify `global_buffer.v` or the interface of `TPU.v`.
+* Before each simulation test case, the testbench loads Global Buffer A and Global Buffer B. The testbench keeps `in_valid` high for one cycle, and the `M` and `N` inputs are valid during that cycle.
+* When `busy` returns low, the testbench compares Global Buffer C against the golden result.
+* Implement your own data loader, PEs, and controller to schedule data from Global Buffer A and Global Buffer B into the PE array.
+* The PE array may contain at most 16 PEs and must not exceed `4 × 4`.
+* Multiplication and accumulation for the convolution must be performed inside the PEs.
+* `1 <= N <= M <= 254`
+* Stride = 1
+* Padding = 0
+
+#### Lab 3-2
+
+You need to perform GEMV between an `M × K` signed 8-bit matrix and a `K × 1` signed 8-bit vector using a PE array. The accumulated results are signed 32-bit values. The dataflow is not restricted; you may use Weight Stationary, Input Stationary, Output Stationary, or another dataflow of your choice.
+
+BRAM A and BRAM B each use a 32-bit interface with four signed 8-bit positions. BRAM C uses a 128-bit interface with four signed 32-bit positions.
+
+The following detailed requirements apply:
+
+* Implement your design inside `TPU.v` without modifying its provided module interface. You may add supporting RTL files such as `PE.v`. The provided `PE.v` interface is a recommendation and can be changed.
+* You may not modify the provided UART, BRAM, or `TPU_top.v` designs. The TAs will integrate and test your submitted `TPU.v` and supporting RTL files with these provided modules and interfaces.
+* During hardware verification, the provided UART flow loads input data into BRAM A and BRAM B. The UART flow keeps `in_valid` high for one cycle, and the `K`, `M`, and `N` inputs are valid during that cycle.
+* When `busy` returns low, the hardware verification flow reads BRAM C and compares the returned values against the golden result.
+* After implementation with Vivado 2024.1, the design must satisfy `LUT <= 2000`, `FF <= 2000`, `DSP <= 16`, and `WNS >= 0`. Designs that violate any of these limits receive no credit for this part.
+* `1 <= M, K <= 254` and `N = 1`.
+* For the 1024-word BRAM configuration used in hardware verification, the matrix dimensions must also satisfy `ceil(M / 4) × K <= 1024`.
 
 
-Your PEs shouldn’t exceed 4 × 4, and a 2D systolic array architecture is recommended.
-The design uses 8-bit input data and 32-bit accumulated data. Please be careful with bit-width issues.
-The total global buffer size is (1024 + 256 × 2) KiB.
-#### lab 3-2
-You need to perform GEMV with your method, using correct functional simulation with PEs. This design should perform multiplication between an M × K 4-bit matrix and a K × 1 8-bit vector.
 
-Your PEs shouldn’t exceed 4 × 4. The design uses 4-bit matrix data, 8-bit vector data, and 32-bit accumulated data. Please be careful with bit-width issues.
-The total global buffer size is (1024 + 256 + 128) KiB.
+```{note}
+For the details of the data mapping into the global buffers or BRAM, please refer to the ***[Appendix](#appendix)***. The Appendix describes the memory layouts used for the Row Stationary convolution in Lab 3-1 and the GEMV in Lab 3-2.
+```
 
 ### Getting Started
 ::: danger
@@ -128,30 +161,30 @@ If you have the licence of `VCS` and want faster simulation, you may use the `Ma
 | ------ | ----------- | --------: | ------------------------------------------------------------------------------------------------------------------------- |
 | Input  | `clk`       |         1 | The clock signal                                                                                                          |
 | Input  | `rst_n`     |         1 | The reset signal, which is active low                                                                                     |
-| Input  | `in_valid`  |         1 | The input is valid when in_valid is high and will only be high for one cycle |
+| Input  | `in_valid`  |         1 | High for one cycle when the input and dimension signals are valid. |
 | Input  | `M`         |         8 | Dimension `M` of the `M × M` input feature map                                                                            |
 | Input  | `N`         |         8 | Dimension `N` of the `N × N` convolution kernel                                                                           |
-| Output | `busy`      |         1 | High when the design is busy. Pattern will check your answer when busy is low after every in_valid.                |
+| Output | `busy`      |         1 | High when the design is busy. We will check your answer when `busy` returns low after each `in_valid`.             |
 
 
 
-**Table 2: The SRAM interface of A and B SRAM**
+**Table 2: The BRAM Interface of BRAM A and BRAM B**
 |  I/O   | Signal name  | Bit width | Description                                  |
 |  ----  | ----         | ----      |  ----                                        |     
 | Input  | `wr_en`        | 1         | The write enable signal.                     |
-| Input  | `index`        | 16        | The address of the sram to be read or write. |
-| Input  | `data_in`      | 32        | The data input to write to the SRAM          |
-| Output | `data_out`     | 32        | The data output from the SRAM                |
+| Input  | `index`        | 16        | The address of the BRAM to be read or written. |
+| Input  | `data_in`      | 32        | The data input to write to the BRAM.         |
+| Output | `data_out`     | 32        | The data output from the BRAM.               |
 
-**Table 3: The SRAM interface of C SRAM**
+**Table 3: The BRAM Interface of BRAM C**
 |  I/O   | Signal name  | Bit width | Description                                  |
 |  ----  | ----         | ----      |  ----                                        |     
 | Input  | `wr_en`        | 1         | The write enable signal.                     |
-| Input  | `index`        | 16        | The address of the sram to be read or write. |
-| Input  | `data_in`      | 128       | The data input to write to the SRAM          |
-| Output | `data_out`     | 128       | The data output from the SRAM                |
+| Input  | `index`        | 16        | The address of the BRAM to be read or written. |
+| Input  | `data_in`      | 128       | The data input to write to the BRAM.         |
+| Output | `data_out`     | 128       | The data output from the BRAM.               |
 ``` {note}
-The 128-bit data input stands for 4 * 32-bit values, allowing 4 elements to be written simultaneously to the C SRAM.
+The 128-bit data input stands for 4 * 32-bit values, allowing 4 elements to be written simultaneously to BRAM C.
 ```
 
 ### lab 3-2
@@ -161,75 +194,35 @@ The 128-bit data input stands for 4 * 32-bit values, allowing 4 elements to be w
 | ------ | ----------- | --------: | ----------------------------------------------------------------------------------------------------- |
 | Input  | `clk`       |         1 | The clock signal                                                                                      |
 | Input  | `rst_n`     |         1 | The reset signal, which is active low                                                                 |
-| Input  | `in_valid`  |         1 | The input is valid when `in_valid` is high and will only high for one cycle                           |
+| Input  | `in_valid`  |         1 | High for one cycle when the input and dimension signals are valid.                                   |
 | Input  | `K`         |         8 | Dimension `K` of the input matrix and vector                                                          |
 | Input  | `M`         |         8 | Dimension `M` of the `M × K` input matrix                                                             |
 | Input  | `N`         |         8 | Dimension `N` of the `K × N` input vector. `N` is fixed to 1 for GEMV                                 |
-| Output | `busy`      |         1 | High when the design is busy. Pattern will check your answer when busy is low after every `in_valid`. |
+| Output | `busy`      |         1 | High when the design is busy. We will check your answer when `busy` returns low after each `in_valid`. |
 
-**Table 2: The SRAM Interface of A SRAM**
+**Table 2: The BRAM Interface of A BRAM**
 | I/O    | Signal name | Bit width | Description                                  |
 | ------ | ----------- | --------- | -------------------------------------------- |
 | Input  | `wr_en`     | 1         | The write enable signal.                     |
-| Input  | `index`     | 16        | The address of the SRAM to be read or write. |
-| Input  | `data_in`   | 16        | The data input to write to the SRAM          |
-| Output | `data_out`  | 16        | The data output from the SRAM                |
+| Input  | `index`     | 16        | The address of the BRAM to be read or written. |
+| Input  | `data_in`   | 32        | The data input to write to the BRAM.         |
+| Output | `data_out`  | 32        | The data output from the BRAM.               |
 
-**Table 3: The SRAM Interface of B SRAM**
+**Table 3: The BRAM Interface of B BRAM**
 | I/O    | Signal name | Bit width | Description                                  |
 | ------ | ----------- | --------- | -------------------------------------------- |
 | Input  | `wr_en`     | 1         | The write enable signal.                     |
-| Input  | `index`     | 16        | The address of the SRAM to be read or write. |
-| Input  | `data_in`   | 32        | The data input to write to the SRAM          |
-| Output | `data_out`  | 32        | The data output from the SRAM                |
+| Input  | `index`     | 16        | The address of the BRAM to be read or written. |
+| Input  | `data_in`   | 32        | The data input to write to the BRAM.         |
+| Output | `data_out`  | 32        | The data output from the BRAM.               |
 
-**Table 4: The SRAM Interface of C SRAM**
+**Table 4: The BRAM Interface of C BRAM**
 |  I/O   | Signal name  | Bit width | Description                                  |
 |  ----  | ----         | ----      |  ----                                        |     
 | Input  | `wr_en`        | 1         | The write enable signal.                     |
-| Input  | `index`        | 16        | The address of the sram to be read or write. |
-| Input  | `data_in`      | 128       | The data input to write to the SRAM          |
-| Output | `data_out`     | 128       | The data output from the SRAM  
-
-### Rules
-
-* Your TPU design (`TPU.v`) should be under the top module provided by TA. It's fine to add various new files in the `RTL` directory.
-
-* You may not modify `global_buffer.v`.
-
-* At the start of the simulation, the testbench will load global buffer A & B, assuming that the CPU or DMA has already prepared the data for the TPU in the global buffer. When signal `in_valid == 1`, the input size parameters (M, N, K) will be available for the TPU for **only one cycle**.
-
-```{note}
-For the details of the data mapping into the global buffers, please refer to the ***[Appendix](#appendix)***. The Appendix describes the memory layouts used for the Row Stationary convolution in Lab 3-1 and the GEMV in Lab 3-2.
-```
-
-* The testbench will compare your output global buffer with the golden result when you finish the calculation, that is, when `busy == 0`. Then, you need to wait for the next `in_valid` for the next test case.
-
-* You should implement your own data loader, PEs, and controller to schedule the data in global buffer A & B to be calculated in the PE array.
-
-* The number of PEs must not exceed **16** (maximum `4 × 4` PEs).
-
-* For **Lab 3-1**, you must perform 2D convolution using the **Row Stationary** method and a PE array.
-
-  * You may not modify the interface of `TPU.v`.
-  * `1 <= N <= M <= 254`
-  * Stride = 1
-  * Padding = 0
-  * Multiplication and accumulation must be performed inside the PEs.
-
-* For Lab 3-2, you must perform GEMV using a PE array. The dataflow is not restricted. You may use Weight Stationary, Input Stationary, Output Stationary, or any other dataflow of your choice.
-
-  * You may not modify the interface of `TPU.v`.
-  * Multiplication and accumulation must be performed inside the PEs. 
-  * Performance is evaluated by cycle count, and a lower cycle count results in a higher ranking.
-
-* You need to set `busy` to high immediately after `in_valid` falls from high to low.
-
-* Use an asynchronous active-low reset architecture.
-
-* The execution latency per test case is limited to 1,500,000 cycles.
-
-
+| Input  | `index`        | 16        | The address of the BRAM to be read or written. |
+| Input  | `data_in`      | 128       | The data input to write to the BRAM.         |
+| Output | `data_out`     | 128       | The data output from the BRAM.               |
 
 ## Row Stationary Exercise #1 - 10%
 ---
@@ -288,34 +281,36 @@ For the details of the data mapping into the global buffers, please refer to the
     2. `\lab3-1$ make verif4`
         - Advanced test cases
         
-## GEMV Basic Exercise - 30%
+## GEMV Basic Exercise - 20%
 ---
 - Input data:
-    - Input Matrix (UINT4) and Input Vector (UINT8)
+    - Input Matrix (INT8) and Input Vector (INT8)
 - Required Output:
-    - the Output Vector (UINT32) of the GEMV operation
+    - the Output Vector (INT32) of the GEMV operation
 - Steps:
-    1. Take data from global buffer
-    2. Use the data from global buffer to calculate with PEs
-    3. Output the result to C global buffer
-    4. `\lab3-2$ make verif1`
-        - 10 explicit testcases (10%)
-    5. `\lab3-2$ make verif2`
-        - 10 explicit testcases (10%)
-    6. `\lab3-2$ make verif3`
-        - 25 hidden testcases (10%)
-    7. The bench will tell if you did it correctly
+    1. Take data from BRAM A and BRAM B
+    2. Process the BRAM data using your TPU architecture and PE array
+    3. Output the result to BRAM C
+    4. Run `\lab3-2$ make hardware_verify`
+        - Pass all hardware verification test cases (10%)
+    5. Pass the hidden test cases (10%)
 
-## GEMV Performance Challenge - 10%
+## GEMV Performance Challenge - 20%
 ---
--   Input data: 
-    -   refer to GEMV Basic Exercise
--   Required Output:
-    -   refer to GEMV Basic Exercise
--   Steps:
-    1.  refer to GEMV Basic Exercise 
-    2.  Run `\lab3-2$ make verif4` for performance evaluation
-        -   The lower the total cycle count, the higher the ranking and score
+
+Only designs that pass all GEMV Basic Exercise test cases are eligible for the performance challenge. Performance will be evaluated using the TA's hidden test cases. Designs with fewer total execution cycles will receive a higher ranking. If two or more designs have the same cycle count, the design with the smaller hardware resource score will rank higher:
+
+`LUT + FF + DSP × 100`
+
+The performance challenge score is assigned according to the final ranking percentile among all eligible designs:
+
+| Performance ranking | Score |
+| --- | ---: |
+| Top 1–20% | 20 |
+| Top 21–40% | 16 |
+| Top 41–60% | 12 |
+| Top 61–80% | 8 |
+| Top 81–100% | 4 |
 
 
 
@@ -357,31 +352,23 @@ The output feature map is stored row by row. Each 128-bit word contains four hor
 
 ### Lab 3-2 Memory Mapping - GEMV
 
-#### Memory Mapping - Type A (with transpose)
+#### BRAM A Mapping
 
-The matrix A in global buffer A is placed with a transposed style, and other spaces are all 0-padded
-<img src="https://hackmd.io/_uploads/S18IElrj2.png" width="660px">
+Matrix A is an `M × K` matrix. Each 32-bit word in BRAM A stores four signed 8-bit elements from four adjacent rows at the same column. When fewer than four rows remain, the unused positions are zero-padded. The following figure shows how matrix A is stored in BRAM A.
 
+![Matrix A mapping in BRAM A](images/lab3/A_Bram.png)
 
-Example of a 10 * 7 matrix
+#### BRAM B Mapping
 
-<img src="images/lab3/A_3.png" width="660px">
+Because `N` is fixed to 1, matrix B is a `K × 1` vector. Each 32-bit word in BRAM B stores one signed 8-bit vector element, and the other three positions are zero-padded. The following figure shows how vector B is stored in BRAM B.
 
-the memory layout of this matrix looks like (note the transpose in the layout)
+![Vector B mapping in BRAM B](images/lab3/B_Bram.png)
 
-<img src="images/lab3/A_4.png" width="150px">
+#### BRAM C Mapping
 
-#### Memory Mapping - Type B (without transpose)
+The GEMV result C is an `M × 1` vector of signed 32-bit accumulated values. Each 128-bit word in BRAM C stores one result element, and the other three 32-bit positions are zero-padded. The following figure shows how vector C is stored in BRAM C.
 
-<img src="https://hackmd.io/_uploads/BJYR4gSo3.png" width="660px">
-
-The matrix B looks more forward in memory layout, for example, a 7 * 9 matrix
-
-<img src="images/lab3/B_1.png" width="660px">
-
-looks like this in global buffer B, with 0-padded also
-
-<img src="images/lab3/B_2.png" width="150px">
+![Vector C mapping in BRAM C](images/lab3/C_Bram.png)
 
 ## Submission
 ---
@@ -390,17 +377,21 @@ Please organize your submission files into a zip archive structured as follows:
 ```
 YourID.zip
     └── YourID/
-        ├── lab3-1/ 
-        |   ├──TPU.v
-        |   └──other files you added inside the RTL directory...
-        └── lab3-2/ 
-            ├──TPU.v
-            └──other files you added inside the RTL directory...
+        ├── lab3-1/
+        │   ├── TPU.v
+        │   └── other supporting RTL files...
+        └── lab3-2/
+            ├── TPU.v
+            ├── PE.v (if used or modified)
+            └── other supporting RTL files...
 ```
 
-```{important}
-1. Make sure your files are well included! 
-2. You **DO NOT** have to submit the `global_buffer.v`.
+For Lab 3-2, obtain `TPU.v`, `PE.v`, and any supporting RTL files from `lab3-2/BOARD/reference/rtl`. Keep the flat submission structure shown above; you do not need to include the `BOARD/reference/rtl` directory hierarchy in the zip archive.
 
-TAs should be able to run your project without any modification. If TAs cannot compile or run your code, **you can't get any scores**. Also, **PLAGIARISM is not allowed**.
+```{important}
+1. Make sure all RTL files required by your design are included.
+2. For Lab 3-1, you **DO NOT** have to submit `global_buffer.v`.
+3. For Lab 3-2, submit only `TPU.v` and the supporting RTL files required by your design. Do not submit the provided UART, BRAM, `TPU_top.v`, constraint, or IP files.
+
+The TAs will integrate your submitted files with the provided interfaces and board design. Your submission must compile and run without modifications. **PLAGIARISM is not allowed**.
 ```
