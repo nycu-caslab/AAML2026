@@ -278,7 +278,7 @@ Prepare a short explanation of your implementation, including how you use aligne
 
 Submit your hardware RTL, custom op design according to the following format. Do not include `Platform/build/`, a generated Vivado project, or other reproducible build output.
 
-```text
+```
 aaml-lab2-[id].zip
 └── aaml-lab2-[id]/
     ├── hw/
