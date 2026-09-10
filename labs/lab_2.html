@@ -370,7 +370,7 @@
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#part-2-tflm-convolution-integration-20">Part 2: TFLM convolution integration (20%)</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Software verification</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#run-the-ds-cnn-stream-fe-model">Run the <code class="docutils literal notranslate"><span class="pre">ds_cnn_stream_fe</span></code> model</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#run-the-kws-model">Run the KWS model</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#latency-and-accelerator-resource-efficiency-40">Latency and accelerator-resource efficiency (40%)</a><ul class="nav section-nav flex-column">
@@ -396,7 +396,7 @@
 <h1>Lab 2: AXI4 Burst Reads for a SIMD<a class="headerlink" href="#lab-2-axi4-burst-reads-for-a-simd" title="Link to this heading">#</a></h1>
 <section id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">#</a></h2>
-<p>In Lab 1, the NPU fetched one 32-bit word per custom instruction. In this lab, one software command must start an AXI4 INCR read burst and retain multiple beats in accelerator-local storage. You will reuse those burst-loaded operands in a self-designed compute datapath and accelerate the int8 convolution used by <code class="docutils literal notranslate"><span class="pre">ds_cnn_stream_fe.tflite</span></code> in Lab 1.</p>
+<p>In Lab 1, we deisgn an accelerator that fetches one 32-bit word per custom instruction. In this lab, one software command must start an AXI4 INCR read burst and retain multiple beats in accelerator-local storage. You will reuse those burst-loaded operands in a self-designed compute datapath and accelerate the int8 convolution used by KWS model in Lab 1.</p>
 <p>The compute instruction encoding and internal microarchitecture are your choice while the external visible behavior is fixed.</p>
 </section>
 <section id="learning-goals">
@@ -443,7 +443,13 @@
 <li><p>Verilator and a host C++11 compiler</p></li>
 <li><p>Model file <code class="docutils literal notranslate"><span class="pre">ds_cnn_stream_fe.tflite</span></code> and its profile from Lab1</p></li>
 </ul>
-<p>From the repository root, run this preflight before editing RTL:</p>
+<ol class="arabic simple">
+<li><p>Download everything in <code class="docutils literal notranslate"><span class="pre">lab2/</span></code> from <a class="reference internal" href="#"><span class="xref myst">AAML2026-Lab</span></a>.</p></li>
+<li><p>Replace <code class="docutils literal notranslate"><span class="pre">Platform/sw/project</span></code> with the version you downloaded.</p></li>
+<li><p>Move everything in <code class="docutils literal notranslate"><span class="pre">model/</span></code> to <code class="docutils literal notranslate"><span class="pre">Platform/sw/model</span></code>.</p></li>
+<li><p>Add <code class="docutils literal notranslate"><span class="pre">APP_EXTRA_SRCS</span> <span class="pre">+=</span> <span class="pre">$(wildcard</span> <span class="pre">models/label/label*_board.cc)</span></code> to <code class="docutils literal notranslate"><span class="pre">project.mk</span></code>, or define it when running <code class="docutils literal notranslate"><span class="pre">make</span></code>.</p></li>
+<li><p>From the repository root, run the following preflight check before editing the RTL:</p></li>
+</ol>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>vivado<span class="w"> </span>-version
 verilator<span class="w"> </span>--version
 c++<span class="w"> </span>--version
@@ -461,7 +467,6 @@ make<span class="w"> </span>-C<span class="w"> </span>Platform/sw<span class="w"
 <p>You may modify:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">Platform/hw/srcs/NPU.v</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">Platform/sw/project/lab2_api.h</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">Platform/sw/project/lab2_api.cc</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">Platform/sw/tflm_patches/tensorflow/lite/kernels/internal/reference/integer_ops/conv.h</span></code></p></li>
 </ul>
@@ -513,8 +518,9 @@ make<span class="w"> </span>-C<span class="w"> </span>Platform/sw<span class="w"
 </tbody>
 </table>
 </div>
-<p>It’s guaranteed that at most two AXI burst transactions are needed.</p>
+<p>It’s guaranteed that at most two AXI burst transactions are needed, one for each <code class="docutils literal notranslate"><span class="pre">ptr</span></code>.</p>
 <p>The CUSTOM-0 encoding behind <code class="docutils literal notranslate"><span class="pre">hw_simd_mac</span></code> is your design. You may choose the <code class="docutils literal notranslate"><span class="pre">funct3</span></code> and <code class="docutils literal notranslate"><span class="pre">funct7</span></code> values, command sequence, local-buffer organization, state machine, and SIMD width.
+You can use register or bram as local data buffer.
 Use the helpers in <code class="docutils literal notranslate"><span class="pre">Platform/sw/app/cfu.h</span></code>.</p>
 <p>The multiplication and main accumulation must be performed by custom hardware using operand data read through AXI4 bursts. A CPU loop that calculates the dot product, including one hidden inside <code class="docutils literal notranslate"><span class="pre">hw_simd_mac</span></code>, does not satisfy the assignment.<br />
 Software may prepare the arguments of custom instructions, clean cache lines and issue custom instructions.</p>
@@ -544,19 +550,16 @@ Software may prepare the arguments of custom instructions, clean cache lines and
 <tr class="row-odd"><td><p>Beat size</p></td>
 <td><p>4 bytes (<code class="docutils literal notranslate"><span class="pre">ARSIZE</span> <span class="pre">=</span> <span class="pre">3'b010</span></code>)</p></td>
 </tr>
-<tr class="row-even"><td><p>Length</p></td>
-<td><p>2 through 64 beats</p></td>
-</tr>
-<tr class="row-odd"><td><p>AXI start address</p></td>
+<tr class="row-even"><td><p>AXI start address</p></td>
 <td><p>4-byte aligned address in <code class="docutils literal notranslate"><span class="pre">0x6000_0000..0x67ff_ffff</span></code></p></td>
 </tr>
-<tr class="row-even"><td><p>Local capacity</p></td>
+<tr class="row-odd"><td><p>Local capacity</p></td>
 <td><p>Enough local storage or streaming state for 256 bytes from each operand</p></td>
 </tr>
-<tr class="row-odd"><td><p>Outstanding requests</p></td>
+<tr class="row-even"><td><p>Outstanding requests</p></td>
 <td><p>One is sufficient</p></td>
 </tr>
-<tr class="row-even"><td><p>4-KiB boundary</p></td>
+<tr class="row-odd"><td><p>4-KiB boundary</p></td>
 <td><p>An individual burst must not cross it</p></td>
 </tr>
 </tbody>
@@ -574,11 +577,9 @@ ARBURST = 2'b01
 address[11:0] + 4 * B &lt;= 4096
 0x6000_0000 &lt;= address
 address + 4 * B &lt;= 0x6800_0000
-1 &lt;= B &lt;= 64
 </pre></div>
 </div>
-<p>Your hardware design must handle independently unaligned pointers, arbitrary <code class="docutils literal notranslate"><span class="pre">N</span></code>, the final partial word, the <code class="docutils literal notranslate"><span class="pre">N=1..4</span></code> cases that still require a real multi-beat burst, and the misaligned <code class="docutils literal notranslate"><span class="pre">N=256</span></code> case without issuing an illegal 65-beat request. Replacing a multi-beat burst with repeated single-beat requests does not satisfy this lab.
-You can use register or bram as data buffer.</p>
+<p>Your hardware design must handle independently unaligned pointers, arbitrary <code class="docutils literal notranslate"><span class="pre">N</span></code> and the final partial word. Replacing a multi-beat burst with repeated single-beat requests does not satisfy this lab.</p>
 </section>
 <section id="axi-protocol-requirements">
 <h3>AXI protocol requirements<a class="headerlink" href="#axi-protocol-requirements" title="Link to this heading">#</a></h3>
@@ -592,9 +593,7 @@ You can use register or bram as data buffer.</p>
 <li><p>An early <code class="docutils literal notranslate"><span class="pre">RLAST</span></code> may finish the command immediately with <code class="docutils literal notranslate"><span class="pre">NPU_done</span></code> and <code class="docutils literal notranslate"><span class="pre">NPU_exception</span></code> asserted. If beat <code class="docutils literal notranslate"><span class="pre">B</span></code> arrives without <code class="docutils literal notranslate"><span class="pre">RLAST</span></code>, stop writing local operand storage, accept and discard later beats until <code class="docutils literal notranslate"><span class="pre">RLAST</span></code>, then finish with <code class="docutils literal notranslate"><span class="pre">NPU_done</span></code> and <code class="docutils literal notranslate"><span class="pre">NPU_exception</span></code> asserted.</p></li>
 <li><p>Keep <code class="docutils literal notranslate"><span class="pre">NPU_exception</span></code> low for a valid command and clear the previous command’s status before accepting a new command.</p></li>
 <li><p>Pulse <code class="docutils literal notranslate"><span class="pre">NPU_done</span></code> exactly once for each completed custom command and do not leave it asserted while idle.</p></li>
-<li><p>Return to a clean idle state after reset and accept back-to-back commands.</p></li>
-<li><p>While reset is asserted, drive <code class="docutils literal notranslate"><span class="pre">M_AXI_ARVALID</span></code>, <code class="docutils literal notranslate"><span class="pre">M_AXI_AWVALID</span></code>, <code class="docutils literal notranslate"><span class="pre">M_AXI_WVALID</span></code>, <code class="docutils literal notranslate"><span class="pre">NPU_done</span></code>, and <code class="docutils literal notranslate"><span class="pre">NPU_exception</span></code> low.</p></li>
-<li><p>Do not write beyond the storage reserved for the current operand or corrupt operand data that is not the destination of the current load.</p></li>
+<li><p>Be prepared to accept back-to-back commands.</p></li>
 </ul>
 </section>
 <section id="software-verification">
@@ -605,8 +604,8 @@ make<span class="w"> </span>-C<span class="w"> </span>Platform<span class="w"> <
 </pre></div>
 </div>
 <p>Press <code class="docutils literal notranslate"><span class="pre">CPU</span> <span class="pre">RESET</span></code> after the upload, press <code class="docutils literal notranslate"><span class="pre">2</span></code> to enter the Lab 2 submenu, and run both entries:</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Main menu -&gt; Lab 2: AXI burst accelerator -&gt; Lab2 set tests (key t)
-Main menu -&gt; Lab 2: AXI burst accelerator -&gt; Lab2 random tests (key r)
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Main menu -&gt; Lab menu (key l) -&gt; Lab2 set tests (key t)
+Main menu -&gt; Lab menu (key l) -&gt; Lab2 random tests (key r)
 </pre></div>
 </div>
 <p>The test code writes the input arrays and then calls <code class="docutils literal notranslate"><span class="pre">hw_simd_mac</span></code>; it does not clean them first, so cache cleaning is part of the service implementation.</p>
@@ -638,18 +637,22 @@ Main menu -&gt; Lab 2: AXI burst accelerator -&gt; Lab2 random tests (key r)
 </pre></div>
 </div>
 <p>After pressing <code class="docutils literal notranslate"><span class="pre">CPU</span> <span class="pre">RESET</span></code>, select:</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Main menu -&gt; Lab 1: single-transaction accelerator -&gt; Basic convolution tests (key 4)
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Main menu -&gt; Lab menu (key l) -&gt; Basic convolution tests (key 4)
 </pre></div>
 </div>
 <p>All three cases must report <code class="docutils literal notranslate"><span class="pre">[PASS]</span></code>.</p>
 </section>
-<section id="run-the-ds-cnn-stream-fe-model">
-<h3>Run the <code class="docutils literal notranslate"><span class="pre">ds_cnn_stream_fe</span></code> model<a class="headerlink" href="#run-the-ds-cnn-stream-fe-model" title="Link to this heading">#</a></h3>
+<section id="run-the-kws-model">
+<h3>Run the KWS model<a class="headerlink" href="#run-the-kws-model" title="Link to this heading">#</a></h3>
 <p>After the test passed, recompile the software with following command:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>run<span class="w"> </span>-C<span class="w"> </span>Platform/sw<span class="w"> </span><span class="nv">MODEL_FILE</span><span class="o">=</span>ds_cnn_stream_fe.tflite<span class="w"> </span><span class="nv">MODEL_PROFILE</span><span class="o">=</span>ds_cnn_stream_fe<span class="w"> </span>
 </pre></div>
 </div>
 <p>It usually takes 20 min to inference. You can print out model output by yourself to check the correctness of model.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>If the result of any testcase inside <code class="docutils literal notranslate"><span class="pre">label/</span></code> is different from golden answer, Parts 2 and the efficiency section receive zero.</p>
+</div>
 </section>
 </section>
 <section id="latency-and-accelerator-resource-efficiency-40">
@@ -659,7 +662,7 @@ Main menu -&gt; Lab 2: AXI burst accelerator -&gt; Lab2 random tests (key r)
 <li><p>receives <code class="docutils literal notranslate"><span class="pre">20/20</span></code> in Part 1</p></li>
 <li><p>receives <code class="docutils literal notranslate"><span class="pre">20/20</span></code> in Part 2</p></li>
 <li><p>compliance with the mandatory accelerator-command, AXI-trace, and convolution-coverage requirements in Part 2</p></li>
-<li><p>successful post-route implementation for <code class="docutils literal notranslate"><span class="pre">xc7a100tcsg324-1</span></code> with exactly one recursive <code class="docutils literal notranslate"><span class="pre">NPU</span></code> instance identified in the utilization report</p></li>
+<li><p>successful post-route implementation for <code class="docutils literal notranslate"><span class="pre">Arty-A7</span> <span class="pre">100T</span></code> with exactly one recursive <code class="docutils literal notranslate"><span class="pre">NPU</span></code> instance identified in the utilization report</p></li>
 <li><p>non-negative overall setup <code class="docutils literal notranslate"><span class="pre">WNS</span> <span class="pre">(ns)</span></code> in the final Design Timing Summary</p></li>
 </ul>
 <section id="available-hardware-and-maximum-usage">
@@ -674,20 +677,24 @@ Main menu -&gt; Lab 2: AXI burst accelerator -&gt; Lab2 random tests (key r)
 </thead>
 <tbody>
 <tr class="row-even"><td><p>Slice LUT</p></td>
-<td class="text-right"><p>63,400</p></td>
-<td class="text-right"><p>63,400</p></td>
+<td class="text-right"><p>56,981</p></td>
+<td class="text-right"><p>20,000</p></td>
 </tr>
 <tr class="row-odd"><td><p>Flip-flop</p></td>
-<td class="text-right"><p>126,800</p></td>
-<td class="text-right"><p>126,800</p></td>
+<td class="text-right"><p>121,572</p></td>
+<td class="text-right"><p>5,000</p></td>
 </tr>
 <tr class="row-even"><td><p>DSP48E1</p></td>
-<td class="text-right"><p>240</p></td>
-<td class="text-right"><p>10</p></td>
+<td class="text-right"><p>230</p></td>
+<td class="text-right"><p>30</p></td>
 </tr>
-<tr class="row-odd"><td><p>BRAM36 equivalent</p></td>
+<tr class="row-odd"><td><p>RAMB18E1</p></td>
+<td class="text-right"><p>270</p></td>
+<td class="text-right"><p>0</p></td>
+</tr>
+<tr class="row-even"><td><p>RAMB36E1</p></td>
 <td class="text-right"><p>135</p></td>
-<td class="text-right"><p>135</p></td>
+<td class="text-right"><p>0</p></td>
 </tr>
 </tbody>
 </table>
@@ -748,7 +755,18 @@ Main menu -&gt; Lab 2: AXI burst accelerator -&gt; Lab2 random tests (key r)
 </section>
 <section id="submission">
 <h2>Submission<a class="headerlink" href="#submission" title="Link to this heading">#</a></h2>
-<p>Submit the source repository (or source-only archive requested on the course page) and a PDF report named <code class="docutils literal notranslate"><span class="pre">[id]-aaml-lab2.pdf</span></code> of at most two pages. Do not include <code class="docutils literal notranslate"><span class="pre">Platform/build/</span></code>, a generated Vivado project, or other reproducible build output. The report must contain your instruction mapping, accelerator/FSM diagram, convolution mapping, cache-coherence strategy, public-test results, inference cycles, post-route resources, and WNS.</p>
+<p>Submit your hardware RTL, custom op design according to the following format. Do not include <code class="docutils literal notranslate"><span class="pre">Platform/build/</span></code>, a generated Vivado project, or other reproducible build output.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>aaml-lab2-[id].zip
+└── aaml-lab2-[id]/
+    ├── hw/
+    │   └── src/
+    │       ├── NPU.v
+    │       └── {any other modules}
+    └── sw/
+        ├── conv.h
+        └── lab2_api.cc
+</pre></div>
+</div>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
 <p>If the project cannot be compiled or run using the documented commands, Parts 1 and 2 and the efficiency section receive zero; only the 20-point demo can be assessed. Follow the course collaboration policy; plagiarism is not allowed.</p>
@@ -817,7 +835,7 @@ Main menu -&gt; Lab 2: AXI burst accelerator -&gt; Lab2 random tests (key r)
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#part-2-tflm-convolution-integration-20">Part 2: TFLM convolution integration (20%)</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Software verification</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#run-the-ds-cnn-stream-fe-model">Run the <code class="docutils literal notranslate"><span class="pre">ds_cnn_stream_fe</span></code> model</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#run-the-kws-model">Run the KWS model</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#latency-and-accelerator-resource-efficiency-40">Latency and accelerator-resource efficiency (40%)</a><ul class="nav section-nav flex-column">
