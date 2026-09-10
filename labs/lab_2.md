@@ -84,19 +84,6 @@ result = sum((ptr1[i] + input_offset)*ptr2[i] for i in range(N))
 
 You can check function `ConvPerChannel` in file `tflite-micro/tensorflow/lite/kernels/internal/reference/integer_ops/conv.h` for more detail.
 
-The required input domain is:
-
-| Property | Required domain |
-| --- | --- |
-| `ptr1[i]`, `ptr2[i]` | Signed two's-complement int8 values |
-| `input_offset` | Signed int8 value from `-128` through `127` |
-| `N` | Every integer from `1` through `256` |
-| Pointer alignment | Each pointer may independently have byte offset `0`, `1`, `2`, or `3` from a 4-byte boundary |
-| Buffer access | Each pointer supplies at least `N` readable bytes; the function must not modify them |
-| Return value | Exact signed 32-bit result for the formula above |
-
-It's guaranteed that at most two AXI burst transactions are needed, one for each `ptr`.
-
 The CUSTOM-0 encoding behind `hw_simd_mac` is your design. You may choose the `funct3` and `funct7` values, command sequence, local-buffer organization, state machine, and SIMD width.
 You can use register or bram as local data buffer.
 Use the helpers in `Platform/sw/app/cfu.h`.
@@ -119,7 +106,6 @@ Implement the read-burst engine and SIMD multiply-accumulate datapath in `Platfo
 | Burst type | INCR (`ARBURST = 2'b01`) |
 | Beat size | 4 bytes (`ARSIZE = 3'b010`) |
 | AXI start address | 4-byte aligned address in `0x6000_0000..0x67ff_ffff` |
-| Local capacity | Enough local storage or streaming state for 256 bytes from each operand |
 | Outstanding requests | One is sufficient |
 | 4-KiB boundary | An individual burst must not cross it |
 
@@ -130,15 +116,6 @@ ARADDR  = legal aligned source or staging address
 ARLEN   = B - 1
 ARSIZE  = 3'b010
 ARBURST = 2'b01
-```
-
-A legal request satisfies:
-
-```text
-address[1:0] == 0
-address[11:0] + 4 * B <= 4096
-0x6000_0000 <= address
-address + 4 * B <= 0x6800_0000
 ```
 
 Your hardware design must handle independently unaligned pointers, arbitrary `N` and the final partial word. Replacing a multi-beat burst with repeated single-beat requests does not satisfy this lab.
@@ -174,6 +151,16 @@ Main menu -> Lab menu (key l) -> Lab2 random tests (key r)
 ```
 
 The test code writes the input arrays and then calls `hw_simd_mac`; it does not clean them first, so cache cleaning is part of the service implementation.
+
+### Testcase Input Limits
+
+- 1 <= N <= 256
+- `ptr1`, `ptr2`: any valid address for AXI read requests
+- elements of `ptr1`, `ptr2`: any value of `int8_t`
+- `input_offset`: any value of `int8_t`
+
+There are hidden testcases.
+Make sure that your design can handle all edge cases correctly.
 
 ## Part 2: TFLM convolution integration (20%)
 
