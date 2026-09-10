@@ -366,6 +366,7 @@
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#required-transfer-domain">Required transfer domain</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#axi-protocol-requirements">AXI protocol requirements</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#software-verification">Software verification</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#testcase-input-limits">Testcase Input Limits</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#part-2-tflm-convolution-integration-20">Part 2: TFLM convolution integration (20%)</a><ul class="nav section-nav flex-column">
@@ -489,36 +490,6 @@ make<span class="w"> </span>-C<span class="w"> </span>Platform/sw<span class="w"
 </pre></div>
 </div>
 <p>You can check function <code class="docutils literal notranslate"><span class="pre">ConvPerChannel</span></code> in file <code class="docutils literal notranslate"><span class="pre">tflite-micro/tensorflow/lite/kernels/internal/reference/integer_ops/conv.h</span></code> for more detail.</p>
-<p>The required input domain is:</p>
-<div class="pst-scrollable-table-container"><table class="table">
-<thead>
-<tr class="row-odd"><th class="head"><p>Property</p></th>
-<th class="head"><p>Required domain</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ptr1[i]</span></code>, <code class="docutils literal notranslate"><span class="pre">ptr2[i]</span></code></p></td>
-<td><p>Signed two’s-complement int8 values</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">input_offset</span></code></p></td>
-<td><p>Signed int8 value from <code class="docutils literal notranslate"><span class="pre">-128</span></code> through <code class="docutils literal notranslate"><span class="pre">127</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">N</span></code></p></td>
-<td><p>Every integer from <code class="docutils literal notranslate"><span class="pre">1</span></code> through <code class="docutils literal notranslate"><span class="pre">256</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p>Pointer alignment</p></td>
-<td><p>Each pointer may independently have byte offset <code class="docutils literal notranslate"><span class="pre">0</span></code>, <code class="docutils literal notranslate"><span class="pre">1</span></code>, <code class="docutils literal notranslate"><span class="pre">2</span></code>, or <code class="docutils literal notranslate"><span class="pre">3</span></code> from a 4-byte boundary</p></td>
-</tr>
-<tr class="row-even"><td><p>Buffer access</p></td>
-<td><p>Each pointer supplies at least <code class="docutils literal notranslate"><span class="pre">N</span></code> readable bytes; the function must not modify them</p></td>
-</tr>
-<tr class="row-odd"><td><p>Return value</p></td>
-<td><p>Exact signed 32-bit result for the formula above</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<p>It’s guaranteed that at most two AXI burst transactions are needed, one for each <code class="docutils literal notranslate"><span class="pre">ptr</span></code>.</p>
 <p>The CUSTOM-0 encoding behind <code class="docutils literal notranslate"><span class="pre">hw_simd_mac</span></code> is your design. You may choose the <code class="docutils literal notranslate"><span class="pre">funct3</span></code> and <code class="docutils literal notranslate"><span class="pre">funct7</span></code> values, command sequence, local-buffer organization, state machine, and SIMD width.
 You can use register or bram as local data buffer.
 Use the helpers in <code class="docutils literal notranslate"><span class="pre">Platform/sw/app/cfu.h</span></code>.</p>
@@ -553,13 +524,10 @@ Software may prepare the arguments of custom instructions, clean cache lines and
 <tr class="row-even"><td><p>AXI start address</p></td>
 <td><p>4-byte aligned address in <code class="docutils literal notranslate"><span class="pre">0x6000_0000..0x67ff_ffff</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p>Local capacity</p></td>
-<td><p>Enough local storage or streaming state for 256 bytes from each operand</p></td>
-</tr>
-<tr class="row-even"><td><p>Outstanding requests</p></td>
+<tr class="row-odd"><td><p>Outstanding requests</p></td>
 <td><p>One is sufficient</p></td>
 </tr>
-<tr class="row-odd"><td><p>4-KiB boundary</p></td>
+<tr class="row-even"><td><p>4-KiB boundary</p></td>
 <td><p>An individual burst must not cross it</p></td>
 </tr>
 </tbody>
@@ -570,13 +538,6 @@ Software may prepare the arguments of custom instructions, clean cache lines and
 ARLEN   = B - 1
 ARSIZE  = 3'b010
 ARBURST = 2'b01
-</pre></div>
-</div>
-<p>A legal request satisfies:</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>address[1:0] == 0
-address[11:0] + 4 * B &lt;= 4096
-0x6000_0000 &lt;= address
-address + 4 * B &lt;= 0x6800_0000
 </pre></div>
 </div>
 <p>Your hardware design must handle independently unaligned pointers, arbitrary <code class="docutils literal notranslate"><span class="pre">N</span></code> and the final partial word. Replacing a multi-beat burst with repeated single-beat requests does not satisfy this lab.</p>
@@ -609,6 +570,17 @@ Main menu -&gt; Lab menu (key l) -&gt; Lab2 random tests (key r)
 </pre></div>
 </div>
 <p>The test code writes the input arrays and then calls <code class="docutils literal notranslate"><span class="pre">hw_simd_mac</span></code>; it does not clean them first, so cache cleaning is part of the service implementation.</p>
+</section>
+<section id="testcase-input-limits">
+<h3>Testcase Input Limits<a class="headerlink" href="#testcase-input-limits" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>1 &lt;= N &lt;= 256</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ptr1</span></code>, <code class="docutils literal notranslate"><span class="pre">ptr2</span></code>: any valid address for AXI read requests</p></li>
+<li><p>elements of <code class="docutils literal notranslate"><span class="pre">ptr1</span></code>, <code class="docutils literal notranslate"><span class="pre">ptr2</span></code>: any value of <code class="docutils literal notranslate"><span class="pre">int8_t</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">input_offset</span></code>: any value of <code class="docutils literal notranslate"><span class="pre">int8_t</span></code></p></li>
+</ul>
+<p>There are hidden testcases.
+Make sure that your design can handle all edge cases correctly.</p>
 </section>
 </section>
 <section id="part-2-tflm-convolution-integration-20">
@@ -831,6 +803,7 @@ Main menu -&gt; Lab menu (key l) -&gt; Lab2 random tests (key r)
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#required-transfer-domain">Required transfer domain</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#axi-protocol-requirements">AXI protocol requirements</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#software-verification">Software verification</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#testcase-input-limits">Testcase Input Limits</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#part-2-tflm-convolution-integration-20">Part 2: TFLM convolution integration (20%)</a><ul class="nav section-nav flex-column">
