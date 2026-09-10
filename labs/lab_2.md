@@ -2,7 +2,7 @@
 
 ## Introduction
 
-In Lab 1, the NPU fetched one 32-bit word per custom instruction. In this lab, one software command must start an AXI4 INCR read burst and retain multiple beats in accelerator-local storage. You will reuse those burst-loaded operands in a self-designed compute datapath and accelerate the int8 convolution used by `ds_cnn_stream_fe.tflite` in Lab 1.
+In Lab 1, we deisgn an accelerator that fetches one 32-bit word per custom instruction. In this lab, one software command must start an AXI4 INCR read burst and retain multiple beats in accelerator-local storage. You will reuse those burst-loaded operands in a self-designed compute datapath and accelerate the int8 convolution used by KWS model in Lab 1.
 
 The compute instruction encoding and internal microarchitecture are your choice while the external visible behavior is fixed.
 
@@ -31,7 +31,11 @@ The compute instruction encoding and internal microarchitecture are your choice 
 - Verilator and a host C++11 compiler
 - Model file `ds_cnn_stream_fe.tflite` and its profile from Lab1
 
-From the repository root, run this preflight before editing RTL:
+1. Download everything in `lab2/` from [AAML2026-Lab]().
+2. Replace `Platform/sw/project` with the version you downloaded.
+3. Move everything in `model/` to `Platform/sw/model`.
+4. Add `APP_EXTRA_SRCS += $(wildcard models/label/label*_board.cc)` to `project.mk`, or define it when running `make`.
+5. From the repository root, run the following preflight check before editing the RTL:
 
 ```sh
 vivado -version
@@ -51,7 +55,6 @@ Use the course setup instructions if one of these commands fails.
 You may modify:
 
 - `Platform/hw/srcs/NPU.v`
-- `Platform/sw/project/lab2_api.h`
 - `Platform/sw/project/lab2_api.cc`
 - `Platform/sw/tflm_patches/tensorflow/lite/kernels/internal/reference/integer_ops/conv.h`
 
@@ -92,9 +95,10 @@ The required input domain is:
 | Buffer access | Each pointer supplies at least `N` readable bytes; the function must not modify them |
 | Return value | Exact signed 32-bit result for the formula above |
 
-It's guaranteed that at most two AXI burst transactions are needed.
+It's guaranteed that at most two AXI burst transactions are needed, one for each `ptr`.
 
 The CUSTOM-0 encoding behind `hw_simd_mac` is your design. You may choose the `funct3` and `funct7` values, command sequence, local-buffer organization, state machine, and SIMD width.
+You can use register or bram as local data buffer.
 Use the helpers in `Platform/sw/app/cfu.h`.
 
 The multiplication and main accumulation must be performed by custom hardware using operand data read through AXI4 bursts. A CPU loop that calculates the dot product, including one hidden inside `hw_simd_mac`, does not satisfy the assignment.  
@@ -114,7 +118,6 @@ Implement the read-burst engine and SIMD multiply-accumulate datapath in `Platfo
 | AXI data width | 32 bits |
 | Burst type | INCR (`ARBURST = 2'b01`) |
 | Beat size | 4 bytes (`ARSIZE = 3'b010`) |
-| Length | 2 through 64 beats |
 | AXI start address | 4-byte aligned address in `0x6000_0000..0x67ff_ffff` |
 | Local capacity | Enough local storage or streaming state for 256 bytes from each operand |
 | Outstanding requests | One is sufficient |
@@ -136,11 +139,9 @@ address[1:0] == 0
 address[11:0] + 4 * B <= 4096
 0x6000_0000 <= address
 address + 4 * B <= 0x6800_0000
-1 <= B <= 64
 ```
 
-Your hardware design must handle independently unaligned pointers, arbitrary `N`, the final partial word, the `N=1..4` cases that still require a real multi-beat burst, and the misaligned `N=256` case without issuing an illegal 65-beat request. Replacing a multi-beat burst with repeated single-beat requests does not satisfy this lab.
-You can use register or bram as data buffer.
+Your hardware design must handle independently unaligned pointers, arbitrary `N` and the final partial word. Replacing a multi-beat burst with repeated single-beat requests does not satisfy this lab.
 
 ### AXI protocol requirements
 
@@ -154,9 +155,7 @@ Your burst engine must satisfy all of the following:
 - An early `RLAST` may finish the command immediately with `NPU_done` and `NPU_exception` asserted. If beat `B` arrives without `RLAST`, stop writing local operand storage, accept and discard later beats until `RLAST`, then finish with `NPU_done` and `NPU_exception` asserted.
 - Keep `NPU_exception` low for a valid command and clear the previous command's status before accepting a new command.
 - Pulse `NPU_done` exactly once for each completed custom command and do not leave it asserted while idle.
-- Return to a clean idle state after reset and accept back-to-back commands.
-- While reset is asserted, drive `M_AXI_ARVALID`, `M_AXI_AWVALID`, `M_AXI_WVALID`, `NPU_done`, and `NPU_exception` low.
-- Do not write beyond the storage reserved for the current operand or corrupt operand data that is not the destination of the current load.
+- Be prepared to accept back-to-back commands.
 
 ### Software verification
 
@@ -170,8 +169,8 @@ make -C Platform run
 Press `CPU RESET` after the upload, press `2` to enter the Lab 2 submenu, and run both entries:
 
 ```text
-Main menu -> Lab 2: AXI burst accelerator -> Lab2 set tests (key t)
-Main menu -> Lab 2: AXI burst accelerator -> Lab2 random tests (key r)
+Main menu -> Lab menu (key l) -> Lab2 set tests (key t)
+Main menu -> Lab menu (key l) -> Lab2 random tests (key r)
 ```
 
 The test code writes the input arrays and then calls `hw_simd_mac`; it does not clean them first, so cache cleaning is part of the service implementation.
@@ -210,11 +209,11 @@ make -C Platform run
 After pressing `CPU RESET`, select:
 
 ```text
-Main menu -> Lab 1: single-transaction accelerator -> Basic convolution tests (key 4)
+Main menu -> Lab menu (key l) -> Basic convolution tests (key 4)
 ```
 All three cases must report `[PASS]`.
 
-### Run the `ds_cnn_stream_fe` model
+### Run the KWS model
 
 After the test passed, recompile the software with following command:
 ```bash
@@ -222,13 +221,16 @@ make run -C Platform/sw MODEL_FILE=ds_cnn_stream_fe.tflite MODEL_PROFILE=ds_cnn_
 ```
 It usually takes 20 min to inference. You can print out model output by yourself to check the correctness of model.
 
+```{important}
+If the result of any testcase inside `label/` is different from golden answer, Parts 2 and the efficiency section receive zero.
+```
 ## Latency and accelerator-resource efficiency (40%)
 
 Only submissions that complete every preceding requirement are eligible for ranking. An eligible submission must:
 - receives `20/20` in Part 1
 - receives `20/20` in Part 2
 - compliance with the mandatory accelerator-command, AXI-trace, and convolution-coverage requirements in Part 2
-- successful post-route implementation for `xc7a100tcsg324-1` with exactly one recursive `NPU` instance identified in the utilization report
+- successful post-route implementation for `Arty-A7 100T` with exactly one recursive `NPU` instance identified in the utilization report
 - non-negative overall setup `WNS (ns)` in the final Design Timing Summary
 
 ### Available hardware and maximum usage
@@ -237,10 +239,11 @@ Resource counts are taken from the recursive NPU-only final post-route utilizati
 
 | Resource | Available on FPGA | Maximum NPU usage |
 | --- | ---: | ---: |
-| Slice LUT | 63,400 | 63,400 |
-| Flip-flop | 126,800 | 126,800 |
-| DSP48E1 | 240 | 10 |
-| BRAM36 equivalent | 135 | 135 |
+| Slice LUT | 56,981 | 20,000 |
+| Flip-flop | 121,572 | 5,000 |
+| DSP48E1 | 230 | 30 |
+| RAMB18E1 | 270 | 0 |
+| RAMB36E1 | 135 | 0 |
 
 ### Latency efficiency
 
@@ -273,7 +276,19 @@ Prepare a short explanation of your implementation, including how you use aligne
 
 ## Submission
 
-Submit the source repository (or source-only archive requested on the course page) and a PDF report named `[id]-aaml-lab2.pdf` of at most two pages. Do not include `Platform/build/`, a generated Vivado project, or other reproducible build output. The report must contain your instruction mapping, accelerator/FSM diagram, convolution mapping, cache-coherence strategy, public-test results, inference cycles, post-route resources, and WNS.
+Submit your hardware RTL, custom op design according to the following format. Do not include `Platform/build/`, a generated Vivado project, or other reproducible build output.
+
+```
+aaml-lab2-[id].zip
+└── aaml-lab2-[id]/
+    ├── hw/
+    │   └── src/
+    │       ├── NPU.v
+    │       └── {any other modules}
+    └── sw/
+        ├── conv.h
+        └── lab2_api.cc
+```
 
 ```{important}
 If the project cannot be compiled or run using the documented commands, Parts 1 and 2 and the efficiency section receive zero; only the 20-point demo can be assessed. Follow the course collaboration policy; plagiarism is not allowed.
