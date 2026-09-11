@@ -77,6 +77,28 @@ You can download .tflite file and input data from below links.
 - You can set `TENSOR_ARENA_SIZE` as 1MB. Tensor arena size will depend on model, and you can try to different size to get minimal value.
 ```
 
+After adding the model files, please do the following:
+
+1. Download everything in `lab1/` from [AAML2026-Lab]().
+2. Replace `Platform/sw/project` with the version you downloaded.
+3. Add `APP_EXTRA_SRCS += $(wildcard models/label/label*_board.cc)` to `project.mk`, or define it when running `make`.
+4. From the repository root, run the following preflight check before editing the RTL:
+
+
+```sh
+vivado -version
+verilator --version
+c++ --version
+riscv64-unknown-elf-g++ --version
+python3 -c "import serial"
+make -C Platform/sw validate
+make -C Platform/sw check-env \
+  MODEL_FILE=ds_cnn_stream_fe.tflite MODEL_PROFILE=ds_cnn_stream_fe
+```
+
+Use the course setup instructions if one of these commands fails.
+
+
 ## Files and submission boundary
 
 You may modify: 

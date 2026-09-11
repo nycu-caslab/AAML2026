@@ -494,6 +494,24 @@
 <li><p>You can set <code class="docutils literal notranslate"><span class="pre">TENSOR_ARENA_SIZE</span></code> as 1MB. Tensor arena size will depend on model, and you can try to different size to get minimal value.</p></li>
 </ul>
 </div>
+<p>After adding the model files, please do the following:</p>
+<ol class="arabic simple">
+<li><p>Download everything in <code class="docutils literal notranslate"><span class="pre">lab1/</span></code> from <a class="reference internal" href="#"><span class="xref myst">AAML2026-Lab</span></a>.</p></li>
+<li><p>Replace <code class="docutils literal notranslate"><span class="pre">Platform/sw/project</span></code> with the version you downloaded.</p></li>
+<li><p>Add <code class="docutils literal notranslate"><span class="pre">APP_EXTRA_SRCS</span> <span class="pre">+=</span> <span class="pre">$(wildcard</span> <span class="pre">models/label/label*_board.cc)</span></code> to <code class="docutils literal notranslate"><span class="pre">project.mk</span></code>, or define it when running <code class="docutils literal notranslate"><span class="pre">make</span></code>.</p></li>
+<li><p>From the repository root, run the following preflight check before editing the RTL:</p></li>
+</ol>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>vivado<span class="w"> </span>-version
+verilator<span class="w"> </span>--version
+c++<span class="w"> </span>--version
+riscv64-unknown-elf-g++<span class="w"> </span>--version
+python3<span class="w"> </span>-c<span class="w"> </span><span class="s2">"import serial"</span>
+make<span class="w"> </span>-C<span class="w"> </span>Platform/sw<span class="w"> </span>validate
+make<span class="w"> </span>-C<span class="w"> </span>Platform/sw<span class="w"> </span>check-env<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="nv">MODEL_FILE</span><span class="o">=</span>ds_cnn_stream_fe.tflite<span class="w"> </span><span class="nv">MODEL_PROFILE</span><span class="o">=</span>ds_cnn_stream_fe
+</pre></div>
+</div>
+<p>Use the course setup instructions if one of these commands fails.</p>
 </section>
 </section>
 <section id="files-and-submission-boundary">
