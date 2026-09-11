@@ -470,6 +470,7 @@
 </ul>
 <section id="add-ds-cnn-stream-fe-into-platform">
 <h3>Add <code class="docutils literal notranslate"><span class="pre">ds_cnn_stream_fe</span></code> into platform<a class="headerlink" href="#add-ds-cnn-stream-fe-into-platform" title="Link to this heading">#</a></h3>
+<p>We use a Keyword Spotting (KWS) model for this lab. The model was originally trained as a floating-point model and then quantized to INT8. Since model quantization is not the focus of this lab, we have provided the pre-quantized INT8 model for you. You can directly use the provided quantized model on our platform without performing the quantization process yourself.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>You can download .tflite file and input data from below links.</p>
@@ -490,7 +491,7 @@
 <p class="admonition-title">Hint</p>
 <ul class="simple">
 <li><p>You can refer to the website in reference section to determine which TFLM OP will be used in model. Note that you only need to register each operator exactly once. For instance, if the model has many layers of conv2d, only register conv2d once.</p></li>
-<li><p>You can set <code class="docutils literal notranslate"><span class="pre">TENSOR_ARENA_SIZE</span></code> as 1MB.</p></li>
+<li><p>You can set <code class="docutils literal notranslate"><span class="pre">TENSOR_ARENA_SIZE</span></code> as 1MB. Tensor arena size will depend on model, and you can try to different size to get minimal value.</p></li>
 </ul>
 </div>
 </section>
@@ -500,7 +501,6 @@
 <p>You may modify:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">Platform/sw/tflm_patches/tensorflow/lite/kernels/internal/reference/integer_ops/conv.h</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">Platform/sw/project/accel_ops.h</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">Platform/hw/srcs/NPU.v</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">tflm_ops.h</span></code>, <code class="docutils literal notranslate"><span class="pre">tflm_ops.cc</span></code>, <code class="docutils literal notranslate"><span class="pre">tflm_runners.cc</span></code></p></li>
 </ul>
@@ -512,7 +512,7 @@
 <section id="axi-single-transaction">
 <h3>1. AXI Single Transaction<a class="headerlink" href="#axi-single-transaction" title="Link to this heading">#</a></h3>
 <p>In this part, the goal is to enable the <code class="docutils literal notranslate"><span class="pre">NPU</span></code> to access data directly through the AXI4 interface instead of relying on the CPU’s <code class="docutils literal notranslate"><span class="pre">LSU</span></code> (Load/Store Unit).</p>
-<p>The AXI4 master interface of the <code class="docutils literal notranslate"><span class="pre">NPU</span></code> is provided in <code class="docutils literal notranslate"><span class="pre">Platform\hw\srcs\NPU.v</span></code>. The <code class="docutils literal notranslate"><span class="pre">NPU</span></code> must control this interface to issue AXI4 read requests, receive the requested data from memory, and return the data through the CPU interface.</p>
+<p>The AXI4 master interface of the <code class="docutils literal notranslate"><span class="pre">NPU</span></code> is provided in <code class="docutils literal notranslate"><span class="pre">Platform/hw/srcs/NPU.v</span></code>. The <code class="docutils literal notranslate"><span class="pre">NPU</span></code> must control this interface to issue AXI4 read requests, receive the requested data from memory, and return the data through the CPU interface.</p>
 <p>The implementation should handle the AXI4 read transaction correctly, including address and data handshaking. The returned data should then be provided to the CPU through the NPU’s existing CPU-side interface, allowing the NPU to directly fetch operands from memory without requiring the CPU’s LSU to perform the load operation.</p>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
@@ -755,6 +755,15 @@ Make <code class="docutils literal notranslate"><span class="pre">NPU</span></co
 <section id="submission">
 <h2>Submission<a class="headerlink" href="#submission" title="Link to this heading">#</a></h2>
 <hr class="docutils" />
+<p>Please compact all platform into a zip file on E3, and name it as <code class="docutils literal notranslate"><span class="pre">YourID.zip</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>YourID.zip
+    └── YourID/
+        ├── Platform
+        |      └── ... 
+        └── tflite-micro
+               └── ... 
+</pre></div>
+</div>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
 <p>Submit source repository without <code class="docutils literal notranslate"><span class="pre">Platform/build/</span></code>. TAs should be able to run your project without any modification. If TAs cannot compile or run your code, <strong>you can’t get any scores even if you passed the DEMO</strong>. Also, <strong>PLAGIARISM is not allowed</strong>.</p>

@@ -57,6 +57,8 @@ For more information on how to handle aligned and unaligned accesses, read the *
 
 ### Add `ds_cnn_stream_fe` into platform
 
+We use a Keyword Spotting (KWS) model for this lab. The model was originally trained as a floating-point model and then quantized to INT8. Since model quantization is not the focus of this lab, we have provided the pre-quantized INT8 model for you. You can directly use the provided quantized model on our platform without performing the quantization process yourself.
+
 ```{note}
 You can download .tflite file and input data from below links.
 
@@ -72,14 +74,13 @@ You can download .tflite file and input data from below links.
 
 ```{hint}
 - You can refer to the website in reference section to determine which TFLM OP will be used in model. Note that you only need to register each operator exactly once. For instance, if the model has many layers of conv2d, only register conv2d once.
-- You can set `TENSOR_ARENA_SIZE` as 1MB.
+- You can set `TENSOR_ARENA_SIZE` as 1MB. Tensor arena size will depend on model, and you can try to different size to get minimal value.
 ```
 
 ## Files and submission boundary
 
 You may modify: 
 - `Platform/sw/tflm_patches/tensorflow/lite/kernels/internal/reference/integer_ops/conv.h`
-- `Platform/sw/project/accel_ops.h` 
 - `Platform/hw/srcs/NPU.v`
 - `tflm_ops.h`, `tflm_ops.cc`, `tflm_runners.cc`
 
@@ -92,7 +93,7 @@ You can add .v file in `Platform/hw/srcs` for submodule in your NPU.
 
 In this part, the goal is to enable the `NPU` to access data directly through the AXI4 interface instead of relying on the CPU's `LSU` (Load/Store Unit).
 
-The AXI4 master interface of the `NPU` is provided in `Platform\hw\srcs\NPU.v`. The `NPU` must control this interface to issue AXI4 read requests, receive the requested data from memory, and return the data through the CPU interface.
+The AXI4 master interface of the `NPU` is provided in `Platform/hw/srcs/NPU.v`. The `NPU` must control this interface to issue AXI4 read requests, receive the requested data from memory, and return the data through the CPU interface.
 
 The implementation should handle the AXI4 read transaction correctly, including address and data handshaking. The returned data should then be provided to the CPU through the NPU's existing CPU-side interface, allowing the NPU to directly fetch operands from memory without requiring the CPU's LSU to perform the load operation. 
 
@@ -310,6 +311,17 @@ You will be asked several questions about the concepts covered in this lab and y
 
 ## Submission
 ---
+
+Please compact all platform into a zip file on E3, and name it as `YourID.zip`. 
+
+```
+YourID.zip
+    └── YourID/
+        ├── Platform
+        |      └── ... 
+        └── tflite-micro
+               └── ... 
+```
 
 ```{important}
 Submit source repository without `Platform/build/`. TAs should be able to run your project without any modification. If TAs cannot compile or run your code, **you can't get any scores even if you passed the DEMO**. Also, **PLAGIARISM is not allowed**.
