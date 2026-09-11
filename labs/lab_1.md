@@ -81,7 +81,6 @@ You can download .tflite file and input data from below links.
 
 You may modify: 
 - `Platform/sw/tflm_patches/tensorflow/lite/kernels/internal/reference/integer_ops/conv.h`
-- `Platform/sw/project/accel_ops.h` 
 - `Platform/hw/srcs/NPU.v`
 - `tflm_ops.h`, `tflm_ops.cc`, `tflm_runners.cc`
 
@@ -94,7 +93,7 @@ You can add .v file in `Platform/hw/srcs` for submodule in your NPU.
 
 In this part, the goal is to enable the `NPU` to access data directly through the AXI4 interface instead of relying on the CPU's `LSU` (Load/Store Unit).
 
-The AXI4 master interface of the `NPU` is provided in `Platform\hw\srcs\NPU.v`. The `NPU` must control this interface to issue AXI4 read requests, receive the requested data from memory, and return the data through the CPU interface.
+The AXI4 master interface of the `NPU` is provided in `Platform/hw/srcs/NPU.v`. The `NPU` must control this interface to issue AXI4 read requests, receive the requested data from memory, and return the data through the CPU interface.
 
 The implementation should handle the AXI4 read transaction correctly, including address and data handshaking. The returned data should then be provided to the CPU through the NPU's existing CPU-side interface, allowing the NPU to directly fetch operands from memory without requiring the CPU's LSU to perform the load operation. 
 

@@ -4,7 +4,7 @@
 
 #include "label/label1_board.h"
 
-static void ds_cnn_prepare_input(TfLiteTensor* input)
+static void ds_cnn_prepare_input(TfLiteTensor* input, size_t sample_index)
 {
     if (input == nullptr)
         return;
@@ -46,7 +46,7 @@ static void ds_cnn_prepare_input(TfLiteTensor* input)
 }
 
 
-static void ds_cnn_verify_output(const TfLiteTensor* output)
+static void ds_cnn_verify_output(const TfLiteTensor* output, size_t sample_index)
 {
     (void)output;
 }
@@ -63,7 +63,8 @@ const ModelProfile* model_profile_get(void)
         0,
         0,
         0,
-        MODEL_TOLERANCE
+        MODEL_TOLERANCE,
+        1
     };
 
 
