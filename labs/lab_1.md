@@ -249,7 +249,7 @@ For example, NPU want to read 4 bytes data in 0x6000_0002. It needs to read 0x60
 
 Verfication: 
 1. Run "Functional tests: scalar and AXI single transactions" in lab1 menu. 
-2. If you pass "Unaligned AXI Read" and "Unaligned AXI Write", your implement is correct.
+2. If you pass "Unaligned AXI Read" and "Unaligned AXI Write", your implementation is correct.
 
 Correct Result (Test 4 and 5): 
 ```
@@ -271,7 +271,7 @@ In this part, We use `ds_cnn_stream_fe` as our benchmark model. Then, compare ru
 > TODO: 
 > 1. Add below code to show outupt data after inference complete.
 > 2. Select "TFLM Inference, Verification, and Cycles" in main menu. 
-> 3. Compare result between orignal version and accelerated version. If your result is match with original version, your implement is correct.
+> 3. Compare result between orignal version and accelerated version. If your result is match with original version, your implementation is correct.
 
 ```cpp
 // Platform/sw/app/tflm_runner.cc
