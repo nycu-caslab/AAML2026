@@ -63,6 +63,7 @@ The CPU communicates with the NPU through a request-response interface based on 
 ### AXI
 We provide a handy introduction to the basic concepts of AXI to help you with Lab 1 and Lab 2:
 > [Learn more about AXI](https://docs.google.com/presentation/d/1PH9ZFxNuDXuPgTCY71MiiTLlWc80MGeT7lYO-IY-NLg/edit?usp=sharing)
+Make sure to use your NYCU account to have access to these slides.
 
 ### TensorFlow Lite For Micro (TFLM)
 TfLM (Tensorflow Lite for Microcontrollers) is designed to run machine learning models on microcontrollers and other devices with only a few kilobytes of memory.  
@@ -106,7 +107,7 @@ This section will guide you through the core three steps from installing the too
 
 ### Toolchain Setup
 #### Step 0: Get Your FPGA Board
-[Nexys A7-100T](https://digilent.com/reference/programmable-logic/nexys-a7/start) is used in this course, contact the TAs if you haven't get one.
+**Arty A7-100T** is used in this course, contact the TAs if you haven't get one.
 #### Step 1: Install Vivado
 - Install Vivado
 We recommend you use version 2023.2 or version 2024.1
@@ -159,9 +160,15 @@ make prog
 #### Step 2: Running the Software
 
 - Run the following command to compile the software application and initiate interaction with the FPGA
-```
+```bash
 make run MODEL_FILE=ad01_int8.tflite MODEL_PROFILE=ad01
 ```
+Or 
+```bash
+make run
+```
+if the project.mk file has been set.
+
 - When you see the line "Listening on /dev/ttyUSB1 for BIOS/App" on your terminal, press the CPU Reset button.
 - After that, you should see the menu on your terminal that you can play around with.
 - (More details on software to be added)
