@@ -118,7 +118,21 @@ ARSIZE  = 3'b010
 ARBURST = 2'b01
 ```
 
+A legal request satisfies:
+
+```text
+address[1:0] == 0
+address[11:0] + 4 * B <= 4096
+0x6000_0000 <= address
+address + 4 * B <= 0x6800_0000
+```
+
+```{note}
 Your hardware design must handle independently unaligned pointers, arbitrary `N` and the final partial word. Replacing a multi-beat burst with repeated single-beat requests does not satisfy this lab.
+```
+```{important}
+Unaligned addresses should be passed directly to the hardware for processing. If we find that your code uses any software staging method to handle unaligned pointers, you will receive zero points for both Part 1 and Part 2.
+```
 
 ### AXI protocol requirements
 
@@ -206,7 +220,26 @@ After the test passed, recompile the software with following command:
 ```bash
 make run -C Platform/sw MODEL_FILE=ds_cnn_stream_fe.tflite MODEL_PROFILE=ds_cnn_stream_fe 
 ```
-It usually takes 20 min to inference. You can print out model output by yourself to check the correctness of model.
+It usually takes 10 min to inference. You can print out model output by yourself to check the correctness of model.
+
+#### KWS Output Verification
+
+You may implement ds_cnn_verify_output() in:
+
+`Platform/sw/models/ds_cnn_stream_fe_profile.cc`
+
+Your verification function should:
+
+- Find the predicted sound pattern using the largest output value (argmax).
+- Compare all 12 output values with the provided golden outputs using their exact IEEE-754 bit representations.
+- Print the predicted and expected sound-pattern names.
+- Report PASS when the predicted class is correct and every output matches its golden value.
+
+Example:
+
+```text
+  Prediction: down (0), expected: down (0) [PASS]
+```
 
 ```{important}
 If the result of any testcase inside `label/` is different from golden answer, Parts 2 and the efficiency section receive zero.

@@ -371,7 +371,10 @@
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#part-2-tflm-convolution-integration-20">Part 2: TFLM convolution integration (20%)</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Software verification</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#run-the-kws-model">Run the KWS model</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#run-the-kws-model">Run the KWS model</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#kws-output-verification">KWS Output Verification</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#latency-and-accelerator-resource-efficiency-40">Latency and accelerator-resource efficiency (40%)</a><ul class="nav section-nav flex-column">
@@ -540,7 +543,21 @@ ARSIZE  = 3'b010
 ARBURST = 2'b01
 </pre></div>
 </div>
+<p>A legal request satisfies:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>address[1:0] == 0
+address[11:0] + 4 * B &lt;= 4096
+0x6000_0000 &lt;= address
+address + 4 * B &lt;= 0x6800_0000
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
 <p>Your hardware design must handle independently unaligned pointers, arbitrary <code class="docutils literal notranslate"><span class="pre">N</span></code> and the final partial word. Replacing a multi-beat burst with repeated single-beat requests does not satisfy this lab.</p>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Unaligned addresses should be passed directly to the hardware for processing. If we find that your code uses any software staging method to handle unaligned pointers, you will receive zero points for both Part 1 and Part 2.</p>
+</div>
 </section>
 <section id="axi-protocol-requirements">
 <h3>AXI protocol requirements<a class="headerlink" href="#axi-protocol-requirements" title="Link to this heading">#</a></h3>
@@ -620,11 +637,27 @@ Make sure that your design can handle all edge cases correctly.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>run<span class="w"> </span>-C<span class="w"> </span>Platform/sw<span class="w"> </span><span class="nv">MODEL_FILE</span><span class="o">=</span>ds_cnn_stream_fe.tflite<span class="w"> </span><span class="nv">MODEL_PROFILE</span><span class="o">=</span>ds_cnn_stream_fe<span class="w"> </span>
 </pre></div>
 </div>
-<p>It usually takes 20 min to inference. You can print out model output by yourself to check the correctness of model.</p>
+<p>It usually takes 10 min to inference. You can print out model output by yourself to check the correctness of model.</p>
+<section id="kws-output-verification">
+<h4>KWS Output Verification<a class="headerlink" href="#kws-output-verification" title="Link to this heading">#</a></h4>
+<p>You may implement ds_cnn_verify_output() in:</p>
+<p><code class="docutils literal notranslate"><span class="pre">Platform/sw/models/ds_cnn_stream_fe_profile.cc</span></code></p>
+<p>Your verification function should:</p>
+<ul class="simple">
+<li><p>Find the predicted sound pattern using the largest output value (argmax).</p></li>
+<li><p>Compare all 12 output values with the provided golden outputs using their exact IEEE-754 bit representations.</p></li>
+<li><p>Print the predicted and expected sound-pattern names.</p></li>
+<li><p>Report PASS when the predicted class is correct and every output matches its golden value.</p></li>
+</ul>
+<p>Example:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>  Prediction: down (0), expected: down (0) [PASS]
+</pre></div>
+</div>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
 <p>If the result of any testcase inside <code class="docutils literal notranslate"><span class="pre">label/</span></code> is different from golden answer, Parts 2 and the efficiency section receive zero.</p>
 </div>
+</section>
 </section>
 </section>
 <section id="latency-and-accelerator-resource-efficiency-40">
@@ -808,7 +841,10 @@ Make sure that your design can handle all edge cases correctly.</p>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#part-2-tflm-convolution-integration-20">Part 2: TFLM convolution integration (20%)</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Software verification</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#run-the-kws-model">Run the KWS model</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#run-the-kws-model">Run the KWS model</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#kws-output-verification">KWS Output Verification</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#latency-and-accelerator-resource-efficiency-40">Latency and accelerator-resource efficiency (40%)</a><ul class="nav section-nav flex-column">
