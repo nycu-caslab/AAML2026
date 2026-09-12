@@ -773,13 +773,14 @@ Make <code class="docutils literal notranslate"><span class="pre">NPU</span></co
 <section id="submission">
 <h2>Submission<a class="headerlink" href="#submission" title="Link to this heading">#</a></h2>
 <hr class="docutils" />
-<p>Please compact all platform into a zip file on E3, and name it as <code class="docutils literal notranslate"><span class="pre">YourID.zip</span></code>.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>YourID.zip
-    └── YourID/
-        ├── Platform
-        |      └── ... 
-        └── tflite-micro
-               └── ... 
+<p>Please compact all platform into a zip file on E3, and name it as <code class="docutils literal notranslate"><span class="pre">[YourID]-lab1.zip</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>[YourID]-lab1.zip
+    └── [YourID]-lab1/
+            ├── hw/
+            |    ├─ NPU.v
+            |    └─ {any other modules}
+            └── sw/ 
+                 └─ conv.h
 </pre></div>
 </div>
 <div class="admonition important">

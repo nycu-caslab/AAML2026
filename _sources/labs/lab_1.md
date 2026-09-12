@@ -334,15 +334,16 @@ You will be asked several questions about the concepts covered in this lab and y
 ## Submission
 ---
 
-Please compact all platform into a zip file on E3, and name it as `YourID.zip`. 
+Please compact all platform into a zip file on E3, and name it as `[YourID]-lab1.zip`. 
 
 ```
-YourID.zip
-    └── YourID/
-        ├── Platform
-        |      └── ... 
-        └── tflite-micro
-               └── ... 
+[YourID]-lab1.zip
+    └── [YourID]-lab1/
+            ├── hw/
+            |    ├─ NPU.v
+            |    └─ {any other modules}
+            └── sw/ 
+                 └─ conv.h
 ```
 
 ```{important}
