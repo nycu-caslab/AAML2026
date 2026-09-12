@@ -18,9 +18,9 @@ The compute instruction encoding and internal microarchitecture are your choice 
 
 | Component | Weight |
 | --- | ---: |
-| AXI4 burst engine and dot-product service | 20% |
-| TFLM convolution and model correctness | 20% |
-| Latency and accelerator-resource efficiency | 40% |
+| AXI4 burst engine and dot-product service | 30% |
+| TFLM convolution and model correctness | 30% |
+| Latency and accelerator-resource efficiency | 20% |
 | Demo and questions | 20% |
 
 ## Prerequisites and setup
@@ -29,7 +29,7 @@ The compute instruction encoding and internal microarchitecture are your choice 
 - RISC-V toolchain
 - Python 3 with `pyserial`
 - Verilator and a host C++11 compiler
-- Model file `ds_cnn_stream_fe.tflite` and its profile from Lab1
+- Model file `ds_cnn_stream_fe.tflite` from lab1
 
 1. Download everything in `lab2/` from [AAML-Labs-2026](https://github.com/nycu-caslab/AAML-Labs-2026).
 2. Replace `Platform/sw/project` with the version you downloaded.
@@ -90,7 +90,7 @@ Use the helpers in `Platform/sw/app/cfu.h`.
 The multiplication and main accumulation must be performed by custom hardware using operand data read through AXI4 bursts. A CPU loop that calculates the dot product, including one hidden inside `hw_simd_mac`, does not satisfy the assignment.  
 Software may prepare the arguments of custom instructions, clean cache lines and issue custom instructions.
 
-## Part 1: AXI4 read burst engine and dot service (20%)
+## Part 1: AXI4 read burst engine and dot service (30%)
 
 Implement the read-burst engine and SIMD multiply-accumulate datapath in `Platform/hw/srcs/NPU.v`, then implement `hw_simd_mac` in `Platform/sw/project/lab2_api.cc` using your custom instructions. The NPU must fetch both operand vectors through its AXI master and use the fetched bytes in the returned dot product. AXI writes are not required for Lab 2.
 
@@ -175,7 +175,7 @@ The test code writes the input arrays and then calls `hw_simd_mac`; it does not 
 There are hidden testcases.
 Make sure that your design can handle all edge cases correctly.
 
-## Part 2: TFLM convolution integration (20%)
+## Part 2: TFLM convolution integration (30%)
 
 Modify the int8 `ConvPerChannel` implementation in:
 
@@ -243,7 +243,7 @@ Example:
 ```{important}
 If the result of any testcase inside `label/` is different from golden answer, Parts 2 and the efficiency section receive zero.
 ```
-## Latency and accelerator-resource efficiency (40%)
+## Latency and accelerator-resource efficiency (20%)
 
 Only submissions that complete every preceding requirement are eligible for ranking. An eligible submission must:
 - receives `20/20` in Part 1
@@ -280,10 +280,10 @@ Eligible submissions are ordered from the lowest to the highest average cycle co
 
 | Level | Nominal position among eligible submissions | Efficiency points |
 | ---: | --- | ---: |
-| 1 | Top 20% | 40 |
-| 2 | 20%-40% | 30 |
-| 3 | 40%-60% | 20 |
-| 4 | 60%-80% | 10 |
+| 1 | Top 20% | 20 |
+| 2 | 20%-40% | 15 |
+| 3 | 40%-60% | 10 |
+| 4 | 60%-80% | 5 |
 | 5 | Bottom 20% | 0 |
 
 ## Demo and questions (20%)
