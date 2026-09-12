@@ -362,14 +362,14 @@
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#prerequisites-and-setup">Prerequisites and setup</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#files-and-submission-boundary">Files and submission boundary</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#required-software-contract">Required software contract</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#part-1-axi4-read-burst-engine-and-dot-service-20">Part 1: AXI4 read burst engine and dot service (20%)</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#part-1-axi4-read-burst-engine-and-dot-service-30">Part 1: AXI4 read burst engine and dot service (30%)</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#required-transfer-domain">Required transfer domain</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#axi-protocol-requirements">AXI protocol requirements</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#software-verification">Software verification</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#testcase-input-limits">Testcase Input Limits</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#part-2-tflm-convolution-integration-20">Part 2: TFLM convolution integration (20%)</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#part-2-tflm-convolution-integration-30">Part 2: TFLM convolution integration (30%)</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Software verification</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#run-the-kws-model">Run the KWS model</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#kws-output-verification">KWS Output Verification</a></li>
@@ -377,7 +377,7 @@
 </li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#latency-and-accelerator-resource-efficiency-40">Latency and accelerator-resource efficiency (40%)</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#latency-and-accelerator-resource-efficiency-20">Latency and accelerator-resource efficiency (20%)</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#available-hardware-and-maximum-usage">Available hardware and maximum usage</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#latency-efficiency">Latency efficiency</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ranking">Ranking</a></li>
@@ -423,13 +423,13 @@
 </thead>
 <tbody>
 <tr class="row-even"><td><p>AXI4 burst engine and dot-product service</p></td>
-<td class="text-right"><p>20%</p></td>
+<td class="text-right"><p>30%</p></td>
 </tr>
 <tr class="row-odd"><td><p>TFLM convolution and model correctness</p></td>
-<td class="text-right"><p>20%</p></td>
+<td class="text-right"><p>30%</p></td>
 </tr>
 <tr class="row-even"><td><p>Latency and accelerator-resource efficiency</p></td>
-<td class="text-right"><p>40%</p></td>
+<td class="text-right"><p>20%</p></td>
 </tr>
 <tr class="row-odd"><td><p>Demo and questions</p></td>
 <td class="text-right"><p>20%</p></td>
@@ -445,7 +445,7 @@
 <li><p>RISC-V toolchain</p></li>
 <li><p>Python 3 with <code class="docutils literal notranslate"><span class="pre">pyserial</span></code></p></li>
 <li><p>Verilator and a host C++11 compiler</p></li>
-<li><p>Model file <code class="docutils literal notranslate"><span class="pre">ds_cnn_stream_fe.tflite</span></code> and its profile from Lab1</p></li>
+<li><p>Model file <code class="docutils literal notranslate"><span class="pre">ds_cnn_stream_fe.tflite</span></code> from lab1</p></li>
 </ul>
 <ol class="arabic simple">
 <li><p>Download everything in <code class="docutils literal notranslate"><span class="pre">lab2/</span></code> from <a class="reference external" href="https://github.com/nycu-caslab/AAML-Labs-2026">AAML-Labs-2026</a>.</p></li>
@@ -499,8 +499,8 @@ Use the helpers in <code class="docutils literal notranslate"><span class="pre">
 <p>The multiplication and main accumulation must be performed by custom hardware using operand data read through AXI4 bursts. A CPU loop that calculates the dot product, including one hidden inside <code class="docutils literal notranslate"><span class="pre">hw_simd_mac</span></code>, does not satisfy the assignment.<br />
 Software may prepare the arguments of custom instructions, clean cache lines and issue custom instructions.</p>
 </section>
-<section id="part-1-axi4-read-burst-engine-and-dot-service-20">
-<h2>Part 1: AXI4 read burst engine and dot service (20%)<a class="headerlink" href="#part-1-axi4-read-burst-engine-and-dot-service-20" title="Link to this heading">#</a></h2>
+<section id="part-1-axi4-read-burst-engine-and-dot-service-30">
+<h2>Part 1: AXI4 read burst engine and dot service (30%)<a class="headerlink" href="#part-1-axi4-read-burst-engine-and-dot-service-30" title="Link to this heading">#</a></h2>
 <p>Implement the read-burst engine and SIMD multiply-accumulate datapath in <code class="docutils literal notranslate"><span class="pre">Platform/hw/srcs/NPU.v</span></code>, then implement <code class="docutils literal notranslate"><span class="pre">hw_simd_mac</span></code> in <code class="docutils literal notranslate"><span class="pre">Platform/sw/project/lab2_api.cc</span></code> using your custom instructions. The NPU must fetch both operand vectors through its AXI master and use the fetched bytes in the returned dot product. AXI writes are not required for Lab 2.</p>
 <section id="required-transfer-domain">
 <h3>Required transfer domain<a class="headerlink" href="#required-transfer-domain" title="Link to this heading">#</a></h3>
@@ -600,8 +600,8 @@ Main menu -&gt; Lab menu (key l) -&gt; Lab2 random tests (key r)
 Make sure that your design can handle all edge cases correctly.</p>
 </section>
 </section>
-<section id="part-2-tflm-convolution-integration-20">
-<h2>Part 2: TFLM convolution integration (20%)<a class="headerlink" href="#part-2-tflm-convolution-integration-20" title="Link to this heading">#</a></h2>
+<section id="part-2-tflm-convolution-integration-30">
+<h2>Part 2: TFLM convolution integration (30%)<a class="headerlink" href="#part-2-tflm-convolution-integration-30" title="Link to this heading">#</a></h2>
 <p>Modify the int8 <code class="docutils literal notranslate"><span class="pre">ConvPerChannel</span></code> implementation in:</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Platform/sw/tflm_patches/tensorflow/lite/kernels/internal/reference/integer_ops/conv.h
 </pre></div>
@@ -660,8 +660,8 @@ Make sure that your design can handle all edge cases correctly.</p>
 </section>
 </section>
 </section>
-<section id="latency-and-accelerator-resource-efficiency-40">
-<h2>Latency and accelerator-resource efficiency (40%)<a class="headerlink" href="#latency-and-accelerator-resource-efficiency-40" title="Link to this heading">#</a></h2>
+<section id="latency-and-accelerator-resource-efficiency-20">
+<h2>Latency and accelerator-resource efficiency (20%)<a class="headerlink" href="#latency-and-accelerator-resource-efficiency-20" title="Link to this heading">#</a></h2>
 <p>Only submissions that complete every preceding requirement are eligible for ranking. An eligible submission must:</p>
 <ul class="simple">
 <li><p>receives <code class="docutils literal notranslate"><span class="pre">20/20</span></code> in Part 1</p></li>
@@ -727,19 +727,19 @@ Make sure that your design can handle all edge cases correctly.</p>
 <tbody>
 <tr class="row-even"><td class="text-right"><p>1</p></td>
 <td><p>Top 20%</p></td>
-<td class="text-right"><p>40</p></td>
+<td class="text-right"><p>20</p></td>
 </tr>
 <tr class="row-odd"><td class="text-right"><p>2</p></td>
 <td><p>20%-40%</p></td>
-<td class="text-right"><p>30</p></td>
+<td class="text-right"><p>15</p></td>
 </tr>
 <tr class="row-even"><td class="text-right"><p>3</p></td>
 <td><p>40%-60%</p></td>
-<td class="text-right"><p>20</p></td>
+<td class="text-right"><p>10</p></td>
 </tr>
 <tr class="row-odd"><td class="text-right"><p>4</p></td>
 <td><p>60%-80%</p></td>
-<td class="text-right"><p>10</p></td>
+<td class="text-right"><p>5</p></td>
 </tr>
 <tr class="row-even"><td class="text-right"><p>5</p></td>
 <td><p>Bottom 20%</p></td>
@@ -832,14 +832,14 @@ Make sure that your design can handle all edge cases correctly.</p>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#prerequisites-and-setup">Prerequisites and setup</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#files-and-submission-boundary">Files and submission boundary</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#required-software-contract">Required software contract</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#part-1-axi4-read-burst-engine-and-dot-service-20">Part 1: AXI4 read burst engine and dot service (20%)</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#part-1-axi4-read-burst-engine-and-dot-service-30">Part 1: AXI4 read burst engine and dot service (30%)</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#required-transfer-domain">Required transfer domain</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#axi-protocol-requirements">AXI protocol requirements</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#software-verification">Software verification</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#testcase-input-limits">Testcase Input Limits</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#part-2-tflm-convolution-integration-20">Part 2: TFLM convolution integration (20%)</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#part-2-tflm-convolution-integration-30">Part 2: TFLM convolution integration (30%)</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Software verification</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#run-the-kws-model">Run the KWS model</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#kws-output-verification">KWS Output Verification</a></li>
@@ -847,7 +847,7 @@ Make sure that your design can handle all edge cases correctly.</p>
 </li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#latency-and-accelerator-resource-efficiency-40">Latency and accelerator-resource efficiency (40%)</a><ul class="nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#latency-and-accelerator-resource-efficiency-20">Latency and accelerator-resource efficiency (20%)</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#available-hardware-and-maximum-usage">Available hardware and maximum usage</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#latency-efficiency">Latency efficiency</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ranking">Ranking</a></li>
