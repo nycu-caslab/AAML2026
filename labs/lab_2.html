@@ -448,7 +448,7 @@
 <li><p>Model file <code class="docutils literal notranslate"><span class="pre">ds_cnn_stream_fe.tflite</span></code> and its profile from Lab1</p></li>
 </ul>
 <ol class="arabic simple">
-<li><p>Download everything in <code class="docutils literal notranslate"><span class="pre">lab2/</span></code> from <a class="reference internal" href="#"><span class="xref myst">AAML2026-Lab</span></a>.</p></li>
+<li><p>Download everything in <code class="docutils literal notranslate"><span class="pre">lab2/</span></code> from <a class="reference external" href="https://github.com/nycu-caslab/AAML-Labs-2026">AAML-Labs-2026</a>.</p></li>
 <li><p>Replace <code class="docutils literal notranslate"><span class="pre">Platform/sw/project</span></code> with the version you downloaded.</p></li>
 <li><p>Move everything in <code class="docutils literal notranslate"><span class="pre">model/</span></code> to <code class="docutils literal notranslate"><span class="pre">Platform/sw/model</span></code>.</p></li>
 <li><p>Add <code class="docutils literal notranslate"><span class="pre">APP_EXTRA_SRCS</span> <span class="pre">+=</span> <span class="pre">$(wildcard</span> <span class="pre">models/label/label*_board.cc)</span></code> to <code class="docutils literal notranslate"><span class="pre">project.mk</span></code>, or define it when running <code class="docutils literal notranslate"><span class="pre">make</span></code>.</p></li>
@@ -464,7 +464,6 @@ make<span class="w"> </span>-C<span class="w"> </span>Platform/sw<span class="w"
 <span class="w">  </span><span class="nv">MODEL_FILE</span><span class="o">=</span>ds_cnn_stream_fe.tflite<span class="w"> </span><span class="nv">MODEL_PROFILE</span><span class="o">=</span>ds_cnn_stream_fe
 </pre></div>
 </div>
-<p>Use the course setup instructions if one of these commands fails.</p>
 </section>
 <section id="files-and-submission-boundary">
 <h2>Files and submission boundary<a class="headerlink" href="#files-and-submission-boundary" title="Link to this heading">#</a></h2>
@@ -472,6 +471,7 @@ make<span class="w"> </span>-C<span class="w"> </span>Platform/sw<span class="w"
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">Platform/hw/srcs/NPU.v</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">Platform/sw/project/lab2_api.cc</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Platform/sw/models/ds_cnn_stream_fe_profile.cc</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">Platform/sw/tflm_patches/tensorflow/lite/kernels/internal/reference/integer_ops/conv.h</span></code></p></li>
 </ul>
 <p>You may add helper Verilog modules under <code class="docutils literal notranslate"><span class="pre">Platform/hw/srcs/</span></code> and helper C/C++ files under <code class="docutils literal notranslate"><span class="pre">Platform/sw/project/</span></code>. Do not replace or rename the <code class="docutils literal notranslate"><span class="pre">NPU</span></code> module. Preserve its complete port list, active-low <code class="docutils literal notranslate"><span class="pre">rst_n</span></code> behavior, and CPU/AXI signal directions so the existing block design still elaborates.</p>
@@ -622,11 +622,11 @@ Make sure that your design can handle all edge cases correctly.</p>
 <section id="id1">
 <h3>Software verification<a class="headerlink" href="#id1" title="Link to this heading">#</a></h3>
 <p>First upload the model-free firmware and run the existing golden convolution cases:</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>-C<span class="w"> </span>Platform<span class="w"> </span>run
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>run
 </pre></div>
 </div>
 <p>After pressing <code class="docutils literal notranslate"><span class="pre">CPU</span> <span class="pre">RESET</span></code>, select:</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Main menu -&gt; Lab menu (key l) -&gt; Basic convolution tests (key 4)
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Main menu -&gt; Lab menu (key l) -&gt; Basic convolution tests (key c)
 </pre></div>
 </div>
 <p>All three cases must report <code class="docutils literal notranslate"><span class="pre">[PASS]</span></code>.</p>

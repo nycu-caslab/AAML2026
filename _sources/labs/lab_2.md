@@ -31,7 +31,7 @@ The compute instruction encoding and internal microarchitecture are your choice 
 - Verilator and a host C++11 compiler
 - Model file `ds_cnn_stream_fe.tflite` and its profile from Lab1
 
-1. Download everything in `lab2/` from [AAML2026-Lab]().
+1. Download everything in `lab2/` from [AAML-Labs-2026](https://github.com/nycu-caslab/AAML-Labs-2026).
 2. Replace `Platform/sw/project` with the version you downloaded.
 3. Move everything in `model/` to `Platform/sw/model`.
 4. Add `APP_EXTRA_SRCS += $(wildcard models/label/label*_board.cc)` to `project.mk`, or define it when running `make`.
@@ -48,14 +48,13 @@ make -C Platform/sw check-env \
   MODEL_FILE=ds_cnn_stream_fe.tflite MODEL_PROFILE=ds_cnn_stream_fe
 ```
 
-Use the course setup instructions if one of these commands fails.
-
 ## Files and submission boundary
 
 You may modify:
 
 - `Platform/hw/srcs/NPU.v`
 - `Platform/sw/project/lab2_api.cc`
+- `Platform/sw/models/ds_cnn_stream_fe_profile.cc`
 - `Platform/sw/tflm_patches/tensorflow/lite/kernels/internal/reference/integer_ops/conv.h`
 
 You may add helper Verilog modules under `Platform/hw/srcs/` and helper C/C++ files under `Platform/sw/project/`. Do not replace or rename the `NPU` module. Preserve its complete port list, active-low `rst_n` behavior, and CPU/AXI signal directions so the existing block design still elaborates.
@@ -204,13 +203,13 @@ Your accelerated kernel must preserve the reference behavior for:
 First upload the model-free firmware and run the existing golden convolution cases:
 
 ```sh
-make -C Platform run
+make run
 ```
 
 After pressing `CPU RESET`, select:
 
 ```text
-Main menu -> Lab menu (key l) -> Basic convolution tests (key 4)
+Main menu -> Lab menu (key l) -> Basic convolution tests (key c)
 ```
 All three cases must report `[PASS]`.
 
