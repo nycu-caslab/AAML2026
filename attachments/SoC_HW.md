@@ -36,15 +36,14 @@ cfu_op3..cfu_op7          -> reserved for user accelerators
 
 ## Add A Custom Instruction
 
-1. Choose a `funct3/funct7` pair. Prefer putting the semantic wrapper in
-   `Platform/sw/project/accel_ops.h`.
+1. Choose a `funct3/funct7` pair.
 2. Implement the hardware behavior in `srcs/NPU.v`, or copy
    `templates/custom_accelerator_template.v` into `srcs/` and wire the Vivado
    block design to that module.
 3. Add or update the software fallback in `Platform/sw/app/software_cfu.cc`.
    This lets `USE_SOFTWARE_CFU=1` and host syntax checks exercise the same API
    before hardware is ready.
-4. Add a functional or performance test in `Platform/sw/project/user_menu.cc`
+4. Add a functional or performance test in `Platform/sw/project/proj_menu.cc`
    or `Platform/sw/project/accel_tests.cc`. Use `perf_get_mcycle64()` for cycle
    measurements.
 5. Run the host-side checks:

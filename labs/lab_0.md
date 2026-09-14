@@ -33,10 +33,9 @@ The official specification reserves blank opcodes (such as custom-0), allowing d
 
 **Adding A Custom Instruction**
 1. Choose a `funct3/funct7` pair. `cfu_op0`..`cfu_op7` select `funct3=0..7`
-2. Add a readable wrapper in `project/accel_ops.h`
 3. Implement the hardware behavior in `../hw/srcs/NPU.v`, or start from `../hw/templates/custom_accelerator_template.v`
-4. Implement the software fallback in `app/software_cfu.cc`
-5. Add a functional or cycle-counting test in `project/accel_tests.cc` or another project source, then register it in the appropriate Lab submenu in `project/proj_menu.cc`  
+3. Implement the software fallback in `app/software_cfu.cc`
+4. Add a functional or cycle-counting test in `project/accelerator_tests.cc` or another project source, then register it in the appropriate Lab submenu in `project/proj_menu.cc`  
 
 Build with `USE_SOFTWARE_CFU=1` when you want to test the software fallback without issuing `CUSTOM-0` instructions.  
 Use `templates/custom_instruction_template.cc` for a standalone performance test skeleton. After adding template-based code, run `make validate`; if the extension adds a new menu item, register its function in the appropriate Lab submenu in `project/proj_menu.cc`.
@@ -82,8 +81,6 @@ Based on TFLM architecture, the standard procedure for switching existing models
     2. Bundled profiles:
         ```
         ad01          ad01_int8.tflite fixture input and golden output
-        vww_96        vww_96_int8.tflite zero input, output verification skipped
-        generic_zero  fallback for new models while bring-up data is not ready
         ```
     3. Build a specific model:
         ```
@@ -97,7 +94,7 @@ Based on TFLM architecture, the standard procedure for switching existing models
 - Add
     1. Copy it into `Platform/sw/models`.
     2. Register any missing kernels in `project/tflm_ops.cc`.
-    3. Start with `MODEL_PROFILE=generic_zero` if fixture data is not ready.
+    3. Start with `templates/model_profile_template.cc` if fixture data is not ready.
     4. Create `models/<profile>_profile.cc` when the model needs fixture input, generated input, custom tensor handling, or golden-output verification. Use `templates/model_profile_template.cc` as the starting pattern.
     5. Implement `const ModelProfile* model_profile_get(void)`.
     6. For simple int8 models, fill `input_data` and `expected_output`.
@@ -115,6 +112,7 @@ This section will guide you through the core three steps from installing the too
 We recommend you use version 2023.2 or version 2024.1
 > [Vivado Download page](https://www.xilinx.com/support/download/index.html/content/xilinx/en/downloadNav/vivado-design-tools/2023-2.html)
 
+- Add vivado to your PATH
 - Make sure vivado is installed correctly on your machine before you start by running:
 ``` bash
 $ vivado -version
@@ -132,10 +130,11 @@ $ tar xvfz ~/Downloads/riscv64-unknown-elf-gcc-10.1.0-2020.08.2-x86_64-linux-ubu
 
 Add the toolchain to your PATH in your `.bashrc` or `.zshrc`:
 ``` bash
-export PATH=$PATH:$HOME/riscv64-unknown-elf-gcc-10.1.0-2020.08.2-x86_64-linux-ubuntu14/bin
+export PATH=$HOME/riscv64-unknown-elf-gcc-10.1.0-2020.08.2-x86_64-linux-ubuntu14/bin:$PATH
 ```
 
 ### Platform Setup
+
 #### Step 0: Initial Preparation
 Prepare a clean directory in your Linux environment and navigate into it.
 #### Step 1: Clone the Repository
@@ -148,6 +147,14 @@ git clone git@github.com:nycu-caslab/TinyRISC-V-SoC-Platform.git
 ```bash
 cd CUSTOM_SoC_Platform/Platform
 chmod +x hw/run_hw.sh
+```
+#### Step 3: Run the Pre-flight check
+```bash
+vivado -version
+riscv64-unknown-elf-g++ --version
+python3 -c "import serial"
+make -C Platform/sw validate
+make -C Platform/sw check-env
 ```
 
 ### Running the Platform
