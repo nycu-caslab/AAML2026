@@ -57,7 +57,7 @@ The CPU communicates with the NPU through a request-response interface based on 
                               v     v
                          AXI Interconnect
                                 |
-                           Shared DDR2
+                           Shared DDR3
 ```
 
 ### AXI
