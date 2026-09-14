@@ -1,14 +1,14 @@
 # Lab 0 : Environment Setup
 
 ## Goal of this lab
-- [Understand the AAML RISC-V SoC platform.](#aaml-risc-v-soc-platform)
+- [Understand the TinyRISC-V SoC platform.](#tinyrisc-v-soc-platform)
 - [Set up Vivado and the RISC-V toolchain.](#toolchain-setup)
-- [Clone and set up `CUSTOM_SoC_Platform`.](#platform-setup)
+- [Clone and set up the `TinyRISC-V SoC Platform`.](#platform-setup)
 - [Program the FPGA and run a TFLM application.](#running-the-platform)
 ## Introduction
-Throughout AAML 2026, we will use the AAML RISC-V SoC platform to explore hardware/software co-design for machine-learning acceleration. The platform integrates a RISC-V CPU, a customizable ML accelerator connected through custom instructions and AXI, and TensorFlow Lite for Microcontrollers (TFLM). In Lab 0, you will set up the required tools, program the reference SoC onto the FPGA, and run a reference TFLM application to verify the development environment for the following labs.
+Throughout AAML 2026, we will use the TinyRISC-V SoC Platform to explore hardware/software co-design for machine-learning acceleration. The platform integrates a RISC-V CPU, a customizable ML accelerator connected through custom instructions and AXI, and TensorFlow Lite for Microcontrollers (TFLM). In Lab 0, you will set up the required tools, program the reference SoC onto the FPGA, and run a reference TFLM application to verify the development environment for the following labs.
 
-## AAML RISC-V SoC Platform
+## TinyRISC-V SoC Platform
 
 ### RISC-V CPU
 For a CPU to function, it must rely on the Instruction Set Architecture (ISA). An instruction set is a predefined list of commands that determines which operations the hardware can understand and execute. In this Lab, we use **RISC-V**, an open source ISA.  
@@ -102,7 +102,7 @@ Based on TFLM architecture, the standard procedure for switching existing models
     7. For custom tensor types, generated inputs, or multi-output checks, set the `prepare_input` or `verify_output` function pointers.
     8. Set `TENSOR_ARENA_SIZE` if the model needs a larger arena.
     9. Run `make validate`, then build with `make MODEL_FILE=<name>.tflite`.
-## Porting AAML RISC-V SoC to FPGA
+## Porting TinyRISC-V SoC to FPGA
 This section will guide you through the core three steps from installing the toolchain, cloning the platform, to running the platform.
 
 ### Toolchain Setup
@@ -140,7 +140,7 @@ Prepare a clean directory in your Linux environment and navigate into it.
 ```bash
 touch {your folder name}
 cd {your folder name}
-git clone -b AAML-sw-dev git@github.com:TTY-RISCV/CUSTOM_SoC_Platform.git
+git clone git@github.com:nycu-caslab/TinyRISC-V-SoC-Platform.git
 ```
 #### Step 2: Set Permissions
 ```bash
