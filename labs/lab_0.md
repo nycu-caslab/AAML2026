@@ -16,7 +16,7 @@ For a CPU to function, it must rely on the Instruction Set Architecture (ISA). A
 Our CPU supports RV32IM, with M-mode only supporting `mcycle` and `mcycleh`, and it also supports the `fence.i` instructions.  
 
 Moreover, the hardware supports `CBO` (Cache-Block Management Operations). We implement the `zicbom` extension, which allows software to manually manage cache coherence by cleaning or invalidating cache blocks.
-<img width="1362" height="725" alt="image" src="https://github.com/user-attachments/assets/7ecd0228-f1e6-4a01-9cb3-ceeec769eb67" />
+<img alt="image" src="images/lab0/SoC_Arch_Diagram.webp" />
 
 ### Extended ISAs
 ISA is divided into two levels: the Base ISA and the Extended ISAs.  
