@@ -402,15 +402,14 @@ cfu_op3..cfu_op7          -&gt; reserved for user accelerators
 <section id="add-a-custom-instruction">
 <h2>Add A Custom Instruction<a class="headerlink" href="#add-a-custom-instruction" title="Link to this heading">#</a></h2>
 <ol class="arabic simple">
-<li><p>Choose a <code class="docutils literal notranslate"><span class="pre">funct3/funct7</span></code> pair. Prefer putting the semantic wrapper in
-<code class="docutils literal notranslate"><span class="pre">Platform/sw/project/accel_ops.h</span></code>.</p></li>
+<li><p>Choose a <code class="docutils literal notranslate"><span class="pre">funct3/funct7</span></code> pair.</p></li>
 <li><p>Implement the hardware behavior in <code class="docutils literal notranslate"><span class="pre">srcs/NPU.v</span></code>, or copy
 <code class="docutils literal notranslate"><span class="pre">templates/custom_accelerator_template.v</span></code> into <code class="docutils literal notranslate"><span class="pre">srcs/</span></code> and wire the Vivado
 block design to that module.</p></li>
 <li><p>Add or update the software fallback in <code class="docutils literal notranslate"><span class="pre">Platform/sw/app/software_cfu.cc</span></code>.
 This lets <code class="docutils literal notranslate"><span class="pre">USE_SOFTWARE_CFU=1</span></code> and host syntax checks exercise the same API
 before hardware is ready.</p></li>
-<li><p>Add a functional or performance test in <code class="docutils literal notranslate"><span class="pre">Platform/sw/project/user_menu.cc</span></code>
+<li><p>Add a functional or performance test in <code class="docutils literal notranslate"><span class="pre">Platform/sw/project/proj_menu.cc</span></code>
 or <code class="docutils literal notranslate"><span class="pre">Platform/sw/project/accel_tests.cc</span></code>. Use <code class="docutils literal notranslate"><span class="pre">perf_get_mcycle64()</span></code> for cycle
 measurements.</p></li>
 <li><p>Run the host-side checks:</p></li>

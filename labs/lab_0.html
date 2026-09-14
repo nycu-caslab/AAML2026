@@ -375,6 +375,7 @@
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#step-0-initial-preparation">Step 0: Initial Preparation</a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#step-1-clone-the-repository">Step 1: Clone the Repository</a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#step-2-set-permissions">Step 2: Set Permissions</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#step-3-run-the-pre-flight-check">Step 3: Run the Pre-flight check</a></li>
 </ul>
 </li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#running-the-platform">Running the Platform</a><ul class="nav section-nav flex-column">
@@ -437,10 +438,9 @@
 <p><strong>Adding A Custom Instruction</strong></p>
 <ol class="arabic simple">
 <li><p>Choose a <code class="docutils literal notranslate"><span class="pre">funct3/funct7</span></code> pair. <code class="docutils literal notranslate"><span class="pre">cfu_op0</span></code>..<code class="docutils literal notranslate"><span class="pre">cfu_op7</span></code> select <code class="docutils literal notranslate"><span class="pre">funct3=0..7</span></code></p></li>
-<li><p>Add a readable wrapper in <code class="docutils literal notranslate"><span class="pre">project/accel_ops.h</span></code></p></li>
 <li><p>Implement the hardware behavior in <code class="docutils literal notranslate"><span class="pre">../hw/srcs/NPU.v</span></code>, or start from <code class="docutils literal notranslate"><span class="pre">../hw/templates/custom_accelerator_template.v</span></code></p></li>
 <li><p>Implement the software fallback in <code class="docutils literal notranslate"><span class="pre">app/software_cfu.cc</span></code></p></li>
-<li><p>Add a functional or cycle-counting test in <code class="docutils literal notranslate"><span class="pre">project/accel_tests.cc</span></code> or another project source, then register it in the appropriate Lab submenu in <code class="docutils literal notranslate"><span class="pre">project/proj_menu.cc</span></code></p></li>
+<li><p>Add a functional or cycle-counting test in <code class="docutils literal notranslate"><span class="pre">project/accelerator_tests.cc</span></code> or another project source, then register it in the appropriate Lab submenu in <code class="docutils literal notranslate"><span class="pre">project/proj_menu.cc</span></code></p></li>
 </ol>
 <p>Build with <code class="docutils literal notranslate"><span class="pre">USE_SOFTWARE_CFU=1</span></code> when you want to test the software fallback without issuing <code class="docutils literal notranslate"><span class="pre">CUSTOM-0</span></code> instructions.<br />
 Use <code class="docutils literal notranslate"><span class="pre">templates/custom_instruction_template.cc</span></code> for a standalone performance test skeleton. After adding template-based code, run <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">validate</span></code>; if the extension adds a new menu item, register its function in the appropriate Lab submenu in <code class="docutils literal notranslate"><span class="pre">project/proj_menu.cc</span></code>.</p>
@@ -488,8 +488,6 @@ Make sure to use your NYCU account to have access to these slides.</p>
 </li>
 <li><p>Bundled profiles:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ad01</span>          <span class="n">ad01_int8</span><span class="o">.</span><span class="n">tflite</span> <span class="n">fixture</span> <span class="nb">input</span> <span class="ow">and</span> <span class="n">golden</span> <span class="n">output</span>
-<span class="n">vww_96</span>        <span class="n">vww_96_int8</span><span class="o">.</span><span class="n">tflite</span> <span class="n">zero</span> <span class="nb">input</span><span class="p">,</span> <span class="n">output</span> <span class="n">verification</span> <span class="n">skipped</span>
-<span class="n">generic_zero</span>  <span class="n">fallback</span> <span class="k">for</span> <span class="n">new</span> <span class="n">models</span> <span class="k">while</span> <span class="n">bring</span><span class="o">-</span><span class="n">up</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">ready</span>
 </pre></div>
 </div>
 </li>
@@ -510,7 +508,7 @@ Make sure to use your NYCU account to have access to these slides.</p>
 <ol class="arabic simple">
 <li><p>Copy it into <code class="docutils literal notranslate"><span class="pre">Platform/sw/models</span></code>.</p></li>
 <li><p>Register any missing kernels in <code class="docutils literal notranslate"><span class="pre">project/tflm_ops.cc</span></code>.</p></li>
-<li><p>Start with <code class="docutils literal notranslate"><span class="pre">MODEL_PROFILE=generic_zero</span></code> if fixture data is not ready.</p></li>
+<li><p>Start with <code class="docutils literal notranslate"><span class="pre">templates/model_profile_template.cc</span></code> if fixture data is not ready.</p></li>
 <li><p>Create <code class="docutils literal notranslate"><span class="pre">models/&lt;profile&gt;_profile.cc</span></code> when the model needs fixture input, generated input, custom tensor handling, or golden-output verification. Use <code class="docutils literal notranslate"><span class="pre">templates/model_profile_template.cc</span></code> as the starting pattern.</p></li>
 <li><p>Implement <code class="docutils literal notranslate"><span class="pre">const</span> <span class="pre">ModelProfile*</span> <span class="pre">model_profile_get(void)</span></code>.</p></li>
 <li><p>For simple int8 models, fill <code class="docutils literal notranslate"><span class="pre">input_data</span></code> and <code class="docutils literal notranslate"><span class="pre">expected_output</span></code>.</p></li>
@@ -541,6 +539,7 @@ We recommend you use version 2023.2 or version 2024.1</p></li>
 <div><p><a class="reference external" href="https://www.xilinx.com/support/download/index.html/content/xilinx/en/downloadNav/vivado-design-tools/2023-2.html">Vivado Download page</a></p>
 </div></blockquote>
 <ul class="simple">
+<li><p>Add vivado to your PATH</p></li>
 <li><p>Make sure vivado is installed correctly on your machine before you start by running:</p></li>
 </ul>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>vivado<span class="w"> </span>-version
@@ -560,7 +559,7 @@ We recommend you use version 2023.2 or version 2024.1</p></li>
 </pre></div>
 </div>
 <p>Add the toolchain to your PATH in your <code class="docutils literal notranslate"><span class="pre">.bashrc</span></code> or <code class="docutils literal notranslate"><span class="pre">.zshrc</span></code>:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:<span class="nv">$HOME</span>/riscv64-unknown-elf-gcc-10.1.0-2020.08.2-x86_64-linux-ubuntu14/bin
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$HOME</span>/riscv64-unknown-elf-gcc-10.1.0-2020.08.2-x86_64-linux-ubuntu14/bin:<span class="nv">$PATH</span>
 </pre></div>
 </div>
 </section>
@@ -583,6 +582,16 @@ git<span class="w"> </span>clone<span class="w"> </span>git@github.com:nycu-casl
 <h4>Step 2: Set Permissions<a class="headerlink" href="#step-2-set-permissions" title="Link to this heading">#</a></h4>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>CUSTOM_SoC_Platform/Platform
 chmod<span class="w"> </span>+x<span class="w"> </span>hw/run_hw.sh
+</pre></div>
+</div>
+</section>
+<section id="step-3-run-the-pre-flight-check">
+<h4>Step 3: Run the Pre-flight check<a class="headerlink" href="#step-3-run-the-pre-flight-check" title="Link to this heading">#</a></h4>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>vivado<span class="w"> </span>-version
+riscv64-unknown-elf-g++<span class="w"> </span>--version
+python3<span class="w"> </span>-c<span class="w"> </span><span class="s2">"import serial"</span>
+make<span class="w"> </span>-C<span class="w"> </span>Platform/sw<span class="w"> </span>validate
+make<span class="w"> </span>-C<span class="w"> </span>Platform/sw<span class="w"> </span>check-env
 </pre></div>
 </div>
 </section>
@@ -697,6 +706,7 @@ chmod<span class="w"> </span>+x<span class="w"> </span>hw/run_hw.sh
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#step-0-initial-preparation">Step 0: Initial Preparation</a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#step-1-clone-the-repository">Step 1: Clone the Repository</a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#step-2-set-permissions">Step 2: Set Permissions</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#step-3-run-the-pre-flight-check">Step 3: Run the Pre-flight check</a></li>
 </ul>
 </li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#running-the-platform">Running the Platform</a><ul class="nav section-nav flex-column">

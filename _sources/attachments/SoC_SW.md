@@ -17,14 +17,11 @@ make run MODEL_FILE=ad01_int8.tflite
 Useful build overrides:
 
 ```sh
-MODEL_DIR=models
 MODEL_FILE=ad01_int8.tflite
 MODEL_PROFILE=ad01
 TENSOR_ARENA_SIZE=262144
-USE_SOFTWARE_CFU=1
 TARGET_PREFIX=riscv64-unknown-elf
-APP_DEFINES="-DMY_FLAG=1"
-APP_EXTRA_SRCS="project/my_extra_file.cc"
+PROJECT_CONFIG=project.mk
 ```
 
 For repeated local settings, copy `project.mk.example` to `project.mk` and edit
@@ -45,21 +42,10 @@ profile source.
 profiles, and templates. It does not build or require the RISC-V embedded
 toolchain.
 
-## File Layout
-
-`project/proj_menu.*` owns the built-in project menu entries for accelerator
-tests, TFLM inference, and the user extension menu.
-
-`project/user_menu.*` is the intended first place to add a new project-specific
-test, demo, or experiment.
-
-`app/cfu.*`, `app/software_cfu.*`, and `project/accel_ops.h` wrap CUSTOM-0
-access. Use `cfu_op0..cfu_op7(funct7, rs1, rs2)` for raw CUSTOM-0 fields, or
-add semantic helpers in `accel_ops.h`.
 
 ## Adding A Menu Item
 
-Edit `project/user_menu.cc`:
+Edit `project/proj_menu.cc`:
 
 ```c++
 void do_my_test(void) {
@@ -80,7 +66,7 @@ Rebuild and open the firmware menu:
 
 For a larger test, start from `templates/app_extension_template.cc`, add the new
 file through `APP_EXTRA_SRCS`, and register its function in
-`project/user_menu.cc`.
+`project/proj_menu.cc`.
 
 ## Adding A Custom Instruction Helper
 
@@ -90,7 +76,7 @@ file through `APP_EXTRA_SRCS`, and register its function in
    `../hw/templates/custom_accelerator_template.v`.
 3. Implement the software fallback in `app/software_cfu.cc`.
 4. Add a readable wrapper in `project/accel_ops.h`.
-5. Add a functional or cycle-counting test entry in `project/user_menu.cc` or
+5. Add a functional or cycle-counting test entry in `project/proj_menu.cc` or
    `project/accel_tests.cc`.
 
 Build with `USE_SOFTWARE_CFU=1` when you want to test the software fallback
@@ -109,7 +95,7 @@ static inline uint32_t accel_my_op(uint32_t a, uint32_t b) {
 
 Use `templates/custom_instruction_template.cc` for a standalone performance
 test skeleton. After adding template-based code, run `make validate`; if the
-extension adds a new menu item, register its function in `project/user_menu.cc`.
+extension adds a new menu item, register its function in `project/proj_menu.cc`.
 
 ## Running Performance Tests
 
@@ -138,8 +124,6 @@ Bundled profiles:
 
 ```text
 ad01          ad01_int8.tflite fixture input and golden output
-vww_96        vww_96_int8.tflite zero input, output verification skipped
-generic_zero  fallback for new models while bring-up data is not ready
 ```
 
 Build a specific model:
@@ -151,7 +135,7 @@ make MODEL_FILE=ad01_int8.tflite
 Select a profile explicitly:
 
 ```sh
-make MODEL_FILE=my_model.tflite MODEL_PROFILE=generic_zero
+make MODEL_FILE=my_model.tflite MODEL_PROFILE=my_model
 make MODEL_FILE=ad01_int8.tflite MODEL_PROFILE=ad01
 ```
 
@@ -159,7 +143,7 @@ When adding a new `.tflite` file:
 
 1. Copy it into `Platform/sw/models`.
 2. Register any missing kernels in `project/tflm_ops.cc`.
-3. Start with `MODEL_PROFILE=generic_zero` if fixture data is not ready.
+3. Start with `MODEL_PROFILE=ad01` if fixture data is not ready.
 4. Create `models/<profile>_profile.cc` when the model needs fixture input,
    generated input, custom tensor handling, or golden-output verification. Use
    `templates/model_profile_template.cc` as the starting pattern.

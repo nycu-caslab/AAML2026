@@ -355,7 +355,6 @@
             <nav aria-label="Page">
                 <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#quick-start">Quick Start</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#file-layout">File Layout</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#adding-a-menu-item">Adding A Menu Item</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#adding-a-custom-instruction-helper">Adding A Custom Instruction Helper</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#running-performance-tests">Running Performance Tests</a></li>
@@ -388,14 +387,11 @@ make<span class="w"> </span>run<span class="w"> </span><span class="nv">MODEL_FI
 </pre></div>
 </div>
 <p>Useful build overrides:</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="nv">MODEL_DIR</span><span class="o">=</span>models
-<span class="nv">MODEL_FILE</span><span class="o">=</span>ad01_int8.tflite
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="nv">MODEL_FILE</span><span class="o">=</span>ad01_int8.tflite
 <span class="nv">MODEL_PROFILE</span><span class="o">=</span>ad01
 <span class="nv">TENSOR_ARENA_SIZE</span><span class="o">=</span><span class="m">262144</span>
-<span class="nv">USE_SOFTWARE_CFU</span><span class="o">=</span><span class="m">1</span>
 <span class="nv">TARGET_PREFIX</span><span class="o">=</span>riscv64-unknown-elf
-<span class="nv">APP_DEFINES</span><span class="o">=</span><span class="s2">"-DMY_FLAG=1"</span>
-<span class="nv">APP_EXTRA_SRCS</span><span class="o">=</span><span class="s2">"project/my_extra_file.cc"</span>
+<span class="nv">PROJECT_CONFIG</span><span class="o">=</span>project.mk
 </pre></div>
 </div>
 <p>For repeated local settings, copy <code class="docutils literal notranslate"><span class="pre">project.mk.example</span></code> to <code class="docutils literal notranslate"><span class="pre">project.mk</span></code> and edit
@@ -413,19 +409,9 @@ profile source.</p>
 profiles, and templates. It does not build or require the RISC-V embedded
 toolchain.</p>
 </section>
-<section id="file-layout">
-<h2>File Layout<a class="headerlink" href="#file-layout" title="Link to this heading">#</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">project/proj_menu.*</span></code> owns the built-in project menu entries for accelerator
-tests, TFLM inference, and the user extension menu.</p>
-<p><code class="docutils literal notranslate"><span class="pre">project/user_menu.*</span></code> is the intended first place to add a new project-specific
-test, demo, or experiment.</p>
-<p><code class="docutils literal notranslate"><span class="pre">app/cfu.*</span></code>, <code class="docutils literal notranslate"><span class="pre">app/software_cfu.*</span></code>, and <code class="docutils literal notranslate"><span class="pre">project/accel_ops.h</span></code> wrap CUSTOM-0
-access. Use <code class="docutils literal notranslate"><span class="pre">cfu_op0..cfu_op7(funct7,</span> <span class="pre">rs1,</span> <span class="pre">rs2)</span></code> for raw CUSTOM-0 fields, or
-add semantic helpers in <code class="docutils literal notranslate"><span class="pre">accel_ops.h</span></code>.</p>
-</section>
 <section id="adding-a-menu-item">
 <h2>Adding A Menu Item<a class="headerlink" href="#adding-a-menu-item" title="Link to this heading">#</a></h2>
-<p>Edit <code class="docutils literal notranslate"><span class="pre">project/user_menu.cc</span></code>:</p>
+<p>Edit <code class="docutils literal notranslate"><span class="pre">project/proj_menu.cc</span></code>:</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">do_my_test</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="c1">// Project-specific test code.</span>
 <span class="p">}</span>
@@ -444,7 +430,7 @@ add semantic helpers in <code class="docutils literal notranslate"><span class="
 </ol>
 <p>For a larger test, start from <code class="docutils literal notranslate"><span class="pre">templates/app_extension_template.cc</span></code>, add the new
 file through <code class="docutils literal notranslate"><span class="pre">APP_EXTRA_SRCS</span></code>, and register its function in
-<code class="docutils literal notranslate"><span class="pre">project/user_menu.cc</span></code>.</p>
+<code class="docutils literal notranslate"><span class="pre">project/proj_menu.cc</span></code>.</p>
 </section>
 <section id="adding-a-custom-instruction-helper">
 <h2>Adding A Custom Instruction Helper<a class="headerlink" href="#adding-a-custom-instruction-helper" title="Link to this heading">#</a></h2>
@@ -455,7 +441,7 @@ their first argument is <code class="docutils literal notranslate"><span class="
 <code class="docutils literal notranslate"><span class="pre">../hw/templates/custom_accelerator_template.v</span></code>.</p></li>
 <li><p>Implement the software fallback in <code class="docutils literal notranslate"><span class="pre">app/software_cfu.cc</span></code>.</p></li>
 <li><p>Add a readable wrapper in <code class="docutils literal notranslate"><span class="pre">project/accel_ops.h</span></code>.</p></li>
-<li><p>Add a functional or cycle-counting test entry in <code class="docutils literal notranslate"><span class="pre">project/user_menu.cc</span></code> or
+<li><p>Add a functional or cycle-counting test entry in <code class="docutils literal notranslate"><span class="pre">project/proj_menu.cc</span></code> or
 <code class="docutils literal notranslate"><span class="pre">project/accel_tests.cc</span></code>.</p></li>
 </ol>
 <p>Build with <code class="docutils literal notranslate"><span class="pre">USE_SOFTWARE_CFU=1</span></code> when you want to test the software fallback
@@ -471,7 +457,7 @@ literals or preprocessor macros, for example:</p>
 </div>
 <p>Use <code class="docutils literal notranslate"><span class="pre">templates/custom_instruction_template.cc</span></code> for a standalone performance
 test skeleton. After adding template-based code, run <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">validate</span></code>; if the
-extension adds a new menu item, register its function in <code class="docutils literal notranslate"><span class="pre">project/user_menu.cc</span></code>.</p>
+extension adds a new menu item, register its function in <code class="docutils literal notranslate"><span class="pre">project/proj_menu.cc</span></code>.</p>
 </section>
 <section id="running-performance-tests">
 <h2>Running Performance Tests<a class="headerlink" href="#running-performance-tests" title="Link to this heading">#</a></h2>
@@ -496,8 +482,6 @@ make<span class="w"> </span>templates
 <code class="docutils literal notranslate"><span class="pre">models</span></code>.</p>
 <p>Bundled profiles:</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>ad01          ad01_int8.tflite fixture input and golden output
-vww_96        vww_96_int8.tflite zero input, output verification skipped
-generic_zero  fallback for new models while bring-up data is not ready
 </pre></div>
 </div>
 <p>Build a specific model:</p>
@@ -505,7 +489,7 @@ generic_zero  fallback for new models while bring-up data is not ready
 </pre></div>
 </div>
 <p>Select a profile explicitly:</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">MODEL_FILE</span><span class="o">=</span>my_model.tflite<span class="w"> </span><span class="nv">MODEL_PROFILE</span><span class="o">=</span>generic_zero
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span><span class="nv">MODEL_FILE</span><span class="o">=</span>my_model.tflite<span class="w"> </span><span class="nv">MODEL_PROFILE</span><span class="o">=</span>my_model
 make<span class="w"> </span><span class="nv">MODEL_FILE</span><span class="o">=</span>ad01_int8.tflite<span class="w"> </span><span class="nv">MODEL_PROFILE</span><span class="o">=</span>ad01
 </pre></div>
 </div>
@@ -513,7 +497,7 @@ make<span class="w"> </span><span class="nv">MODEL_FILE</span><span class="o">=<
 <ol class="arabic simple">
 <li><p>Copy it into <code class="docutils literal notranslate"><span class="pre">Platform/sw/models</span></code>.</p></li>
 <li><p>Register any missing kernels in <code class="docutils literal notranslate"><span class="pre">project/tflm_ops.cc</span></code>.</p></li>
-<li><p>Start with <code class="docutils literal notranslate"><span class="pre">MODEL_PROFILE=generic_zero</span></code> if fixture data is not ready.</p></li>
+<li><p>Start with <code class="docutils literal notranslate"><span class="pre">MODEL_PROFILE=ad01</span></code> if fixture data is not ready.</p></li>
 <li><p>Create <code class="docutils literal notranslate"><span class="pre">models/&lt;profile&gt;_profile.cc</span></code> when the model needs fixture input,
 generated input, custom tensor handling, or golden-output verification. Use
 <code class="docutils literal notranslate"><span class="pre">templates/model_profile_template.cc</span></code> as the starting pattern.</p></li>
@@ -571,7 +555,6 @@ Makefile variables instead.</p>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#quick-start">Quick Start</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#file-layout">File Layout</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#adding-a-menu-item">Adding A Menu Item</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#adding-a-custom-instruction-helper">Adding A Custom Instruction Helper</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#running-performance-tests">Running Performance Tests</a></li>
