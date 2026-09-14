@@ -61,9 +61,11 @@ The CPU communicates with the NPU through a request-response interface based on 
 ```
 
 ### AXI
-We provide a handy introduction to the basic concepts of AXI to help you with Lab 1 and Lab 2:
-> [Learn more about AXI](https://docs.google.com/presentation/d/1PH9ZFxNuDXuPgTCY71MiiTLlWc80MGeT7lYO-IY-NLg/edit?usp=sharing)
+We provide a handy introduction to the basic concepts of AXI to help you with Lab 1 and Lab 2. </br>
 Make sure to use your NYCU account to have access to these slides.
+
+> [Learn more about AXI](https://docs.google.com/presentation/d/1PH9ZFxNuDXuPgTCY71MiiTLlWc80MGeT7lYO-IY-NLg/edit?usp=sharing)
+
 
 ### TensorFlow Lite For Micro (TFLM)
 TfLM (Tensorflow Lite for Microcontrollers) is designed to run machine learning models on microcontrollers and other devices with only a few kilobytes of memory.  
