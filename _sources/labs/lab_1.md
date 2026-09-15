@@ -67,7 +67,7 @@ You can download .tflite file and input data from below links.
 - [input file](https://drive.google.com/drive/folders/1rY7SDD1qh-EXn8nqex7QDDvqbSiz7Ki_)
 ```
 
-> 1. Add .tflite, profile.cc into `Platform/sw/models/`,and input data into `Platform/sw`.
+> 1. Add .tflite, profile.cc, input data folder into `Platform/sw/models/`.
 > 2. Register TFLM OP in `tflm_ops.cc`, and modify `kTflmResolverOpCount` in `tflm_ops.h` with number of register OP.
 > 3. Set parameter in `project.mk` file (`MODEL_FILE`, `MODEL_PROFILE`, `TENSOR_ARENA_SIZE`), and add file of input data into `APP_EXTRA_SRCS`.
 
@@ -136,21 +136,11 @@ Please follow below table to design NPU AXI read/write instruction.
 - If you want more information about custom instruction of software, you can trace these files, "accel_ops.h", "accel_ops.cc", and "accel_test.cc". 
 
 - Verification: 
-    1. Run "Functional tests: scalar and AXI single transactions" in lab1 menu. 
+    1. Run "Accelerator AXI Aligned Test" in lab1 menu. 
     2. If result show "AXI read" and "AXI write" pass, this part is correct.
 ```
 
-Correct Result (Test 2 and 3): 
-```
->>> STARTING ACCELERATOR FUNCTIONAL TEST...
-[TEST 1/5] Scalar Math... PASS
-[TEST 2/5] AXI Write... PASS
-[TEST 3/5] AXI Read... PASS
-[TEST 4/5] Unaligned AXI Read... PASS
-[TEST 5/5] Unaligned AXI Write... PASS
-[SUCCESS] All functional tests passed!
----
-```
+<img src="images/lab1/axi_aligned_result.png" width="400px">
 
 ### 2. SIMD MAC
 
@@ -196,7 +186,7 @@ This part does not have any test. You can write your test function and add it in
 In this part, you need to modify `conv.h` and change `ConvPerChannel` function into accelerated version. Please use AXI read function of `NPU` to get input data and filter, and use your MAC instruction in previous part. 
 
 ```{note}
-You can find `ConvPerfChannel` function in `Platform\sw\tflm_patches\tensorflow\lite\kernels\internal\reference\integer_ops\conv.h`
+You can find `ConvPerChannel` function in `Platform\sw\tflm_patches\tensorflow\lite\kernels\internal\reference\integer_ops\conv.h`
 ```
 
 Replace some parts of original operations with `cfu_op`, and don’t forget to add `#include "cfu.h"` and `#include "cbo.h"` in the file.
@@ -257,7 +247,7 @@ If you pass all testcase, you can get full score of basic part.
 ## Adavance Exercise 1 - AXI Address Aligned - 15%
 ---
 
-Because of 8-bit element type of model, some AXI reading request may use unaligned address data, and unaligned address may cause AXI trigger exception. Therefore, we need to make our `NPU` to handle request with unaligned address data. 
+Because of 8-bit element type of model, some AXI reading request may use misaligned address data, and misaligned address may cause AXI trigger exception. Therefore, we need to make our `NPU` to handle request with misaligned address data. 
 
 ```{hint}
 We can divide single DRAM request into two DRAM request, and combine two request into one 4 byte data transition. 
@@ -271,20 +261,11 @@ For example, NPU want to read 4 bytes data in 0x6000_0002. It needs to read 0x60
 
 
 Verfication: 
-1. Run "Functional tests: scalar and AXI single transactions" in lab1 menu. 
+1. Run "Accelerator AXI Misaligned Test" in lab1 menu. 
 2. If you pass "Unaligned AXI Read" and "Unaligned AXI Write", your implementation is correct.
 
-Correct Result (Test 4 and 5): 
-```
->>> STARTING ACCELERATOR FUNCTIONAL TEST...
-[TEST 1/5] Scalar Math... PASS
-[TEST 2/5] AXI Write... PASS
-[TEST 3/5] AXI Read... PASS
-[TEST 4/5] Unaligned AXI Read... PASS
-[TEST 5/5] Unaligned AXI Write... PASS
-[SUCCESS] All functional tests passed!
----
-```
+<img src="images/lab1/axi_misaligned_result.png" width="400px">
+
 
 ## Adavance Exercise 2 - Running TFLM Model Inference - 10%
 ---
@@ -334,8 +315,6 @@ You will be asked several questions about the concepts covered in this lab and y
 ## Submission
 ---
 
-Please compact all platform into a zip file on E3, and name it as `[YourID]-lab1.zip`. 
-
 ```
 [YourID]-lab1.zip
     └── [YourID]-lab1/
@@ -347,7 +326,7 @@ Please compact all platform into a zip file on E3, and name it as `[YourID]-lab1
 ```
 
 ```{important}
-Submit source repository without `Platform/build/`. TAs should be able to run your project without any modification. If TAs cannot compile or run your code, **you can't get any scores even if you passed the DEMO**. Also, **PLAGIARISM is not allowed**.
+Submit source with above files structure. TAs should be able to run your project without any modification. If TAs cannot compile or run your code, **you can't get any scores even if you passed the DEMO**. Also, **PLAGIARISM is not allowed**.
 ```
 
 ## Reference 

@@ -475,7 +475,7 @@
 </div>
 <blockquote>
 <div><ol class="arabic simple">
-<li><p>Add .tflite, profile.cc into <code class="docutils literal notranslate"><span class="pre">Platform/sw/models/</span></code>,and input data into <code class="docutils literal notranslate"><span class="pre">Platform/sw</span></code>.</p></li>
+<li><p>Add .tflite, profile.cc, input data folder into <code class="docutils literal notranslate"><span class="pre">Platform/sw/models/</span></code>.</p></li>
 <li><p>Register TFLM OP in <code class="docutils literal notranslate"><span class="pre">tflm_ops.cc</span></code>, and modify <code class="docutils literal notranslate"><span class="pre">kTflmResolverOpCount</span></code> in <code class="docutils literal notranslate"><span class="pre">tflm_ops.h</span></code> with number of register OP.</p></li>
 <li><p>Set parameter in <code class="docutils literal notranslate"><span class="pre">project.mk</span></code> file (<code class="docutils literal notranslate"><span class="pre">MODEL_FILE</span></code>, <code class="docutils literal notranslate"><span class="pre">MODEL_PROFILE</span></code>, <code class="docutils literal notranslate"><span class="pre">TENSOR_ARENA_SIZE</span></code>), and add file of input data into <code class="docutils literal notranslate"><span class="pre">APP_EXTRA_SRCS</span></code>.</p></li>
 </ol>
@@ -564,23 +564,14 @@ make<span class="w"> </span>-C<span class="w"> </span>Platform/sw<span class="w"
 <li><p>If you want more information about custom instruction of software, you can trace these files, “accel_ops.h”, “accel_ops.cc”, and “accel_test.cc”.</p></li>
 <li><p>Verification:</p>
 <ol class="arabic simple">
-<li><p>Run “Functional tests: scalar and AXI single transactions” in lab1 menu.</p></li>
+<li><p>Run “Accelerator AXI Aligned Test” in lab1 menu.</p></li>
 <li><p>If result show “AXI read” and “AXI write” pass, this part is correct.</p></li>
 </ol>
 </li>
 </ul>
 </div>
-<p>Correct Result (Test 2 and 3):</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">STARTING</span> <span class="n">ACCELERATOR</span> <span class="n">FUNCTIONAL</span> <span class="n">TEST</span><span class="o">...</span>
-<span class="go">[TEST 1/5] Scalar Math... PASS</span>
-<span class="go">[TEST 2/5] AXI Write... PASS</span>
-<span class="go">[TEST 3/5] AXI Read... PASS</span>
-<span class="go">[TEST 4/5] Unaligned AXI Read... PASS</span>
-<span class="go">[TEST 5/5] Unaligned AXI Write... PASS</span>
-<span class="go">[SUCCESS] All functional tests passed!</span>
-<span class="go">---</span>
-</pre></div>
-</div>
+<a class="reference internal image-reference" href="../_images/axi_aligned_result.png"><img alt="../_images/axi_aligned_result.png" src="../_images/axi_aligned_result.png" style="width: 400px;" />
+</a>
 </section>
 <section id="simd-mac">
 <h3>2. SIMD MAC<a class="headerlink" href="#simd-mac" title="Link to this heading">#</a></h3>
@@ -627,7 +618,7 @@ Make <code class="docutils literal notranslate"><span class="pre">NPU</span></co
 <p>In this part, you need to modify <code class="docutils literal notranslate"><span class="pre">conv.h</span></code> and change <code class="docutils literal notranslate"><span class="pre">ConvPerChannel</span></code> function into accelerated version. Please use AXI read function of <code class="docutils literal notranslate"><span class="pre">NPU</span></code> to get input data and filter, and use your MAC instruction in previous part.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>You can find <code class="docutils literal notranslate"><span class="pre">ConvPerfChannel</span></code> function in <code class="docutils literal notranslate"><span class="pre">Platform\sw\tflm_patches\tensorflow\lite\kernels\internal\reference\integer_ops\conv.h</span></code></p>
+<p>You can find <code class="docutils literal notranslate"><span class="pre">ConvPerChannel</span></code> function in <code class="docutils literal notranslate"><span class="pre">Platform\sw\tflm_patches\tensorflow\lite\kernels\internal\reference\integer_ops\conv.h</span></code></p>
 </div>
 <p>Replace some parts of original operations with <code class="docutils literal notranslate"><span class="pre">cfu_op</span></code>, and don’t forget to add <code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&quot;cfu.h&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&quot;cbo.h&quot;</span></code> in the file.</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">out_channel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">out_channel</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">output_depth</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">out_channel</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
@@ -688,7 +679,7 @@ Make <code class="docutils literal notranslate"><span class="pre">NPU</span></co
 <section id="adavance-exercise-1-axi-address-aligned-15">
 <h2>Adavance Exercise 1 - AXI Address Aligned - 15%<a class="headerlink" href="#adavance-exercise-1-axi-address-aligned-15" title="Link to this heading">#</a></h2>
 <hr class="docutils" />
-<p>Because of 8-bit element type of model, some AXI reading request may use unaligned address data, and unaligned address may cause AXI trigger exception. Therefore, we need to make our <code class="docutils literal notranslate"><span class="pre">NPU</span></code> to handle request with unaligned address data.</p>
+<p>Because of 8-bit element type of model, some AXI reading request may use misaligned address data, and misaligned address may cause AXI trigger exception. Therefore, we need to make our <code class="docutils literal notranslate"><span class="pre">NPU</span></code> to handle request with misaligned address data.</p>
 <div class="admonition hint">
 <p class="admonition-title">Hint</p>
 <p>We can divide single DRAM request into two DRAM request, and combine two request into one 4 byte data transition.</p>
@@ -703,20 +694,11 @@ Make <code class="docutils literal notranslate"><span class="pre">NPU</span></co
 </div></blockquote>
 <p>Verfication:</p>
 <ol class="arabic simple">
-<li><p>Run “Functional tests: scalar and AXI single transactions” in lab1 menu.</p></li>
+<li><p>Run “Accelerator AXI Misaligned Test” in lab1 menu.</p></li>
 <li><p>If you pass “Unaligned AXI Read” and “Unaligned AXI Write”, your implementation is correct.</p></li>
 </ol>
-<p>Correct Result (Test 4 and 5):</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">STARTING</span> <span class="n">ACCELERATOR</span> <span class="n">FUNCTIONAL</span> <span class="n">TEST</span><span class="o">...</span>
-<span class="go">[TEST 1/5] Scalar Math... PASS</span>
-<span class="go">[TEST 2/5] AXI Write... PASS</span>
-<span class="go">[TEST 3/5] AXI Read... PASS</span>
-<span class="go">[TEST 4/5] Unaligned AXI Read... PASS</span>
-<span class="go">[TEST 5/5] Unaligned AXI Write... PASS</span>
-<span class="go">[SUCCESS] All functional tests passed!</span>
-<span class="go">---</span>
-</pre></div>
-</div>
+<a class="reference internal image-reference" href="../_images/axi_misaligned_result.png"><img alt="../_images/axi_misaligned_result.png" src="../_images/axi_misaligned_result.png" style="width: 400px;" />
+</a>
 </section>
 <section id="adavance-exercise-2-running-tflm-model-inference-10">
 <h2>Adavance Exercise 2 - Running TFLM Model Inference - 10%<a class="headerlink" href="#adavance-exercise-2-running-tflm-model-inference-10" title="Link to this heading">#</a></h2>
@@ -766,7 +748,6 @@ Make <code class="docutils literal notranslate"><span class="pre">NPU</span></co
 <section id="submission">
 <h2>Submission<a class="headerlink" href="#submission" title="Link to this heading">#</a></h2>
 <hr class="docutils" />
-<p>Please compact all platform into a zip file on E3, and name it as <code class="docutils literal notranslate"><span class="pre">[YourID]-lab1.zip</span></code>.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>[YourID]-lab1.zip
     └── [YourID]-lab1/
             ├── hw/
@@ -778,7 +759,7 @@ Make <code class="docutils literal notranslate"><span class="pre">NPU</span></co
 </div>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
-<p>Submit source repository without <code class="docutils literal notranslate"><span class="pre">Platform/build/</span></code>. TAs should be able to run your project without any modification. If TAs cannot compile or run your code, <strong>you can’t get any scores even if you passed the DEMO</strong>. Also, <strong>PLAGIARISM is not allowed</strong>.</p>
+<p>Submit source with above files structure. TAs should be able to run your project without any modification. If TAs cannot compile or run your code, <strong>you can’t get any scores even if you passed the DEMO</strong>. Also, <strong>PLAGIARISM is not allowed</strong>.</p>
 </div>
 </section>
 <section id="reference">
