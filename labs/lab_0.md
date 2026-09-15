@@ -112,6 +112,10 @@ This section will guide you through the core three steps from installing the too
 We recommend you use version 2023.2 or version 2024.1
 > [Vivado Download page](https://www.xilinx.com/support/download/index.html/content/xilinx/en/downloadNav/vivado-design-tools/2023-2.html)
 
+```{note}
+For Windows users, please install **all of your toolchains** under **WSL (Ubuntu)** rather than on Windows to prevent any environment setup issues.
+```
+
 - Add vivado to your PATH
 - Make sure vivado is installed correctly on your machine before you start by running:
 ``` bash
