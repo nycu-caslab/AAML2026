@@ -180,7 +180,6 @@ if the project.mk file has been set.
 
 - When you see the line "Listening on /dev/ttyUSB1 for BIOS/App" on your terminal, press the CPU Reset button.
 - After that, you should see the menu on your terminal that you can play around with.
-- (More details on software to be added)
 
 ### Detail Reference on How to Use the Platform
 

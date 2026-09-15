@@ -351,7 +351,7 @@
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#goal-of-this-lab">Goal of this lab</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#background">Background</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#axi-protocol-basics">AXI Protocol Basics</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#address-alignment-and-unaligned-access">Address Alignment and Unaligned Access</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#address-alignment-and-misaligned-access">Address Alignment and Misaligned Access</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grading">Grading</a></li>
@@ -421,12 +421,12 @@
 <div><p><a class="reference external" href="https://docs.google.com/presentation/d/1PH9ZFxNuDXuPgTCY71MiiTLlWc80MGeT7lYO-IY-NLg/edit?usp=sharing">Learn more about AXI</a></p>
 </div></blockquote>
 </section>
-<section id="address-alignment-and-unaligned-access">
-<h3>Address Alignment and Unaligned Access<a class="headerlink" href="#address-alignment-and-unaligned-access" title="Link to this heading">#</a></h3>
-<p>Since we are dealing with 8-bit data elements, memory addresses are not always 4-byte aligned. You must design your <code class="docutils literal notranslate"><span class="pre">NPU.v</span></code> in the way that can handle both aligned and unaligned access.</p>
+<section id="address-alignment-and-misaligned-access">
+<h3>Address Alignment and Misaligned Access<a class="headerlink" href="#address-alignment-and-misaligned-access" title="Link to this heading">#</a></h3>
+<p>Since we are dealing with 8-bit data elements, memory addresses are not always 4-byte aligned. You must design your <code class="docutils literal notranslate"><span class="pre">NPU.v</span></code> in the way that can handle both aligned and misaligned access.</p>
 <p><strong>Aligned Address</strong>: A 4-byte transfer is aligned when address[1:0] == 2’b00. In this case, a single AXI read/write cycle fetches the exact 4 bytes.</p>
-<p><strong>Unaligned Address</strong>: When address[1:0] != 2’b00, issuing a single 4-byte AXI request to an unaligned address may cause an AXI exception.</p>
-<p>For more information on how to handle aligned and unaligned accesses, read the <strong>Adavance Exercise 1 - AXI Address Aligned</strong> section.</p>
+<p><strong>Misaligned Address</strong>: When address[1:0] != 2’b00, issuing a single 4-byte AXI request to an misaligned address may cause an AXI exception.</p>
+<p>For more information on how to handle aligned and misaligned accesses, read the <strong>Adavance Exercise 1 - AXI Address Aligned</strong> section.</p>
 </section>
 </section>
 <section id="grading">
@@ -689,13 +689,13 @@ Make <code class="docutils literal notranslate"><span class="pre">NPU</span></co
 <div><p>TODO:</p>
 <ul class="simple">
 <li><p>Add address alignment control to the AXI single transaction.</p></li>
-<li><p>Ensure <code class="docutils literal notranslate"><span class="pre">NPU</span></code> can get correct result if it receive request with unaligned address.</p></li>
+<li><p>Ensure <code class="docutils literal notranslate"><span class="pre">NPU</span></code> can get correct result if it receive request with misaligned address.</p></li>
 </ul>
 </div></blockquote>
 <p>Verfication:</p>
 <ol class="arabic simple">
 <li><p>Run “Accelerator AXI Misaligned Test” in lab1 menu.</p></li>
-<li><p>If you pass “Unaligned AXI Read” and “Unaligned AXI Write”, your implementation is correct.</p></li>
+<li><p>If you pass “Misaligned AXI Read” and “Misaligned AXI Write”, your implementation is correct.</p></li>
 </ol>
 <a class="reference internal image-reference" href="../_images/axi_misaligned_result.png"><img alt="../_images/axi_misaligned_result.png" src="../_images/axi_misaligned_result.png" style="width: 400px;" />
 </a>
@@ -812,7 +812,7 @@ Make <code class="docutils literal notranslate"><span class="pre">NPU</span></co
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#goal-of-this-lab">Goal of this lab</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#background">Background</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#axi-protocol-basics">AXI Protocol Basics</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#address-alignment-and-unaligned-access">Address Alignment and Unaligned Access</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#address-alignment-and-misaligned-access">Address Alignment and Misaligned Access</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grading">Grading</a></li>
