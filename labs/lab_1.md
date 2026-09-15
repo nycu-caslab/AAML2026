@@ -80,7 +80,7 @@ You can download .tflite file and input data from below links.
 After adding the model files, please do the following:
 
 1. Download everything in `lab1/` from [AAML2026-Lab](https://github.com/nycu-caslab/AAML-Labs-2026).
-2. Replace `Platform/sw/project` with the version you downloaded.
+2. Replace existing files or add new files to `Platform/sw/project/` using the downloaded version.
 3. Add `APP_EXTRA_SRCS += $(wildcard models/label/label*_board.cc)` to `project.mk`, or define it when running `make`.
 4. From the repository root, run the following preflight check before editing the RTL:
 
