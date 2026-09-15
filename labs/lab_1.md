@@ -30,14 +30,14 @@ You can also refer to the supplementary slides from lab 0 for more details about
 
 
 
-### Address Alignment and Unaligned Access
-Since we are dealing with 8-bit data elements, memory addresses are not always 4-byte aligned. You must design your `NPU.v` in the way that can handle both aligned and unaligned access. 
+### Address Alignment and Misaligned Access
+Since we are dealing with 8-bit data elements, memory addresses are not always 4-byte aligned. You must design your `NPU.v` in the way that can handle both aligned and misaligned access. 
 
 **Aligned Address**: A 4-byte transfer is aligned when address[1:0] == 2'b00. In this case, a single AXI read/write cycle fetches the exact 4 bytes.
 
-**Unaligned Address**: When address[1:0] != 2'b00, issuing a single 4-byte AXI request to an unaligned address may cause an AXI exception.
+**Misaligned Address**: When address[1:0] != 2'b00, issuing a single 4-byte AXI request to an misaligned address may cause an AXI exception.
 
-For more information on how to handle aligned and unaligned accesses, read the **Adavance Exercise 1 - AXI Address Aligned** section.
+For more information on how to handle aligned and misaligned accesses, read the **Adavance Exercise 1 - AXI Address Aligned** section.
 
 
 ## Grading
@@ -257,12 +257,12 @@ For example, NPU want to read 4 bytes data in 0x6000_0002. It needs to read 0x60
 
 > TODO: 
 > - Add address alignment control to the AXI single transaction. 
-> - Ensure `NPU` can get correct result if it receive request with unaligned address.
+> - Ensure `NPU` can get correct result if it receive request with misaligned address.
 
 
 Verfication: 
 1. Run "Accelerator AXI Misaligned Test" in lab1 menu. 
-2. If you pass "Unaligned AXI Read" and "Unaligned AXI Write", your implementation is correct.
+2. If you pass "Misaligned AXI Read" and "Misaligned AXI Write", your implementation is correct.
 
 <img src="images/lab1/axi_misaligned_result.png" width="400px">
 
