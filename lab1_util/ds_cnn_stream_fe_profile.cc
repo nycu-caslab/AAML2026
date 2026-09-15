@@ -2,9 +2,9 @@
 #include<stdio.h>
 #include "platform_config.h"
 
-#include "label/label1_board.h"
+#include "models/label/label1_board.h"
 
-static void ds_cnn_prepare_input(TfLiteTensor* input, size_t sample_index)
+static void ds_cnn_prepare_input(TfLiteTensor* input, size_t index)
 {
     if (input == nullptr)
         return;
@@ -46,7 +46,7 @@ static void ds_cnn_prepare_input(TfLiteTensor* input, size_t sample_index)
 }
 
 
-static void ds_cnn_verify_output(const TfLiteTensor* output, size_t sample_index)
+static void ds_cnn_verify_output(const TfLiteTensor* output, size_t index)
 {
     (void)output;
 }
