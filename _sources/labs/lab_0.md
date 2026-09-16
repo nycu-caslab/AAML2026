@@ -143,13 +143,12 @@ export PATH=$HOME/riscv64-unknown-elf-gcc-10.1.0-2020.08.2-x86_64-linux-ubuntu14
 Prepare a clean directory in your Linux environment and navigate into it.
 #### Step 1: Clone the Repository
 ```bash
-touch {your folder name}
-cd {your folder name}
+cd {your folder}
 git clone git@github.com:nycu-caslab/TinyRISC-V-SoC-Platform.git
 ```
 #### Step 2: Set Permissions
 ```bash
-cd CUSTOM_SoC_Platform/Platform
+cd TinyRISC-V-SoC-Platform/Platform
 chmod +x hw/run_hw.sh
 ```
 #### Step 3: Run the Pre-flight check
