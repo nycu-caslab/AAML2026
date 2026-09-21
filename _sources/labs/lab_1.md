@@ -310,19 +310,29 @@ You can also compare two version output of others input in `labels` to verify co
 ## Question in Demo - 15%
 ---
 
-You will be asked several questions about the concepts covered in this lab and your NPU design. 
+You will be asked several questions about the concepts covered in this lab and your NPU design. You do not need to run your code during the demo.
+
+
+## Lab Report
+Please submit a lab report in the following format for each of the exercise you did.
+- Format:
+    1. Exercise Name
+    2. Screenshot of your output 
+    3. A brief explanation of your design and implementation(5 sentences max).
 
 ## Submission
 ---
 
 ```
 [YourID]-lab1.zip
-    └── [YourID]-lab1/
-            ├── hw/
-            |    ├─ NPU.v
-            |    └─ {any other modules}
-            └── sw/ 
-                 └─ conv.h
+└── [YourID]-lab1/
+    ├── hw/
+    │   ├── NPU.v
+    │   └── {any other modules}
+    ├── sw/
+    │   └── conv.h
+    └── report/
+        └── lab1_report.pdf
 ```
 
 ```{important}
