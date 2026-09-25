@@ -372,14 +372,14 @@
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">lab 3-2</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#row-stationary-exercise-1-10">Row Stationary Exercise #1 - 10%</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#row-stationary-exercise-2-10">Row Stationary Exercise #2 - 10%</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#row-stationary-exercise-3-20">Row Stationary Exercise #3 - 20%</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#row-stationary-exercise-4-20">Row Stationary Exercise #4 - 20%</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convolution-exercise-1-10">Convolution Exercise #1 - 10%</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convolution-exercise-2-10">Convolution Exercise #2 - 10%</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convolution-exercise-3-20">Convolution Exercise #3 - 20%</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convolution-exercise-4-20">Convolution Exercise #4 - 20%</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gemv-basic-exercise-20">GEMV Basic Exercise - 20%</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gemv-performance-challenge-20">GEMV Performance Challenge - 20%</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#appendix">Appendix</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#lab-3-1-memory-mapping-row-stationary-convolution">Lab 3-1 Memory Mapping - Row Stationary Convolution</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#lab-3-1-memory-mapping-2d-convolution">Lab 3-1 Memory Mapping - 2D Convolution</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#global-buffer-a-input-feature-map">Global Buffer A - Input Feature Map</a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#global-buffer-b-kernel">Global Buffer B - Kernel</a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#global-buffer-c-output">Global Buffer C - Output</a></li>
@@ -410,10 +410,10 @@
 <hr class="docutils" />
 <!-- ## Goal of this lab
 ---
-- [Row Stationary Exercise #1 - 10%](#row-stationary-exercise-1---10) 
-- [Row Stationary Exercise #2 - 10%](#row-stationary-exercise-2---10) 
-- [Row Stationary Exercise #3 - 20%](#row-stationary-exercise-3---20) 
-- [Row Stationary Exercise #4 - 20%](#row-stationary-exercise-4---20)
+- [Convolution Exercise #1 - 10%](#convolution-exercise-1---10)
+- [Convolution Exercise #2 - 10%](#convolution-exercise-2---10)
+- [Convolution Exercise #3 - 20%](#convolution-exercise-3---20)
+- [Convolution Exercise #4 - 20%](#convolution-exercise-4---20)
 - [GEMV Basic Exercise - 20%](#gemv-basic-exercise---20)
 - [GEMV Performance Challenge - 20%](#gemv-performance-challenge---20)
  -->
@@ -434,7 +434,7 @@
 <section id="learning-goals">
 <h2>Learning goals<a class="headerlink" href="#learning-goals" title="Link to this heading">#</a></h2>
 <ul class="simple">
-<li><p>Implement 2D convolution on a systolic array using the Row Stationary dataflow.</p></li>
+<li><p>Implement 2D convolution on a systolic array with processing element(s) (PEs), using a dataflow of your choice.</p></li>
 <li><p>Implement GEMV on a systolic array using a dataflow of your choice.</p></li>
 <li><p>Optimize the GEMV architecture and dataflow to reduce the total execution cycle count.</p></li>
 </ul>
@@ -449,19 +449,19 @@
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p><a class="reference internal" href="#row-stationary-exercise-1---10"><span class="xref myst">Row Stationary Exercise #1</span></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#convolution-exercise-1---10"><span class="xref myst">Convolution Exercise #1</span></a></p></td>
 <td><p>2D convolution with fixed <code class="docutils literal notranslate"><span class="pre">M</span> <span class="pre">=</span> <span class="pre">7</span></code>, <code class="docutils literal notranslate"><span class="pre">N</span> <span class="pre">=</span> <span class="pre">4</span></code></p></td>
 <td class="text-right"><p>10%</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#row-stationary-exercise-2---10"><span class="xref myst">Row Stationary Exercise #2</span></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#convolution-exercise-2---10"><span class="xref myst">Convolution Exercise #2</span></a></p></td>
 <td><p>2D convolution with fixed <code class="docutils literal notranslate"><span class="pre">M</span> <span class="pre">=</span> <span class="pre">10</span></code>, <code class="docutils literal notranslate"><span class="pre">N</span> <span class="pre">=</span> <span class="pre">5</span></code></p></td>
 <td class="text-right"><p>10%</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#row-stationary-exercise-3---20"><span class="xref myst">Row Stationary Exercise #3</span></a></p></td>
-<td><p>General 2D convolution with random <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">&lt;=</span> <span class="pre">N</span> <span class="pre">&lt;=</span> <span class="pre">M</span> <span class="pre">&lt;=</span> <span class="pre">254</span></code></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#convolution-exercise-3---20"><span class="xref myst">Convolution Exercise #3</span></a></p></td>
+<td><p>2D convolution with 4 fixed-dimension cases and 6 random-dimension cases, all satisfying <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">&lt;=</span> <span class="pre">N</span> <span class="pre">&lt;=</span> <span class="pre">M</span> <span class="pre">&lt;=</span> <span class="pre">254</span></code></p></td>
 <td class="text-right"><p>20%</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#row-stationary-exercise-4---20"><span class="xref myst">Row Stationary Exercise #4</span></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#convolution-exercise-4---20"><span class="xref myst">Convolution Exercise #4</span></a></p></td>
 <td><p>2D convolution with advanced test cases</p></td>
 <td class="text-right"><p>20%</p></td>
 </tr>
@@ -527,24 +527,32 @@
 <li><p>Use an asynchronous active-low reset architecture.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">in_valid</span></code> is asserted for one clock cycle. The dimension inputs are valid only during that cycle.</p></li>
 <li><p>Assert <code class="docutils literal notranslate"><span class="pre">busy</span></code> in response to <code class="docutils literal notranslate"><span class="pre">in_valid</span></code> and keep it high until all output data is ready. The next test case will begin only after <code class="docutils literal notranslate"><span class="pre">busy</span></code> returns low.</p></li>
-<li><p>The execution latency for each test case must not exceed 1,500,000 cycles.</p></li>
+<li><p>For Lab 3-1, the execution cycle limit depends on the test case. Refer to <code class="docutils literal notranslate"><span class="pre">wait_finished</span></code> in <code class="docutils literal notranslate"><span class="pre">TESTBENCH/PATTERN.v</span></code> for the limit calculation.</p></li>
+<li><p>For Lab 3-2, there is no execution cycle limit for functional correctness grading. Execution cycles are used to rank designs in the GEMV Performance Challenge.</p></li>
+<li><p>Before each computation, the testbench initializes the output region of Global Buffer C to zero in Lab 3-1, and the board controller clears all of BRAM C to zero in Lab 3-2.</p></li>
 </ul>
 </section>
 <section id="lab-3-1">
 <h4>Lab 3-1<a class="headerlink" href="#lab-3-1" title="Link to this heading">#</a></h4>
-<p>You need to perform 2D convolution between an <code class="docutils literal notranslate"><span class="pre">M</span> <span class="pre">×</span> <span class="pre">M</span></code> 8-bit input feature map and an <code class="docutils literal notranslate"><span class="pre">N</span> <span class="pre">×</span> <span class="pre">N</span></code> 8-bit kernel. The design must use the Row Stationary dataflow and a PE array. Accumulated results are 32-bit values, so pay careful attention to intermediate bit widths.</p>
+<p>You need to perform 2D convolution between an <code class="docutils literal notranslate"><span class="pre">M</span> <span class="pre">×</span> <span class="pre">M</span></code> unsigned 8-bit input feature map and an <code class="docutils literal notranslate"><span class="pre">N</span> <span class="pre">×</span> <span class="pre">N</span></code> unsigned 8-bit kernel. The design must use a systolic array with (PEs) to perform the computation, using a dataflow of your choice. Accumulated results are unsigned 32-bit values, so pay careful attention to intermediate bit widths.</p>
 <p>The following detailed requirements apply:</p>
+<p>Row Stationary is recommended for Lab 3-1, but other dataflows are allowed.</p>
 <ul class="simple">
 <li><p>Implement your TPU design in <code class="docutils literal notranslate"><span class="pre">TPU.v</span></code>. You may add supporting Verilog files in the <code class="docutils literal notranslate"><span class="pre">RTL</span></code> directory.</p></li>
 <li><p>You may not modify <code class="docutils literal notranslate"><span class="pre">global_buffer.v</span></code> or the interface of <code class="docutils literal notranslate"><span class="pre">TPU.v</span></code>.</p></li>
-<li><p>Before each simulation test case, the testbench loads Global Buffer A and Global Buffer B. The testbench keeps <code class="docutils literal notranslate"><span class="pre">in_valid</span></code> high for one cycle, and the <code class="docutils literal notranslate"><span class="pre">M</span></code> and <code class="docutils literal notranslate"><span class="pre">N</span></code> inputs are valid during that cycle.</p></li>
-<li><p>When <code class="docutils literal notranslate"><span class="pre">busy</span></code> returns low, the testbench compares Global Buffer C against the golden result.</p></li>
-<li><p>Implement your own data loader, PEs, and controller to schedule data from Global Buffer A and Global Buffer B into the PE array.</p></li>
-<li><p>The PE array may contain at most 16 PEs and must not exceed <code class="docutils literal notranslate"><span class="pre">4</span> <span class="pre">×</span> <span class="pre">4</span></code>.</p></li>
-<li><p>Multiplication and accumulation for the convolution must be performed inside the PEs.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">&lt;=</span> <span class="pre">N</span> <span class="pre">&lt;=</span> <span class="pre">M</span> <span class="pre">&lt;=</span> <span class="pre">254</span></code></p></li>
 <li><p>Stride = 1</p></li>
 <li><p>Padding = 0</p></li>
+<li><p>Use the kernel in its original orientation; do not flip it horizontally or vertically.</p></li>
+<li><p>The output feature map has dimensions <code class="docutils literal notranslate"><span class="pre">(M-N+1)</span> <span class="pre">×</span> <span class="pre">(M-N+1)</span></code>.</p></li>
+<li><p>Implement your own data loader, PEs, and controller to schedule data from Global Buffer A and Global Buffer B into the PE array.</p></li>
+<li><p>The PE array may contain at most 16 PEs.</p></li>
+<li><p>Multiplication and accumulation for the convolution must be performed inside the PEs.</p></li>
+<li><p>The provided <code class="docutils literal notranslate"><span class="pre">global_buffer.v</span></code> can be treated as a behavioral model of BRAM.</p></li>
+<li><p>Before each simulation test case, the testbench loads Global Buffer A and Global Buffer B. The testbench keeps <code class="docutils literal notranslate"><span class="pre">in_valid</span></code> high for one cycle, and the <code class="docutils literal notranslate"><span class="pre">M</span></code> and <code class="docutils literal notranslate"><span class="pre">N</span></code> inputs are valid during that cycle.</p></li>
+<li><p>The TPU may only read from Global Buffer A and Global Buffer B; it cannot write to them.</p></li>
+<li><p>While <code class="docutils literal notranslate"><span class="pre">busy</span> <span class="pre">=</span> <span class="pre">0</span></code>, keep all BRAM access enables (<code class="docutils literal notranslate"><span class="pre">A_ram_en</span></code>, <code class="docutils literal notranslate"><span class="pre">B_ram_en</span></code>, <code class="docutils literal notranslate"><span class="pre">C_ram_en</span></code>, and <code class="docutils literal notranslate"><span class="pre">C_wr_en</span></code>) at 0.</p></li>
+<li><p>When <code class="docutils literal notranslate"><span class="pre">busy</span></code> returns low, the testbench compares Global Buffer C against the golden result.</p></li>
 </ul>
 </section>
 <section id="lab-3-2">
@@ -555,15 +563,18 @@
 <ul class="simple">
 <li><p>Implement your design inside <code class="docutils literal notranslate"><span class="pre">TPU.v</span></code> without modifying its provided module interface. You may add supporting RTL files such as <code class="docutils literal notranslate"><span class="pre">PE.v</span></code>. The provided <code class="docutils literal notranslate"><span class="pre">PE.v</span></code> interface is a recommendation and can be changed.</p></li>
 <li><p>You may not modify the provided UART, BRAM, or <code class="docutils literal notranslate"><span class="pre">TPU_top.v</span></code> designs. The TAs will integrate and test your submitted <code class="docutils literal notranslate"><span class="pre">TPU.v</span></code> and supporting RTL files with these provided modules and interfaces.</p></li>
-<li><p>During hardware verification, the provided UART flow loads input data into BRAM A and BRAM B. The UART flow keeps <code class="docutils literal notranslate"><span class="pre">in_valid</span></code> high for one cycle, and the <code class="docutils literal notranslate"><span class="pre">K</span></code>, <code class="docutils literal notranslate"><span class="pre">M</span></code>, and <code class="docutils literal notranslate"><span class="pre">N</span></code> inputs are valid during that cycle.</p></li>
-<li><p>When <code class="docutils literal notranslate"><span class="pre">busy</span></code> returns low, the hardware verification flow reads BRAM C and compares the returned values against the golden result.</p></li>
-<li><p>After implementation with Vivado 2024.1, the design must satisfy <code class="docutils literal notranslate"><span class="pre">LUT</span> <span class="pre">&lt;=</span> <span class="pre">2000</span></code>, <code class="docutils literal notranslate"><span class="pre">FF</span> <span class="pre">&lt;=</span> <span class="pre">2000</span></code>, <code class="docutils literal notranslate"><span class="pre">DSP</span> <span class="pre">&lt;=</span> <span class="pre">16</span></code>, and <code class="docutils literal notranslate"><span class="pre">WNS</span> <span class="pre">&gt;=</span> <span class="pre">0</span></code>. Designs that violate any of these limits receive no credit for this part.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">&lt;=</span> <span class="pre">M,</span> <span class="pre">K</span> <span class="pre">&lt;=</span> <span class="pre">254</span></code> and <code class="docutils literal notranslate"><span class="pre">N</span> <span class="pre">=</span> <span class="pre">1</span></code>.</p></li>
 <li><p>For the 1024-word BRAM configuration used in hardware verification, the matrix dimensions must also satisfy <code class="docutils literal notranslate"><span class="pre">ceil(M</span> <span class="pre">/</span> <span class="pre">4)</span> <span class="pre">×</span> <span class="pre">K</span> <span class="pre">&lt;=</span> <span class="pre">1024</span></code>.</p></li>
+<li><p>During hardware verification, the provided UART flow loads input data into BRAM A and BRAM B. The UART flow keeps <code class="docutils literal notranslate"><span class="pre">in_valid</span></code> high for one cycle, and the <code class="docutils literal notranslate"><span class="pre">K</span></code>, <code class="docutils literal notranslate"><span class="pre">M</span></code>, and <code class="docutils literal notranslate"><span class="pre">N</span></code> inputs are valid during that cycle.</p></li>
+<li><p>The TPU may only read from BRAM A and BRAM B; it cannot write to them. The TPU outputs <code class="docutils literal notranslate"><span class="pre">A_wr_en</span></code>, <code class="docutils literal notranslate"><span class="pre">A_data_in</span></code>, <code class="docutils literal notranslate"><span class="pre">B_wr_en</span></code>, and <code class="docutils literal notranslate"><span class="pre">B_data_in</span></code> are unused in the provided board design.</p></li>
+<li><p>Complete all computation and write the final results to BRAM C before setting <code class="docutils literal notranslate"><span class="pre">busy</span></code> to 0.</p></li>
+<li><p>While <code class="docutils literal notranslate"><span class="pre">busy</span> <span class="pre">=</span> <span class="pre">0</span></code>, keep all BRAM access enables (<code class="docutils literal notranslate"><span class="pre">A_ram_en</span></code>, <code class="docutils literal notranslate"><span class="pre">B_ram_en</span></code>, <code class="docutils literal notranslate"><span class="pre">C_ram_en</span></code>, and <code class="docutils literal notranslate"><span class="pre">C_wr_en</span></code>) at 0.</p></li>
+<li><p>When <code class="docutils literal notranslate"><span class="pre">busy</span></code> returns low, the hardware verification flow reads BRAM C and compares the returned values against the golden result.</p></li>
+<li><p>After implementation with Vivado 2024.1, the design must satisfy <code class="docutils literal notranslate"><span class="pre">LUT</span> <span class="pre">&lt;=</span> <span class="pre">2000</span></code>, <code class="docutils literal notranslate"><span class="pre">FF</span> <span class="pre">&lt;=</span> <span class="pre">2000</span></code>, <code class="docutils literal notranslate"><span class="pre">DSP</span> <span class="pre">&lt;=</span> <span class="pre">16</span></code>, and <code class="docutils literal notranslate"><span class="pre">WNS</span> <span class="pre">&gt;=</span> <span class="pre">0</span></code>. Designs that violate any of these limits receive no credit for this part.</p></li>
 </ul>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>For the details of the data mapping into the global buffers or BRAM, please refer to the <em><strong><a class="reference internal" href="#appendix"><span class="xref myst">Appendix</span></a></strong></em>. The Appendix describes the memory layouts used for the Row Stationary convolution in Lab 3-1 and the GEMV in Lab 3-2.</p>
+<p>For the details of the data mapping into the global buffers or BRAM, please refer to the <em><strong><a class="reference internal" href="#appendix"><span class="xref myst">Appendix</span></a></strong></em>. The Appendix describes the memory layouts used for the 2D convolution in Lab 3-1 and the GEMV in Lab 3-2.</p>
 </div>
 </section>
 </section>
@@ -646,6 +657,7 @@ If you have the licence of <code class="docutils literal notranslate"><span clas
 </table>
 </div>
 <p><strong>Table 2: The BRAM Interface of BRAM A and BRAM B</strong></p>
+<p>The I/O directions in Tables 2 and 3 are relative to the BRAM module. The TPU outputs <code class="docutils literal notranslate"><span class="pre">A_ram_en</span></code>, <code class="docutils literal notranslate"><span class="pre">B_ram_en</span></code>, and <code class="docutils literal notranslate"><span class="pre">C_ram_en</span></code> drive the corresponding BRAM’s <code class="docutils literal notranslate"><span class="pre">ram_en</span></code> input during computation.</p>
 <div class="pst-scrollable-table-container"><table class="table">
 <thead>
 <tr class="row-odd"><th class="head"><p>I/O</p></th>
@@ -656,21 +668,26 @@ If you have the licence of <code class="docutils literal notranslate"><span clas
 </thead>
 <tbody>
 <tr class="row-even"><td><p>Input</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">wr_en</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ram_en</span></code></p></td>
 <td><p>1</p></td>
-<td><p>The write enable signal.</p></td>
+<td><p>Enables BRAM reads and writes when high.</p></td>
 </tr>
 <tr class="row-odd"><td><p>Input</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">wr_en</span></code></p></td>
+<td><p>1</p></td>
+<td><p>Selects write when high and read when low, provided <code class="docutils literal notranslate"><span class="pre">ram_en</span></code> is high.</p></td>
+</tr>
+<tr class="row-even"><td><p>Input</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">index</span></code></p></td>
 <td><p>16</p></td>
 <td><p>The address of the BRAM to be read or written.</p></td>
 </tr>
-<tr class="row-even"><td><p>Input</p></td>
+<tr class="row-odd"><td><p>Input</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">data_in</span></code></p></td>
 <td><p>32</p></td>
 <td><p>The data input to write to the BRAM.</p></td>
 </tr>
-<tr class="row-odd"><td><p>Output</p></td>
+<tr class="row-even"><td><p>Output</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">data_out</span></code></p></td>
 <td><p>32</p></td>
 <td><p>The data output from the BRAM.</p></td>
@@ -689,21 +706,26 @@ If you have the licence of <code class="docutils literal notranslate"><span clas
 </thead>
 <tbody>
 <tr class="row-even"><td><p>Input</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">wr_en</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ram_en</span></code></p></td>
 <td><p>1</p></td>
-<td><p>The write enable signal.</p></td>
+<td><p>Enables BRAM reads and writes when high.</p></td>
 </tr>
 <tr class="row-odd"><td><p>Input</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">wr_en</span></code></p></td>
+<td><p>1</p></td>
+<td><p>Selects write when high and read when low, provided <code class="docutils literal notranslate"><span class="pre">ram_en</span></code> is high.</p></td>
+</tr>
+<tr class="row-even"><td><p>Input</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">index</span></code></p></td>
 <td><p>16</p></td>
 <td><p>The address of the BRAM to be read or written.</p></td>
 </tr>
-<tr class="row-even"><td><p>Input</p></td>
+<tr class="row-odd"><td><p>Input</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">data_in</span></code></p></td>
 <td><p>128</p></td>
 <td><p>The data input to write to the BRAM.</p></td>
 </tr>
-<tr class="row-odd"><td><p>Output</p></td>
+<tr class="row-even"><td><p>Output</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">data_out</span></code></p></td>
 <td><p>128</p></td>
 <td><p>The data output from the BRAM.</p></td>
@@ -714,6 +736,7 @@ If you have the licence of <code class="docutils literal notranslate"><span clas
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The 128-bit data input stands for 4 * 32-bit values, allowing 4 elements to be written simultaneously to BRAM C.</p>
+<p>Global Buffer reads and writes occur on the falling edge of <code class="docutils literal notranslate"><span class="pre">clk</span></code>; read data is available after that edge.</p>
 </div>
 </section>
 <section id="id2">
@@ -767,6 +790,7 @@ If you have the licence of <code class="docutils literal notranslate"><span clas
 </table>
 </div>
 <p><strong>Table 2: The BRAM Interface of A BRAM</strong></p>
+<p>The I/O directions in Tables 2–4 are relative to the BRAM interface. The TPU outputs <code class="docutils literal notranslate"><span class="pre">A_ram_en</span></code>, <code class="docutils literal notranslate"><span class="pre">B_ram_en</span></code>, and <code class="docutils literal notranslate"><span class="pre">C_ram_en</span></code> enable access to the corresponding BRAM.</p>
 <div class="pst-scrollable-table-container"><table class="table">
 <thead>
 <tr class="row-odd"><th class="head"><p>I/O</p></th>
@@ -777,21 +801,26 @@ If you have the licence of <code class="docutils literal notranslate"><span clas
 </thead>
 <tbody>
 <tr class="row-even"><td><p>Input</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ram_en</span></code></p></td>
+<td><p>1</p></td>
+<td><p>Enables BRAM access when high.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Input</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">wr_en</span></code></p></td>
 <td><p>1</p></td>
 <td><p>The write enable signal.</p></td>
 </tr>
-<tr class="row-odd"><td><p>Input</p></td>
+<tr class="row-even"><td><p>Input</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">index</span></code></p></td>
 <td><p>16</p></td>
 <td><p>The address of the BRAM to be read or written.</p></td>
 </tr>
-<tr class="row-even"><td><p>Input</p></td>
+<tr class="row-odd"><td><p>Input</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">data_in</span></code></p></td>
 <td><p>32</p></td>
 <td><p>The data input to write to the BRAM.</p></td>
 </tr>
-<tr class="row-odd"><td><p>Output</p></td>
+<tr class="row-even"><td><p>Output</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">data_out</span></code></p></td>
 <td><p>32</p></td>
 <td><p>The data output from the BRAM.</p></td>
@@ -810,21 +839,26 @@ If you have the licence of <code class="docutils literal notranslate"><span clas
 </thead>
 <tbody>
 <tr class="row-even"><td><p>Input</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ram_en</span></code></p></td>
+<td><p>1</p></td>
+<td><p>Enables BRAM access when high.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Input</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">wr_en</span></code></p></td>
 <td><p>1</p></td>
 <td><p>The write enable signal.</p></td>
 </tr>
-<tr class="row-odd"><td><p>Input</p></td>
+<tr class="row-even"><td><p>Input</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">index</span></code></p></td>
 <td><p>16</p></td>
 <td><p>The address of the BRAM to be read or written.</p></td>
 </tr>
-<tr class="row-even"><td><p>Input</p></td>
+<tr class="row-odd"><td><p>Input</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">data_in</span></code></p></td>
 <td><p>32</p></td>
 <td><p>The data input to write to the BRAM.</p></td>
 </tr>
-<tr class="row-odd"><td><p>Output</p></td>
+<tr class="row-even"><td><p>Output</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">data_out</span></code></p></td>
 <td><p>32</p></td>
 <td><p>The data output from the BRAM.</p></td>
@@ -843,21 +877,26 @@ If you have the licence of <code class="docutils literal notranslate"><span clas
 </thead>
 <tbody>
 <tr class="row-even"><td><p>Input</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">wr_en</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ram_en</span></code></p></td>
 <td><p>1</p></td>
-<td><p>The write enable signal.</p></td>
+<td><p>Enables BRAM access when high.</p></td>
 </tr>
 <tr class="row-odd"><td><p>Input</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">wr_en</span></code></p></td>
+<td><p>1</p></td>
+<td><p>Selects write when high and read when low, provided <code class="docutils literal notranslate"><span class="pre">ram_en</span></code> is high.</p></td>
+</tr>
+<tr class="row-even"><td><p>Input</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">index</span></code></p></td>
 <td><p>16</p></td>
 <td><p>The address of the BRAM to be read or written.</p></td>
 </tr>
-<tr class="row-even"><td><p>Input</p></td>
+<tr class="row-odd"><td><p>Input</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">data_in</span></code></p></td>
 <td><p>128</p></td>
 <td><p>The data input to write to the BRAM.</p></td>
 </tr>
-<tr class="row-odd"><td><p>Output</p></td>
+<tr class="row-even"><td><p>Output</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">data_out</span></code></p></td>
 <td><p>128</p></td>
 <td><p>The data output from the BRAM.</p></td>
@@ -865,10 +904,14 @@ If you have the licence of <code class="docutils literal notranslate"><span clas
 </tbody>
 </table>
 </div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>BRAM reads and writes occur on the rising edge of <code class="docutils literal notranslate"><span class="pre">clk</span></code>; read data is available after that edge.</p>
+</div>
 </section>
 </section>
-<section id="row-stationary-exercise-1-10">
-<h2>Row Stationary Exercise #1 - 10%<a class="headerlink" href="#row-stationary-exercise-1-10" title="Link to this heading">#</a></h2>
+<section id="convolution-exercise-1-10">
+<h2>Convolution Exercise #1 - 10%<a class="headerlink" href="#convolution-exercise-1-10" title="Link to this heading">#</a></h2>
 <hr class="docutils" />
 <ul class="simple">
 <li><p>Input data:</p>
@@ -889,7 +932,7 @@ If you have the licence of <code class="docutils literal notranslate"><span clas
 <li><p>Output the result to C global buffer</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">\lab3-1$</span> <span class="pre">make</span> <span class="pre">verif1</span></code></p>
 <ul>
-<li><p>10 test cases of fixed input</p></li>
+<li><p>10 test cases with fixed input dimensions and random data values</p></li>
 </ul>
 </li>
 <li><p>The bench will tell if you did it correctly</p></li>
@@ -897,8 +940,8 @@ If you have the licence of <code class="docutils literal notranslate"><span clas
 </li>
 </ul>
 </section>
-<section id="row-stationary-exercise-2-10">
-<h2>Row Stationary Exercise #2 - 10%<a class="headerlink" href="#row-stationary-exercise-2-10" title="Link to this heading">#</a></h2>
+<section id="convolution-exercise-2-10">
+<h2>Convolution Exercise #2 - 10%<a class="headerlink" href="#convolution-exercise-2-10" title="Link to this heading">#</a></h2>
 <hr class="docutils" />
 <ul class="simple">
 <li><p>Input data:</p>
@@ -914,18 +957,18 @@ If you have the licence of <code class="docutils literal notranslate"><span clas
 </li>
 <li><p>Steps:</p>
 <ol class="arabic simple">
-<li><p>refer to Row Stationary Exercise #1</p></li>
+<li><p>refer to Convolution Exercise #1</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">\lab3-1$</span> <span class="pre">make</span> <span class="pre">verif2</span></code></p>
 <ul>
-<li><p>10 test cases of fixed input</p></li>
+<li><p>10 test cases with fixed input dimensions and random data values</p></li>
 </ul>
 </li>
 </ol>
 </li>
 </ul>
 </section>
-<section id="row-stationary-exercise-3-20">
-<h2>Row Stationary Exercise #3 - 20%<a class="headerlink" href="#row-stationary-exercise-3-20" title="Link to this heading">#</a></h2>
+<section id="convolution-exercise-3-20">
+<h2>Convolution Exercise #3 - 20%<a class="headerlink" href="#convolution-exercise-3-20" title="Link to this heading">#</a></h2>
 <hr class="docutils" />
 <ul class="simple">
 <li><p>Input data:</p>
@@ -941,18 +984,18 @@ If you have the licence of <code class="docutils literal notranslate"><span clas
 </li>
 <li><p>Steps:</p>
 <ol class="arabic simple">
-<li><p>refer to Row Stationary Exercise #1</p></li>
+<li><p>refer to Convolution Exercise #1</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">\lab3-1$</span> <span class="pre">make</span> <span class="pre">verif3</span></code></p>
 <ul>
-<li><p>10 test cases of large random M, N</p></li>
+<li><p>10 test cases: the first 4 use fixed dimensions, and the remaining 6 use random dimensions. All cases use random data values.</p></li>
 </ul>
 </li>
 </ol>
 </li>
 </ul>
 </section>
-<section id="row-stationary-exercise-4-20">
-<h2>Row Stationary Exercise #4 - 20%<a class="headerlink" href="#row-stationary-exercise-4-20" title="Link to this heading">#</a></h2>
+<section id="convolution-exercise-4-20">
+<h2>Convolution Exercise #4 - 20%<a class="headerlink" href="#convolution-exercise-4-20" title="Link to this heading">#</a></h2>
 <hr class="docutils" />
 <ul class="simple">
 <li><p>Input data:</p>
@@ -968,7 +1011,7 @@ If you have the licence of <code class="docutils literal notranslate"><span clas
 </li>
 <li><p>Steps:</p>
 <ol class="arabic simple">
-<li><p>refer to Row Stationary Exercise #1</p></li>
+<li><p>refer to Convolution Exercise #1</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">\lab3-1$</span> <span class="pre">make</span> <span class="pre">verif4</span></code></p>
 <ul>
 <li><p>Advanced test cases</p></li>
@@ -981,25 +1024,33 @@ If you have the licence of <code class="docutils literal notranslate"><span clas
 <section id="gemv-basic-exercise-20">
 <h2>GEMV Basic Exercise - 20%<a class="headerlink" href="#gemv-basic-exercise-20" title="Link to this heading">#</a></h2>
 <hr class="docutils" />
-<ul class="simple">
-<li><p>Input data:</p>
 <ul>
+<li><p>Input data:</p>
+<ul class="simple">
 <li><p>Input Matrix (INT8) and Input Vector (INT8)</p></li>
 </ul>
 </li>
 <li><p>Required Output:</p>
-<ul>
+<ul class="simple">
 <li><p>the Output Vector (INT32) of the GEMV operation</p></li>
 </ul>
 </li>
 <li><p>Steps:</p>
-<ol class="arabic simple">
+<ol class="arabic">
 <li><p>Take data from BRAM A and BRAM B</p></li>
 <li><p>Process the BRAM data using your TPU architecture and PE array</p></li>
 <li><p>Output the result to BRAM C</p></li>
-<li><p>Run <code class="docutils literal notranslate"><span class="pre">\lab3-2$</span> <span class="pre">make</span> <span class="pre">hardware_verify</span></code></p>
-<ul>
-<li><p>Pass all hardware verification test cases (10%)</p></li>
+<li><p>From the <code class="docutils literal notranslate"><span class="pre">lab3-2</span></code> directory, build the FPGA bitstream, program the connected Arty A7-100T, and run UART verification in order:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>generate_gemv_bitstream
+make<span class="w"> </span>program
+make<span class="w"> </span>hardware_verify
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">generate_gemv_bitstream</span></code> creates the Vivado project, runs synthesis and implementation, and generates the bitstream.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">program</span></code> programs the FPGA with the generated bitstream.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">hardware_verify</span></code> runs the UART tests against the programmed FPGA. Follow the terminal prompts. Pass all hardware verification test cases to earn 10%.</p></li>
+<li><p>After changing the RTL, repeat all three commands to test the updated design.</p></li>
 </ul>
 </li>
 <li><p>Pass the hidden test cases (10%)</p></li>
@@ -1042,9 +1093,9 @@ If you have the licence of <code class="docutils literal notranslate"><span clas
 <section id="appendix">
 <h2>Appendix<a class="headerlink" href="#appendix" title="Link to this heading">#</a></h2>
 <hr class="docutils" />
-<section id="lab-3-1-memory-mapping-row-stationary-convolution">
-<h3>Lab 3-1 Memory Mapping - Row Stationary Convolution<a class="headerlink" href="#lab-3-1-memory-mapping-row-stationary-convolution" title="Link to this heading">#</a></h3>
-<p>Lab 3-1 uses a memory layout suitable for Row Stationary execution.</p>
+<section id="lab-3-1-memory-mapping-2d-convolution">
+<h3>Lab 3-1 Memory Mapping - 2D Convolution<a class="headerlink" href="#lab-3-1-memory-mapping-2d-convolution" title="Link to this heading">#</a></h3>
+<p>The following sections describe the memory layout for 2D convolution in Lab 3-1.</p>
 <section id="global-buffer-a-input-feature-map">
 <h4>Global Buffer A - Input Feature Map<a class="headerlink" href="#global-buffer-a-input-feature-map" title="Link to this heading">#</a></h4>
 <p>The input feature map is stored column by column. Three zero-padded elements are appended after each column so that the TPU can safely access four vertically adjacent 8-bit input elements at a time.</p>
@@ -1164,14 +1215,14 @@ If you have the licence of <code class="docutils literal notranslate"><span clas
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">lab 3-2</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#row-stationary-exercise-1-10">Row Stationary Exercise #1 - 10%</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#row-stationary-exercise-2-10">Row Stationary Exercise #2 - 10%</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#row-stationary-exercise-3-20">Row Stationary Exercise #3 - 20%</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#row-stationary-exercise-4-20">Row Stationary Exercise #4 - 20%</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convolution-exercise-1-10">Convolution Exercise #1 - 10%</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convolution-exercise-2-10">Convolution Exercise #2 - 10%</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convolution-exercise-3-20">Convolution Exercise #3 - 20%</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#convolution-exercise-4-20">Convolution Exercise #4 - 20%</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gemv-basic-exercise-20">GEMV Basic Exercise - 20%</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gemv-performance-challenge-20">GEMV Performance Challenge - 20%</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#appendix">Appendix</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#lab-3-1-memory-mapping-row-stationary-convolution">Lab 3-1 Memory Mapping - Row Stationary Convolution</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#lab-3-1-memory-mapping-2d-convolution">Lab 3-1 Memory Mapping - 2D Convolution</a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#global-buffer-a-input-feature-map">Global Buffer A - Input Feature Map</a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#global-buffer-b-kernel">Global Buffer B - Kernel</a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#global-buffer-c-output">Global Buffer C - Output</a></li>
