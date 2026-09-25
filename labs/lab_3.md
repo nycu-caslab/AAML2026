@@ -2,10 +2,10 @@
 ---
 <!-- ## Goal of this lab
 ---
-- [Row Stationary Exercise #1 - 10%](#row-stationary-exercise-1---10) 
-- [Row Stationary Exercise #2 - 10%](#row-stationary-exercise-2---10) 
-- [Row Stationary Exercise #3 - 20%](#row-stationary-exercise-3---20) 
-- [Row Stationary Exercise #4 - 20%](#row-stationary-exercise-4---20)
+- [Convolution Exercise #1 - 10%](#convolution-exercise-1---10)
+- [Convolution Exercise #2 - 10%](#convolution-exercise-2---10)
+- [Convolution Exercise #3 - 20%](#convolution-exercise-3---20)
+- [Convolution Exercise #4 - 20%](#convolution-exercise-4---20)
 - [GEMV Basic Exercise - 20%](#gemv-basic-exercise---20)
 - [GEMV Performance Challenge - 20%](#gemv-performance-challenge---20)
  -->
@@ -26,7 +26,7 @@ In this lab, we will use Verilog to implement PEs and a small systolic array com
 ```
 
 ## Learning goals
-- Implement 2D convolution on a systolic array using the Row Stationary dataflow.
+- Implement 2D convolution on a systolic array with processing element(s) (PEs), using a dataflow of your choice.
 - Implement GEMV on a systolic array using a dataflow of your choice.
 - Optimize the GEMV architecture and dataflow to reduce the total execution cycle count.
 
@@ -34,10 +34,10 @@ In this lab, we will use Verilog to implement PEs and a small systolic array com
 
 | Component | Description | Weight |
 | --- | --- | ---: |
-| [Row Stationary Exercise #1](#row-stationary-exercise-1---10)  | 2D convolution with fixed `M = 7`, `N = 4` | 10% |
-| [Row Stationary Exercise #2](#row-stationary-exercise-2---10) | 2D convolution with fixed `M = 10`, `N = 5` | 10% |
-| [Row Stationary Exercise #3](#row-stationary-exercise-3---20) | General 2D convolution with random `1 <= N <= M <= 254` | 20% |
-| [Row Stationary Exercise #4](#row-stationary-exercise-4---20) | 2D convolution with advanced test cases | 20% |
+| [Convolution Exercise #1](#convolution-exercise-1---10)  | 2D convolution with fixed `M = 7`, `N = 4` | 10% |
+| [Convolution Exercise #2](#convolution-exercise-2---10) | 2D convolution with fixed `M = 10`, `N = 5` | 10% |
+| [Convolution Exercise #3](#convolution-exercise-3---20) | 2D convolution with 4 fixed-dimension cases and 6 random-dimension cases, all satisfying `1 <= N <= M <= 254` | 20% |
+| [Convolution Exercise #4](#convolution-exercise-4---20) | 2D convolution with advanced test cases | 20% |
 | [GEMV Basic Exercise](#gemv-basic-exercise---20)  | Functional correctness in hardware and hidden test cases | 20% |
 | [GEMV Performance Challenge](#gemv-performance-challenge---20) | Ranking by execution cycles, with hardware resources used as the tie-breaker | 20% |
 | **Total** |  | **100%** |
@@ -86,24 +86,33 @@ The goals of this lab are to familiarize you with the concepts of dataflows in s
 * Use an asynchronous active-low reset architecture.
 * `in_valid` is asserted for one clock cycle. The dimension inputs are valid only during that cycle.
 * Assert `busy` in response to `in_valid` and keep it high until all output data is ready. The next test case will begin only after `busy` returns low.
-* The execution latency for each test case must not exceed 1,500,000 cycles.
+* For Lab 3-1, the execution cycle limit depends on the test case. Refer to `wait_finished` in `TESTBENCH/PATTERN.v` for the limit calculation.
+* For Lab 3-2, there is no execution cycle limit for functional correctness grading. Execution cycles are used to rank designs in the GEMV Performance Challenge.
+* Before each computation, the testbench initializes the output region of Global Buffer C to zero in Lab 3-1, and the board controller clears all of BRAM C to zero in Lab 3-2.
 
 #### Lab 3-1
 
-You need to perform 2D convolution between an `M × M` 8-bit input feature map and an `N × N` 8-bit kernel. The design must use the Row Stationary dataflow and a PE array. Accumulated results are 32-bit values, so pay careful attention to intermediate bit widths.
+You need to perform 2D convolution between an `M × M` unsigned 8-bit input feature map and an `N × N` unsigned 8-bit kernel. The design must use a systolic array with (PEs) to perform the computation, using a dataflow of your choice. Accumulated results are unsigned 32-bit values, so pay careful attention to intermediate bit widths.
 
 The following detailed requirements apply:
 
+Row Stationary is recommended for Lab 3-1, but other dataflows are allowed.
+
 * Implement your TPU design in `TPU.v`. You may add supporting Verilog files in the `RTL` directory.
 * You may not modify `global_buffer.v` or the interface of `TPU.v`.
-* Before each simulation test case, the testbench loads Global Buffer A and Global Buffer B. The testbench keeps `in_valid` high for one cycle, and the `M` and `N` inputs are valid during that cycle.
-* When `busy` returns low, the testbench compares Global Buffer C against the golden result.
-* Implement your own data loader, PEs, and controller to schedule data from Global Buffer A and Global Buffer B into the PE array.
-* The PE array may contain at most 16 PEs and must not exceed `4 × 4`.
-* Multiplication and accumulation for the convolution must be performed inside the PEs.
 * `1 <= N <= M <= 254`
 * Stride = 1
 * Padding = 0
+* Use the kernel in its original orientation; do not flip it horizontally or vertically.
+* The output feature map has dimensions `(M-N+1) × (M-N+1)`.
+* Implement your own data loader, PEs, and controller to schedule data from Global Buffer A and Global Buffer B into the PE array.
+* The PE array may contain at most 16 PEs.
+* Multiplication and accumulation for the convolution must be performed inside the PEs.
+* The provided `global_buffer.v` can be treated as a behavioral model of BRAM.
+* Before each simulation test case, the testbench loads Global Buffer A and Global Buffer B. The testbench keeps `in_valid` high for one cycle, and the `M` and `N` inputs are valid during that cycle.
+* The TPU may only read from Global Buffer A and Global Buffer B; it cannot write to them.
+* While `busy = 0`, keep all BRAM access enables (`A_ram_en`, `B_ram_en`, `C_ram_en`, and `C_wr_en`) at 0.
+* When `busy` returns low, the testbench compares Global Buffer C against the golden result.
 
 #### Lab 3-2
 
@@ -115,16 +124,18 @@ The following detailed requirements apply:
 
 * Implement your design inside `TPU.v` without modifying its provided module interface. You may add supporting RTL files such as `PE.v`. The provided `PE.v` interface is a recommendation and can be changed.
 * You may not modify the provided UART, BRAM, or `TPU_top.v` designs. The TAs will integrate and test your submitted `TPU.v` and supporting RTL files with these provided modules and interfaces.
-* During hardware verification, the provided UART flow loads input data into BRAM A and BRAM B. The UART flow keeps `in_valid` high for one cycle, and the `K`, `M`, and `N` inputs are valid during that cycle.
-* When `busy` returns low, the hardware verification flow reads BRAM C and compares the returned values against the golden result.
-* After implementation with Vivado 2024.1, the design must satisfy `LUT <= 2000`, `FF <= 2000`, `DSP <= 16`, and `WNS >= 0`. Designs that violate any of these limits receive no credit for this part.
 * `1 <= M, K <= 254` and `N = 1`.
 * For the 1024-word BRAM configuration used in hardware verification, the matrix dimensions must also satisfy `ceil(M / 4) × K <= 1024`.
-
+* During hardware verification, the provided UART flow loads input data into BRAM A and BRAM B. The UART flow keeps `in_valid` high for one cycle, and the `K`, `M`, and `N` inputs are valid during that cycle.
+* The TPU may only read from BRAM A and BRAM B; it cannot write to them. The TPU outputs `A_wr_en`, `A_data_in`, `B_wr_en`, and `B_data_in` are unused in the provided board design.
+* Complete all computation and write the final results to BRAM C before setting `busy` to 0.
+* While `busy = 0`, keep all BRAM access enables (`A_ram_en`, `B_ram_en`, `C_ram_en`, and `C_wr_en`) at 0.
+* When `busy` returns low, the hardware verification flow reads BRAM C and compares the returned values against the golden result.
+* After implementation with Vivado 2024.1, the design must satisfy `LUT <= 2000`, `FF <= 2000`, `DSP <= 16`, and `WNS >= 0`. Designs that violate any of these limits receive no credit for this part.
 
 
 ```{note}
-For the details of the data mapping into the global buffers or BRAM, please refer to the ***[Appendix](#appendix)***. The Appendix describes the memory layouts used for the Row Stationary convolution in Lab 3-1 and the GEMV in Lab 3-2.
+For the details of the data mapping into the global buffers or BRAM, please refer to the ***[Appendix](#appendix)***. The Appendix describes the memory layouts used for the 2D convolution in Lab 3-1 and the GEMV in Lab 3-2.
 ```
 
 ### Getting Started
@@ -169,9 +180,13 @@ If you have the licence of `VCS` and want faster simulation, you may use the `Ma
 
 
 **Table 2: The BRAM Interface of BRAM A and BRAM B**
+
+The I/O directions in Tables 2 and 3 are relative to the BRAM module. The TPU outputs `A_ram_en`, `B_ram_en`, and `C_ram_en` drive the corresponding BRAM's `ram_en` input during computation.
+
 |  I/O   | Signal name  | Bit width | Description                                  |
 |  ----  | ----         | ----      |  ----                                        |     
-| Input  | `wr_en`        | 1         | The write enable signal.                     |
+| Input  | `ram_en`      | 1         | Enables BRAM reads and writes when high. |
+| Input  | `wr_en`        | 1         | Selects write when high and read when low, provided `ram_en` is high. |
 | Input  | `index`        | 16        | The address of the BRAM to be read or written. |
 | Input  | `data_in`      | 32        | The data input to write to the BRAM.         |
 | Output | `data_out`     | 32        | The data output from the BRAM.               |
@@ -179,12 +194,15 @@ If you have the licence of `VCS` and want faster simulation, you may use the `Ma
 **Table 3: The BRAM Interface of BRAM C**
 |  I/O   | Signal name  | Bit width | Description                                  |
 |  ----  | ----         | ----      |  ----                                        |     
-| Input  | `wr_en`        | 1         | The write enable signal.                     |
+| Input  | `ram_en`      | 1         | Enables BRAM reads and writes when high. |
+| Input  | `wr_en`        | 1         | Selects write when high and read when low, provided `ram_en` is high. |
 | Input  | `index`        | 16        | The address of the BRAM to be read or written. |
 | Input  | `data_in`      | 128       | The data input to write to the BRAM.         |
 | Output | `data_out`     | 128       | The data output from the BRAM.               |
 ``` {note}
 The 128-bit data input stands for 4 * 32-bit values, allowing 4 elements to be written simultaneously to BRAM C.
+
+Global Buffer reads and writes occur on the falling edge of `clk`; read data is available after that edge.
 ```
 
 ### lab 3-2
@@ -201,8 +219,12 @@ The 128-bit data input stands for 4 * 32-bit values, allowing 4 elements to be w
 | Output | `busy`      |         1 | High when the design is busy. We will check your answer when `busy` returns low after each `in_valid`. |
 
 **Table 2: The BRAM Interface of A BRAM**
+
+The I/O directions in Tables 2–4 are relative to the BRAM interface. The TPU outputs `A_ram_en`, `B_ram_en`, and `C_ram_en` enable access to the corresponding BRAM.
+
 | I/O    | Signal name | Bit width | Description                                  |
 | ------ | ----------- | --------- | -------------------------------------------- |
+| Input  | `ram_en`    | 1         | Enables BRAM access when high. |
 | Input  | `wr_en`     | 1         | The write enable signal.                     |
 | Input  | `index`     | 16        | The address of the BRAM to be read or written. |
 | Input  | `data_in`   | 32        | The data input to write to the BRAM.         |
@@ -211,6 +233,7 @@ The 128-bit data input stands for 4 * 32-bit values, allowing 4 elements to be w
 **Table 3: The BRAM Interface of B BRAM**
 | I/O    | Signal name | Bit width | Description                                  |
 | ------ | ----------- | --------- | -------------------------------------------- |
+| Input  | `ram_en`    | 1         | Enables BRAM access when high. |
 | Input  | `wr_en`     | 1         | The write enable signal.                     |
 | Input  | `index`     | 16        | The address of the BRAM to be read or written. |
 | Input  | `data_in`   | 32        | The data input to write to the BRAM.         |
@@ -219,12 +242,17 @@ The 128-bit data input stands for 4 * 32-bit values, allowing 4 elements to be w
 **Table 4: The BRAM Interface of C BRAM**
 |  I/O   | Signal name  | Bit width | Description                                  |
 |  ----  | ----         | ----      |  ----                                        |     
-| Input  | `wr_en`        | 1         | The write enable signal.                     |
+| Input  | `ram_en`      | 1         | Enables BRAM access when high. |
+| Input  | `wr_en`        | 1         | Selects write when high and read when low, provided `ram_en` is high.                     |
 | Input  | `index`        | 16        | The address of the BRAM to be read or written. |
 | Input  | `data_in`      | 128       | The data input to write to the BRAM.         |
 | Output | `data_out`     | 128       | The data output from the BRAM.               |
 
-## Row Stationary Exercise #1 - 10%
+```{note}
+BRAM reads and writes occur on the rising edge of `clk`; read data is available after that edge.
+```
+
+## Convolution Exercise #1 - 10%
 ---
 - Input data:
     - Input feature map (M * M) and Kernel (N * N) where M = 7, N = 4
@@ -237,10 +265,10 @@ The 128-bit data input stands for 4 * 32-bit values, allowing 4 elements to be w
     2. Use the data from global buffer to calculate with PEs
     3. Output the result to C global buffer
     4. `\lab3-1$ make verif1`
-        - 10 test cases of fixed input
+        - 10 test cases with fixed input dimensions and random data values
     5. The bench will tell if you did it correctly
 
-## Row Stationary Exercise #2 - 10%
+## Convolution Exercise #2 - 10%
 ---
 - Input data:
     - Input feature map (M * M) and Kernel (N * N) where M = 10, N = 5
@@ -249,11 +277,11 @@ The 128-bit data input stands for 4 * 32-bit values, allowing 4 elements to be w
 - Required Output:
     - the Output feature map (UINT32) of the 2D convolution
 - Steps:
-    1. refer to Row Stationary Exercise #1
+    1. refer to Convolution Exercise #1
     2. `\lab3-1$ make verif2`
-        - 10 test cases of fixed input
+        - 10 test cases with fixed input dimensions and random data values
 
-## Row Stationary Exercise #3 - 20%
+## Convolution Exercise #3 - 20%
 ---
 - Input data:
     - Input feature map (M * M) and Kernel (N * N) where 1 <= N <= M <= 254
@@ -263,11 +291,11 @@ The 128-bit data input stands for 4 * 32-bit values, allowing 4 elements to be w
     - the Output feature map (UINT32) of the 2D convolution
 
 - Steps:
-    1. refer to Row Stationary Exercise #1
+    1. refer to Convolution Exercise #1
     2. `\lab3-1$ make verif3`
-        - 10 test cases of large random M, N
+        - 10 test cases: the first 4 use fixed dimensions, and the remaining 6 use random dimensions. All cases use random data values.
 
-## Row Stationary Exercise #4 - 20%
+## Convolution Exercise #4 - 20%
 ---
 - Input data:
     - Input feature map (M * M) and Kernel (N * N) where 1 <= N <= M <= 254
@@ -277,7 +305,7 @@ The 128-bit data input stands for 4 * 32-bit values, allowing 4 elements to be w
     - the Output feature map (UINT32) of the 2D convolution
 
 - Steps:
-    1. refer to Row Stationary Exercise #1
+    1. refer to Convolution Exercise #1
     2. `\lab3-1$ make verif4`
         - Advanced test cases
         
@@ -291,8 +319,18 @@ The 128-bit data input stands for 4 * 32-bit values, allowing 4 elements to be w
     1. Take data from BRAM A and BRAM B
     2. Process the BRAM data using your TPU architecture and PE array
     3. Output the result to BRAM C
-    4. Run `\lab3-2$ make hardware_verify`
-        - Pass all hardware verification test cases (10%)
+    4. From the `lab3-2` directory, build the FPGA bitstream, program the connected Arty A7-100T, and run UART verification in order:
+
+        ```bash
+        make generate_gemv_bitstream
+        make program
+        make hardware_verify
+        ```
+
+        - `make generate_gemv_bitstream` creates the Vivado project, runs synthesis and implementation, and generates the bitstream.
+        - `make program` programs the FPGA with the generated bitstream.
+        - `make hardware_verify` runs the UART tests against the programmed FPGA. Follow the terminal prompts. Pass all hardware verification test cases to earn 10%.
+        - After changing the RTL, repeat all three commands to test the updated design.
     5. Pass the hidden test cases (10%)
 
 ## GEMV Performance Challenge - 20%
@@ -318,9 +356,9 @@ The performance challenge score is assigned according to the final ranking perce
 ## Appendix
 ---
 
-### Lab 3-1 Memory Mapping - Row Stationary Convolution
+### Lab 3-1 Memory Mapping - 2D Convolution
 
-Lab 3-1 uses a memory layout suitable for Row Stationary execution.
+The following sections describe the memory layout for 2D convolution in Lab 3-1.
 
 #### Global Buffer A - Input Feature Map
 
