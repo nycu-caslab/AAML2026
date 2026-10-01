@@ -219,26 +219,7 @@ After the test passed, recompile the software with following command:
 ```bash
 make run -C Platform/sw MODEL_FILE=ds_cnn_stream_fe.tflite MODEL_PROFILE=ds_cnn_stream_fe 
 ```
-It usually takes 10 min to inference. You can print out model output by yourself to check the correctness of model.
-
-#### KWS Output Verification
-
-You may implement ds_cnn_verify_output() in:
-
-`Platform/sw/models/ds_cnn_stream_fe_profile.cc`
-
-Your verification function should:
-
-- Find the predicted sound pattern using the largest output value (argmax).
-- Compare all 12 output values with the provided golden outputs using their exact IEEE-754 bit representations.
-- Print the predicted and expected sound-pattern names.
-- Report PASS when the predicted class is correct and every output matches its golden value.
-
-Example:
-
-```text
-  Prediction: down (0), expected: down (0) [PASS]
-```
+It usually takes 3 min to inference. You can print out model output by yourself to check the correctness of model.
 
 ```{important}
 If the result of any testcase inside `label/` is different from golden answer, Parts 2 and the efficiency section receive zero.
@@ -308,7 +289,9 @@ aaml-lab2-[id].zip
         ├── conv.h
         └── lab2_api.cc
 ```
-
+```{important}
+Notice: An incorrect submission structure will result in a 10-point deduction from your total lab score!
+```
 ```{important}
 If the project cannot be compiled or run using the documented commands, Parts 1 and 2 and the efficiency section receive zero; only the 20-point demo can be assessed. Follow the course collaboration policy; plagiarism is not allowed.
 ```
