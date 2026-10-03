@@ -242,8 +242,8 @@ Resource counts are taken from the recursive NPU-only final post-route utilizati
 | Slice LUT | 56,981 | 20,000 |
 | Flip-flop | 121,572 | 5,000 |
 | DSP48E1 | 230 | 30 |
-| RAMB18E1 | 270 | 0 |
-| RAMB36E1 | 135 | 0 |
+| RAMB18E1 | 270 | 270 |
+| RAMB36E1 | 135 | 135 |
 
 ### Latency efficiency
 
