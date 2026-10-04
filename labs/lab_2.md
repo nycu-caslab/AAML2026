@@ -141,9 +141,8 @@ Your burst engine must satisfy all of the following:
 - Accept a read beat only when `RVALID && RREADY`.
 - Accept exactly `B` beats in address order and interpret each 32-bit beat in little-endian byte order.
 - Do not assume that `ARREADY` or `RVALID` remains high continuously.
-- Complete a successful load only after accepting beat `B` with `RLAST`; an early `RLAST`, a missing `RLAST` on beat `B`, an incorrect beat count, or a non-OKAY `RRESP` is an error and must assert `NPU_exception`.
-- An early `RLAST` may finish the command immediately with `NPU_done` and `NPU_exception` asserted. If beat `B` arrives without `RLAST`, stop writing local operand storage, accept and discard later beats until `RLAST`, then finish with `NPU_done` and `NPU_exception` asserted.
-- Keep `NPU_exception` low for a valid command and clear the previous command's status before accepting a new command.
+- Complete a successful load only after accepting beat `B` with `RLAST`; an early `RLAST`, a missing `RLAST` on beat `B`, an incorrect beat count, or a non-OKAY `RRESP` is an error.
+- An early `RLAST` may finish the command immediately with `NPU_done` asserted. If beat `B` arrives without `RLAST`, stop writing local operand storage, accept and discard later beats until `RLAST`, then finish with `NPU_done` asserted.
 - Pulse `NPU_done` exactly once for each completed custom command and do not leave it asserted while idle.
 - Be prepared to accept back-to-back commands.
 
