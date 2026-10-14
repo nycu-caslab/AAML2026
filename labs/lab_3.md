@@ -413,8 +413,8 @@ The GEMV result C is an `M × 1` vector of signed 32-bit accumulated values. Eac
 
 Please organize your submission files into a zip archive structured as follows:
 ```
-YourID.zip
-    └── YourID/
+YourID_lab3.zip
+    └── YourID_lab3/
         ├── lab3-1/
         │   ├── TPU.v
         │   └── other supporting RTL files...
