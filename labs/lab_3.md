@@ -34,12 +34,12 @@ In this lab, we will use Verilog to implement PEs and a small systolic array com
 
 | Component | Description | Weight |
 | --- | --- | ---: |
-| [Convolution Exercise #1](#convolution-exercise-1---10)  | 2D convolution with fixed `M = 7`, `N = 4` | 10% |
-| [Convolution Exercise #2](#convolution-exercise-2---10) | 2D convolution with fixed `M = 10`, `N = 5` | 10% |
-| [Convolution Exercise #3](#convolution-exercise-3---20) | 2D convolution with 4 fixed-dimension cases and 6 random-dimension cases, all satisfying `1 <= N <= M <= 254` | 20% |
-| [Convolution Exercise #4](#convolution-exercise-4---20) | 2D convolution with advanced test cases | 20% |
-| [GEMV Basic Exercise](#gemv-basic-exercise---20)  | Functional correctness in hardware and hidden test cases | 20% |
-| [GEMV Performance Challenge](#gemv-performance-challenge---20) | Ranking by execution cycles, with hardware resources used as the tie-breaker | 20% |
+| [Lab 3-1 Convolution Exercise #1](#lab-3-1-convolution-exercise-1---10)  | 2D convolution with fixed `M = 7`, `N = 4` | 10% |
+| [Lab 3-1 Convolution Exercise #2](#lab-3-1-convolution-exercise-2---10) | 2D convolution with fixed `M = 10`, `N = 5` | 10% |
+| [Lab 3-1 Convolution Exercise #3](#lab-3-1-convolution-exercise-3---20) | 2D convolution with 4 fixed-dimension cases and 6 random-dimension cases, all satisfying `1 <= N <= M <= 254` | 20% |
+| [Lab 3-1 Convolution Exercise #4](#lab-3-1-convolution-exercise-4---20) | 2D convolution with advanced test cases | 20% |
+| [Lab 3-2 GEMV Basic Exercise](#lab-3-2-gemv-basic-exercise---20)  | Functional correctness in hardware and hidden test cases | 20% |
+| [Lab 3-2 GEMV Performance Challenge](#lab-3-2-gemv-performance-challenge---20) | Ranking by execution cycles, with hardware resources used as the tie-breaker | 20% |
 | **Total** |  | **100%** |
 
 ## Background
@@ -252,7 +252,7 @@ The I/O directions in Tables 2–4 are relative to the BRAM interface. The TPU o
 BRAM reads and writes occur on the rising edge of `clk`; read data is available after that edge.
 ```
 
-## Convolution Exercise #1 - 10%
+## Lab 3-1 Convolution Exercise #1 - 10%
 ---
 - Input data:
     - Input feature map (M * M) and Kernel (N * N) where M = 7, N = 4
@@ -268,7 +268,7 @@ BRAM reads and writes occur on the rising edge of `clk`; read data is available 
         - 10 test cases with fixed input dimensions and random data values
     5. The bench will tell if you did it correctly
 
-## Convolution Exercise #2 - 10%
+## Lab 3-1 Convolution Exercise #2 - 10%
 ---
 - Input data:
     - Input feature map (M * M) and Kernel (N * N) where M = 10, N = 5
@@ -281,7 +281,7 @@ BRAM reads and writes occur on the rising edge of `clk`; read data is available 
     2. `\lab3-1$ make verif2`
         - 10 test cases with fixed input dimensions and random data values
 
-## Convolution Exercise #3 - 20%
+## Lab 3-1 Convolution Exercise #3 - 20%
 ---
 - Input data:
     - Input feature map (M * M) and Kernel (N * N) where 1 <= N <= M <= 254
@@ -295,7 +295,7 @@ BRAM reads and writes occur on the rising edge of `clk`; read data is available 
     2. `\lab3-1$ make verif3`
         - 10 test cases: the first 4 use fixed dimensions, and the remaining 6 use random dimensions. All cases use random data values.
 
-## Convolution Exercise #4 - 20%
+## Lab 3-1 Convolution Exercise #4 - 20%
 ---
 - Input data:
     - Input feature map (M * M) and Kernel (N * N) where 1 <= N <= M <= 254
@@ -309,7 +309,7 @@ BRAM reads and writes occur on the rising edge of `clk`; read data is available 
     2. `\lab3-1$ make verif4`
         - Advanced test cases
         
-## GEMV Basic Exercise - 20%
+## Lab 3-2 GEMV Basic Exercise - 20%
 ---
 - Input data:
     - Input Matrix (INT8) and Input Vector (INT8)
@@ -333,7 +333,7 @@ BRAM reads and writes occur on the rising edge of `clk`; read data is available 
         - After changing the RTL, repeat all three commands to test the updated design.
     5. Pass the hidden test cases (10%)
 
-## GEMV Performance Challenge - 20%
+## Lab 3-2 GEMV Performance Challenge - 20%
 ---
 
 Only designs that pass all GEMV Basic Exercise test cases are eligible for the performance challenge. Performance will be evaluated using the TA's hidden test cases. Designs with fewer total execution cycles will receive a higher ranking. If two or more designs have the same cycle count, the design with the smaller hardware resource score will rank higher:
