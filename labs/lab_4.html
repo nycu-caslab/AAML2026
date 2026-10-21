@@ -352,29 +352,36 @@
             </div>
             <nav aria-label="Page">
                 <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#goal-of-this-lab">Goal of this lab</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#introduction">Introduction</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#porting-and-profiling-the-models-10">Porting and Profiling the Models - 10%</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#porting-the-new-model-and-tests-5">Porting the New Model and Tests - 5%</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#profiling-the-mobilevit-5">Profiling the MobileViT - 5%</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#goal-of-this-lab">Goal of this lab</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#porting-the-model-and-tests">1. Porting the Model and Tests</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#project-structure-extracting">1.1 Project Structure &amp; Extracting</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#model-configuration-and-tflm-updates">1.2 Model Configuration and TFLM Updates</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#clearing-the-previous-software-build">1.3 Clearing the Previous Software Build</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#accelerating-the-logistic-function-60">Accelerating the Logistic Function - 60%</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#evaluation-criteria">Evaluation Criteria</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#guide">Guide</a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#software">Software</a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#hardware">Hardware</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#profiling-the-mobilevit">2. Profiling the MobileViT</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#establishing-a-comparable-baseline">2.1 Establishing a Comparable Baseline</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#counter-definitions-and-measurement-scope">2.2 Counter Definitions and Measurement Scope</a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#accelerating-the-logistic-function">3. Accelerating the Logistic Function</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tracing-the-original-computation">3.1 Tracing the Original Computation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fixed-point-formats">3.2 Fixed-Point Formats</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#connecting-software-and-hardware">3.3 Connecting Software and Hardware</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#accelerating-the-softmax-function-20">Accelerating the Softmax Function - 20%</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Evaluation Criteria</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Guide</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#accelerating-the-transpose-function">4. Accelerating the Transpose Function</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#from-matrix-transpose-to-multidimensional-indexing">4.1 From Matrix Transpose to Multidimensional Indexing</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#questions-in-the-demo-10">Questions in the Demo - 10%</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#submission">Submission</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#check-results">5. Check Results</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#basic-test-verification">5.1 Basic Test Verification</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#running-tflm-model-inference">5.2 Running TFLM Model Inference</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#questions-in-the-demo">6. Questions in the Demo</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#submission">7. Submission</a></li>
 </ul>
             </nav>
         </div>
@@ -388,370 +395,449 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="lab-4-elementwise-unit">
 <h1>Lab 4 : Elementwise Unit<a class="headerlink" href="#lab-4-elementwise-unit" title="Link to this heading">#</a></h1>
-<section id="goal-of-this-lab">
-<h2>Goal of this lab<a class="headerlink" href="#goal-of-this-lab" title="Link to this heading">#</a></h2>
-<hr class="docutils" />
-<ul class="simple">
-<li><p><a class="reference internal" href="#porting-and-profiling-the-models-10"><span class="xref myst">Porting and Profiling the Models - 10%</span></a></p></li>
-<li><p><a class="reference internal" href="#accelerating-the-logistic-function-60"><span class="xref myst">Accelerating the Logistic Function - 60%</span></a></p></li>
-<li><p><a class="reference internal" href="#accelerating-the-softmax-function-20"><span class="xref myst">Accelerating the Softmax Function - 20%</span></a></p></li>
-<li><p><a class="reference internal" href="#questions-in-the-demo-10"><span class="xref myst">Questions in the Demo - 10%</span></a></p></li>
-</ul>
-</section>
 <section id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">#</a></h2>
 <hr class="docutils" />
-<p>Modern models frequently utilize specialized activation functions that involve complex mathematical computations, such as exponentials, square roots, and reciprocals. Unlike simpler functions like ReLU, these sophisticated operations can become bottlenecks during model inference. In this lab, we will design an element-wise unit specifically for enhancing the inference speed of the <strong>Logistic</strong> and <strong>Softmax</strong> functions in the <strong>MobileViT</strong> model.</p>
+<p>Modern models frequently utilize specialized activation functions that involve complex mathematical computations, such as exponentials, square roots, and reciprocals. Unlike simpler functions like ReLU, these sophisticated operations can become bottlenecks during model inference. In this lab, we will design an element-wise unit specifically for enhancing the inference speed of the <strong>Logistic</strong> functions in the <strong>MobileViT</strong> model.
+Logistic applies the sigmoid function to each element:
+$<span class="math notranslate nohighlight">\( \sigma(x)=\frac{1}{1+e^{-x}} \)</span>$
+Additionally, MobileViT combines convolution, nonlinear operations, and multidimensional tensor rearrangement. This lab focuses on two different costs: fixed-point numerical computation in Logistic, and index calculation and memory transfers in <strong>Transpose</strong>.</p>
 </section>
-<section id="porting-and-profiling-the-models-10">
-<h2>Porting and Profiling the Models - 10%<a class="headerlink" href="#porting-and-profiling-the-models-10" title="Link to this heading">#</a></h2>
+<section id="goal-of-this-lab">
+<h2>Goal of this lab<a class="headerlink" href="#goal-of-this-lab" title="Link to this heading">#</a></h2>
 <hr class="docutils" />
-<section id="porting-the-new-model-and-tests-5">
-<h3>Porting the New Model and Tests - 5%<a class="headerlink" href="#porting-the-new-model-and-tests-5" title="Link to this heading">#</a></h3>
-<p>In this lab, we provide you a new model and the project template. Follow the instrusctions below to install them.</p>
-<ol class="arabic">
-<li><p>Project Template with Tests</p>
-<p>The project template contains some tests and files you’ll use in this lab.</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span><span class="si">${</span><span class="nv">CFU_ROOT</span><span class="si">}</span>/proj/
-$<span class="w"> </span>wget<span class="w"> </span>https://github.com/nycu-caslab/AAML2025/raw/main/lab4_util/lab4_template.zip
-$<span class="w"> </span>unzip<span class="w"> </span>lab4_template.zip
-</pre></div>
-</div>
-<p>In the <code class="docutils literal notranslate"><span class="pre">/src/tensorflow/lite/micro/</span></code> directory, you’ll find tests for the Logistic and Softmax functions, along with some updated kernels for MobileViT inference. <strong>DO NOT MODIFY</strong> any files in this directory.</p>
-</li>
-<li><p>MobileViT Model</p>
-<p>This is the model we aim to accelerate. We will use this model to benchmark the performance of your design.</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span><span class="si">${</span><span class="nv">CFU_ROOT</span><span class="si">}</span>/common/src/models
-$<span class="w"> </span>wget<span class="w"> </span>https://github.com/nycu-caslab/AAML2025/raw/main/lab4_util/lab4_model.zip
-$<span class="w"> </span>unzip<span class="w"> </span>lab4_model.zip
-</pre></div>
-</div>
-</li>
+<ol class="arabic simple">
+<li><p>Integrate MobileViT xxs and its tests into the platform and establish a correct software baseline.</p></li>
+<li><p>Trace the quantization and fixed-point arithmetic in int8 Logistic and design a hardware accelerator.</p></li>
+<li><p>Understand multidimensional Transpose strides and address generation, and rearrange data through the NPU AXI master.</p></li>
+<li><p>Handle multicycle custom instructions and memory consistency between the CPU cache and NPU.</p></li>
 </ol>
-<p>After that, just like we did in lab 1, we should modify some files to add the new models:</p>
-<p><code class="docutils literal notranslate"><span class="pre">CFU-Playground/common/src/models/models.c</span></code></p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">"models/ds_cnn_stream_fe/ds_cnn.h"</span>
-<span class="c1">// add codes below</span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">"models/mobileViT_xxs/mobileViT.h"</span>
-
-<span class="p">...</span>
-
-<span class="cp">#if defined(INCLUDE_MODEL_DS_CNN_STREAM_FE)</span>
-<span class="w">        </span><span class="n">MENU_ITEM</span><span class="p">(</span><span class="n">AUTO_INC_CHAR</span><span class="p">,</span><span class="w"> </span><span class="s">"Ds cnn stream fe"</span><span class="p">,</span><span class="w"> </span><span class="n">ds_cnn_stream_fe_menu</span><span class="p">),</span>
-<span class="cp">#endif</span>
-<span class="c1">// add codes below</span>
-<span class="cp">#if defined(INCLUDE_MODEL_MOBILE_VIT_XXS)</span>
-<span class="w">        </span><span class="n">MENU_ITEM</span><span class="p">(</span><span class="n">AUTO_INC_CHAR</span><span class="p">,</span><span class="w"> </span><span class="s">"MobileViT xxs"</span><span class="p">,</span><span class="w"> </span><span class="n">mobileViT_xxs_menu</span><span class="p">),</span>
-<span class="cp">#endif</span>
-</pre></div>
-</div>
-<p><code class="docutils literal notranslate"><span class="pre">CFU-Playground/common/src/tflite.cc</span></code></p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#ifdef INCLUDE_MODEL_DS_CNN_STREAM_FE</span>
-<span class="w">    </span><span class="mi">2048</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1024</span><span class="p">,</span>
-<span class="cp">#endif</span>
-<span class="c1">// add codes below</span>
-<span class="cp">#ifdef INCLUDE_MODEL_MOBILE_VIT_XXS</span>
-<span class="w">    </span><span class="mi">16384</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1024</span><span class="p">,</span>
-<span class="cp">#endif</span>
-</pre></div>
-</div>
-<p><code class="docutils literal notranslate"><span class="pre">CFU-Playground/proj/&lt;lab4</span> <span class="pre">proj</span> <span class="pre">folder&gt;/Makefile</span></code><br />
-(This has been done in the project template.)</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="nv">DEFINES</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span>INCLUDE_MODEL_MOBILE_VIT_XXS
-</pre></div>
-</div>
-<p>After completing these steps, you should be able to run the MobileViT model and the Tests in the <code class="docutils literal notranslate"><span class="pre">Project</span> <span class="pre">menu</span></code>.</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>make<span class="w"> </span>prog<span class="w"> </span><span class="nv">EXTRA_LITEX_ARGS</span><span class="o">=</span><span class="s2">"--cpu-variant=perf+cfu"</span>
-$<span class="w"> </span>make<span class="w"> </span>load
-</pre></div>
-</div>
-<ul class="simple">
-<li><p>MobileViT result of zeros input without any modification</p></li>
-</ul>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">Counter</span> <span class="o">|</span>  <span class="n">Total</span> <span class="o">|</span> <span class="n">Starts</span> <span class="o">|</span> <span class="n">Average</span> <span class="o">|</span>     <span class="n">Raw</span>
-<span class="o">---------+--------+--------+---------+--------------</span>
-    <span class="mi">0</span>    <span class="o">|</span>     <span class="mi">0</span>  <span class="o">|</span>     <span class="mi">0</span>  <span class="o">|</span>   <span class="n">n</span><span class="o">/</span><span class="n">a</span>   <span class="o">|</span>            <span class="mi">0</span>
-    <span class="mi">1</span>    <span class="o">|</span>     <span class="mi">0</span>  <span class="o">|</span>     <span class="mi">0</span>  <span class="o">|</span>   <span class="n">n</span><span class="o">/</span><span class="n">a</span>   <span class="o">|</span>            <span class="mi">0</span>
-    <span class="mi">2</span>    <span class="o">|</span>     <span class="mi">0</span>  <span class="o">|</span>     <span class="mi">0</span>  <span class="o">|</span>   <span class="n">n</span><span class="o">/</span><span class="n">a</span>   <span class="o">|</span>            <span class="mi">0</span>
-    <span class="mi">3</span>    <span class="o">|</span>     <span class="mi">0</span>  <span class="o">|</span>     <span class="mi">0</span>  <span class="o">|</span>   <span class="n">n</span><span class="o">/</span><span class="n">a</span>   <span class="o">|</span>            <span class="mi">0</span>
-    <span class="mi">4</span>    <span class="o">|</span>     <span class="mi">0</span>  <span class="o">|</span>     <span class="mi">0</span>  <span class="o">|</span>   <span class="n">n</span><span class="o">/</span><span class="n">a</span>   <span class="o">|</span>            <span class="mi">0</span>
-    <span class="mi">5</span>    <span class="o">|</span>   <span class="mi">145</span><span class="n">M</span> <span class="o">|</span>     <span class="mi">9</span>  <span class="o">|</span>    <span class="mi">16</span><span class="n">M</span>  <span class="o">|</span>    <span class="mi">145244066</span>
-    <span class="mi">6</span>    <span class="o">|</span>  <span class="mi">1318</span><span class="n">M</span> <span class="o">|</span>    <span class="mi">37</span>  <span class="o">|</span>    <span class="mi">36</span><span class="n">M</span>  <span class="o">|</span>   <span class="mi">1317968736</span>
-    <span class="mi">7</span>    <span class="o">|</span>     <span class="mi">0</span>  <span class="o">|</span>     <span class="mi">0</span>  <span class="o">|</span>   <span class="n">n</span><span class="o">/</span><span class="n">a</span>   <span class="o">|</span>            <span class="mi">0</span>
-  <span class="mi">5234</span><span class="n">M</span> <span class="p">(</span>   <span class="mi">5233667340</span> <span class="p">)</span>  <span class="n">cycles</span> <span class="n">total</span>
-<span class="mi">0</span> <span class="p">:</span> <span class="o">-</span><span class="mi">128</span><span class="p">,</span>
-<span class="mi">1</span> <span class="p">:</span> <span class="mi">67</span><span class="p">,</span>
-<span class="mi">2</span> <span class="p">:</span> <span class="mi">57</span><span class="p">,</span>
-<span class="mi">3</span> <span class="p">:</span> <span class="o">-</span><span class="mi">72</span><span class="p">,</span>
-<span class="mi">4</span> <span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
-<span class="mi">5</span> <span class="p">:</span> <span class="mi">37</span><span class="p">,</span>
-<span class="mi">6</span> <span class="p">:</span> <span class="o">-</span><span class="mi">9</span><span class="p">,</span>
-<span class="mi">7</span> <span class="p">:</span> <span class="o">-</span><span class="mi">8</span><span class="p">,</span>
-<span class="mi">8</span> <span class="p">:</span> <span class="o">-</span><span class="mi">6</span><span class="p">,</span>
-<span class="mi">9</span> <span class="p">:</span> <span class="o">-</span><span class="mi">21</span><span class="p">,</span>
-</pre></div>
-</div>
-<ul class="simple">
-<li><p>Tests for Logistic and Softmax</p></li>
-</ul>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CFU</span> <span class="n">Playground</span>
-<span class="o">==============</span>
- <span class="mi">1</span><span class="p">:</span> <span class="n">TfLM</span> <span class="n">Models</span> <span class="n">menu</span>
- <span class="mi">2</span><span class="p">:</span> <span class="n">Functional</span> <span class="n">CFU</span> <span class="n">Tests</span>
-<span class="o">&gt;</span><span class="mi">3</span><span class="p">:</span> <span class="n">Project</span> <span class="n">menu</span>
- <span class="mi">4</span><span class="p">:</span> <span class="n">Performance</span> <span class="n">Counter</span> <span class="n">Tests</span>
- <span class="mi">5</span><span class="p">:</span> <span class="n">TFLite</span> <span class="n">Unit</span> <span class="n">Tests</span>
- <span class="mi">6</span><span class="p">:</span> <span class="n">Benchmarks</span>
- <span class="mi">7</span><span class="p">:</span> <span class="n">Util</span> <span class="n">Tests</span>
- <span class="mi">8</span><span class="p">:</span> <span class="n">Embench</span> <span class="n">IoT</span>
- <span class="n">d</span><span class="p">:</span> <span class="n">Donut</span> <span class="n">demo</span>
-<span class="n">main</span><span class="o">&gt;</span> <span class="mi">3</span>
-
-<span class="n">Running</span> <span class="n">Project</span> <span class="n">menu</span>
-
-<span class="n">Project</span> <span class="n">Menu</span>
-<span class="o">============</span>
- <span class="mi">1</span><span class="p">:</span> <span class="n">Run</span> <span class="n">logistic</span> <span class="n">tests</span>
- <span class="mi">2</span><span class="p">:</span> <span class="n">Run</span> <span class="n">softmax</span> <span class="n">tests</span>
- <span class="n">x</span><span class="p">:</span> <span class="n">eXit</span> <span class="n">to</span> <span class="n">previous</span> <span class="n">menu</span>
-<span class="n">project</span><span class="o">&gt;</span> <span class="mi">1</span>
-
-<span class="n">Running</span> <span class="n">Run</span> <span class="n">logistic</span> <span class="n">tests</span>
-
-<span class="n">LOGISTIC</span> <span class="n">TEST</span><span class="p">:</span>
-<span class="n">Testing</span> <span class="n">LogisticQuantizedInt8AroundZeroShouldMatchGolden</span>
-<span class="n">Testing</span> <span class="n">LogisticQuantizedInt8NarrowRangeShouldMatchGolden</span>
-<span class="n">Testing</span> <span class="n">LogisticQuantizedInt8BasicShouldMatchGolden</span>
-<span class="n">Testing</span> <span class="n">LogisticQuantizedInt8WideRangeShouldMatchGolden</span>
-<span class="mi">4</span><span class="o">/</span><span class="mi">4</span> <span class="n">tests</span> <span class="n">passed</span>
-<span class="o">~~~</span><span class="n">ALL</span> <span class="n">TESTS</span> <span class="n">PASSED</span><span class="o">~~~</span>
-</pre></div>
-</div>
 </section>
-<section id="profiling-the-mobilevit-5">
-<h3>Profiling the MobileViT - 5%<a class="headerlink" href="#profiling-the-mobilevit-5" title="Link to this heading">#</a></h3>
-<p>After executing the MobileViT model, you may notice that the inference process is quite slow. Please <strong>analyze and compare the time consumed by each operation</strong>, with particular attention to the <strong>activation functions</strong>. You may present your analysis in any format, such as <strong>a table or a pie chart</strong>. Additionally, you have the option to use data with or without SIMD MAC acceleration.</p>
-<p>Here is an example of a pie chart:<br />
-<a class="reference internal" href="../_images/pie_example.png"><img alt="../_images/pie_example.png" src="../_images/pie_example.png" style="width: 600px;" /></a></p>
-<div class="admonition hint">
-<p class="admonition-title">Hint</p>
-<p>You can use either the perf counter or the ticks displayed in the results after execution as your data source.
-the displayed ticks look something like this:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>...
-450,LOGISTIC,1848
-451,MUL,84
-452,CONCATENATION,35
-453,CONV_2D,27022
-454,LOGISTIC,1804
-455,MUL,84
-456,CONV_2D,9782
-457,LOGISTIC,7071
-458,MUL,333
-459,AVERAGE_POOL_2D,84
-460,RESHAPE,6
-461,FULLY_CONNECTED,48
-Perf counters not enabled.
-  5558M (   5558234259 )  cycles total
-</pre></div>
-</div>
-</div>
-<p>Next, trace the code of the Logistic function to identify the <strong>complex mathematical computations involved</strong>, which may be contributing to the slow execution.</p>
-<p>Make sure to present your findings to the TAs during the demo.</p>
-<div class="admonition hint">
-<p class="admonition-title">Hint</p>
-<p>You can start tracing the code from this file, and the model will use the topmost overloaded <code class="docutils literal notranslate"><span class="pre">Logistic(...)</span></code> function:<br />
-<code class="docutils literal notranslate"><span class="pre">CFU-Playground/third_party/tflite-micro/tensorflow\</span> <span class="pre">/lite/kernels/internal/reference/integer_ops/logistic.h</span></code><br />
-Then, you will find the mathematical computations are defined in:<br />
-<code class="docutils literal notranslate"><span class="pre">CFU-Playground/third_party/tflite-micro/third_party/gemmlowp/fixedpoint/fixedpoint.h</span></code></p>
-</div>
-</section>
-</section>
-<section id="accelerating-the-logistic-function-60">
-<h2>Accelerating the Logistic Function - 60%<a class="headerlink" href="#accelerating-the-logistic-function-60" title="Link to this heading">#</a></h2>
+<section id="porting-the-model-and-tests">
+<h2>1. Porting the Model and Tests<a class="headerlink" href="#porting-the-model-and-tests" title="Link to this heading">#</a></h2>
 <hr class="docutils" />
-<div class="amsmath math notranslate nohighlight">
-\[\begin{gather*}
-\text{logistic}(x) = \frac{1}{1 + e^{-x}}
-\end{gather*}\]</div>
-<p>(We have done these for you in the template.)<br />
-Add the integer version of the Logistic function to your project.</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>cp<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>../../third_party/tflite-micro/tensorflow/lite/kernels/internal/reference/integer_ops/logistic.h<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>src/tensorflow/lite/kernels/internal/reference/integer_ops/logistic.h
+<section id="project-structure-extracting">
+<h3>1.1 Project Structure &amp; Extracting<a class="headerlink" href="#project-structure-extracting" title="Link to this heading">#</a></h3>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>YOUR_PROJECT/
+    ├── tflite-micro/
+    └── Platform/
+        ├── Makefile
+        ├── hw/
+        │   └── srcs/NPU.v
+        └── sw/
+            ├── app/
+            ├── models/
+            ├── project/
+            ├── tflm_patches/
+            └── project.mk
 </pre></div>
 </div>
-<div class="admonition important">
-<p class="admonition-title">Important</p>
-<p>Add the <strong>sixth perf counter</strong> at the beginning and end of the <strong>topmost</strong> Logistic function within the <code class="docutils literal notranslate"><span class="pre">logistic.h</span></code> file in your project. This step is crucial for evaluating your score, so please ensure it is not overlooked.</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="kr">inline</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">Logistic</span><span class="p">(</span><span class="kt">int32_t</span><span class="w"> </span><span class="n">input_zero_point</span><span class="p">,</span><span class="w"> </span><span class="kt">int32_t</span><span class="w"> </span><span class="n">input_range_radius</span><span class="p">,</span>
-<span class="w">                     </span><span class="kt">int32_t</span><span class="w"> </span><span class="n">input_multiplier</span><span class="p">,</span><span class="w"> </span><span class="kt">int32_t</span><span class="w"> </span><span class="n">input_left_shift</span><span class="p">,</span>
-<span class="w">                     </span><span class="kt">int32_t</span><span class="w"> </span><span class="n">input_size</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">int8_t</span><span class="o">*</span><span class="w"> </span><span class="n">input_data</span><span class="p">,</span>
-<span class="w">                     </span><span class="kt">int8_t</span><span class="o">*</span><span class="w"> </span><span class="n">output_data</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="n">perf_enable_counter</span><span class="p">(</span><span class="mi">6</span><span class="p">);</span>
-
-<span class="w">  </span><span class="p">...</span>
-
-<span class="w">  </span><span class="n">perf_disable_counter</span><span class="p">(</span><span class="mi">6</span><span class="p">);</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-</div>
-<section id="evaluation-criteria">
-<h3>Evaluation Criteria<a class="headerlink" href="#evaluation-criteria" title="Link to this heading">#</a></h3>
-<p>You should first pass the <code class="docutils literal notranslate"><span class="pre">LOGISTIC</span> <span class="pre">TEST</span></code> in the <code class="docutils literal notranslate"><span class="pre">Project</span> <span class="pre">menu</span></code>, then run MobileViT with any input and obtain scores based on the criteria.</p>
+<p><code class="docutils literal notranslate"><span class="pre">lab4.zip</span></code> provides the model, tests, and TFLM updates. The current project also includes accelerators, wrappers, simulation tools, and upload-flow fixes. The ZIP is not a backup of the complete current implementation.</p>
+<p>Omit the ZIP’s outermost <code class="docutils literal notranslate"><span class="pre">lab4/</span></code> directory when mapping files into the project. <strong>Merge folders, overwrite files with the same path, and add new files.</strong> Keep existing files that are not included in the package; the package contains updates, not a complete replacement for the platform or TFLM tree.</p>
 <div class="pst-scrollable-table-container"><table class="table">
 <thead>
-<tr class="row-odd"><th class="head"><p>Cycles of Counter 6</p></th>
-<th class="head"><p>&gt; 1000M</p></th>
-<th class="head"><p>400~1000M</p></th>
-<th class="head text-left"><p>140~400M</p></th>
-<th class="head text-left"><p>&lt; 140M</p></th>
+<tr class="row-odd"><th class="head"><p>Source in the ZIP</p></th>
+<th class="head"><p>Destination under <code class="docutils literal notranslate"><span class="pre">AAML_CPU_Backup/</span></code></p></th>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>Score</p></td>
-<td><p>0</p></td>
-<td><p>10</p></td>
-<td class="text-left"><p>30</p></td>
-<td class="text-left"><p>60</p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">lab4/Platform/sw/app/</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Platform/sw/app/</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">lab4/Platform/sw/models/</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Platform/sw/models/</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">lab4/Platform/sw/project/</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Platform/sw/project/</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">lab4/Platform/sw/tflm_patches/</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Platform/sw/tflm_patches/</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">lab4/Platform/sw/project.mk</span></code></p></td>
+<td><p>Overwrite <code class="docutils literal notranslate"><span class="pre">Platform/sw/project.mk</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">lab4/tflite-micro/</span></code></p></td>
+<td><p><strong><code class="docutils literal notranslate"><span class="pre">tflite-micro/</span></code> at the project root</strong></p></td>
 </tr>
 </tbody>
 </table>
 </div>
-<div class="admonition hint">
-<p class="admonition-title">Hint</p>
-<p>You may need to accelerate both the exponential and reciprocal parts in order to meet the full score cycle count criteria.</p>
-</div>
-<div class="admonition attention">
-<p class="admonition-title">Attention</p>
-<p>You will get <strong>0%</strong> if you can’t pass all <code class="docutils literal notranslate"><span class="pre">LOGISTIC</span> <span class="pre">TEST</span></code> in the <code class="docutils literal notranslate"><span class="pre">Project</span> <span class="pre">menu</span></code>.</p>
-</div>
 </section>
-<section id="guide">
-<h3>Guide<a class="headerlink" href="#guide" title="Link to this heading">#</a></h3>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p><strong>You are not required to follow to the provided guide below</strong>. Instead, feel free to use any method to accelerate the inference of Logistic function, provided that it passes the unit test.</p>
-</div>
-<p>First of all, it is essential to familiarize yourself with <strong>fixed-point</strong> arithmetic and the <code class="docutils literal notranslate"><span class="pre">FixedPoint</span></code> class defined in <code class="docutils literal notranslate"><span class="pre">fixedpoint.h</span></code>  ( Part 2: the FixedPoint class ). The key components and functions you are likely to use within the <code class="docutils literal notranslate"><span class="pre">FixedPoint</span></code> class include <code class="docutils literal notranslate"><span class="pre">kIntegerBits</span></code>, <code class="docutils literal notranslate"><span class="pre">FromRaw()</span></code>, and <code class="docutils literal notranslate"><span class="pre">raw()</span></code>.</p>
-<p>Additionally, You can refer to <a class="reference external" href="https://en.wikipedia.org/wiki/Q_(number_format)">Wikipedia - Q format notation</a> and the comments for the <code class="docutils literal notranslate"><span class="pre">FixedPoint</span></code> class in <code class="docutils literal notranslate"><span class="pre">fixedpoint.h</span></code> to help you understand fixed-point arithmetic. <strong>The <a class="reference external" href="https://chummersone.github.io/qformat.html#converter">Q format converter</a> is also a very useful tool</strong> that you can use to convert between fixed-point and floating-point numbers, which will definitely assist you in debugging.</p>
-<p>After tracing the code, you may notice that the <strong>exponential</strong> and the <strong>reciprocal</strong> are the primary bottlenecks, so we can focus on accelerating these two operations in this function.<br />
-<code class="docutils literal notranslate"><span class="pre">third_party/gemmlowp/fixedpoint/fixedpoint.h</span></code></p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Returns logistic(x) = 1 / (1 + exp(-x)) for x &gt; 0.</span>
-<span class="k">template</span><span class="w"> </span><span class="o">&lt;</span><span class="k">typename</span><span class="w"> </span><span class="nc">tRawType</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">tIntegerBits</span><span class="o">&gt;</span>
-<span class="n">FixedPoint</span><span class="o">&lt;</span><span class="n">tRawType</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="o">&gt;</span><span class="w"> </span><span class="n">logistic_on_positive_values</span><span class="p">(</span>
-<span class="w">    </span><span class="n">FixedPoint</span><span class="o">&lt;</span><span class="n">tRawType</span><span class="p">,</span><span class="w"> </span><span class="n">tIntegerBits</span><span class="o">&gt;</span><span class="w"> </span><span class="n">a</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">one_over_one_plus_x_for_x_in_0_1</span><span class="p">(</span><span class="n">exp_on_negative_values</span><span class="p">(</span><span class="o">-</span><span class="n">a</span><span class="p">));</span>
-<span class="p">}</span>
+<section id="model-configuration-and-tflm-updates">
+<h3>1.2 Model Configuration and TFLM Updates<a class="headerlink" href="#model-configuration-and-tflm-updates" title="Link to this heading">#</a></h3>
+<p>The package supplies <code class="docutils literal notranslate"><span class="pre">Platform/sw/project.mk</span></code>, which is read automatically by the default build commands. Its Lab4 settings are:</p>
+<div class="highlight-makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">MODEL_DIR</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span>models
+<span class="nv">MODEL_FILE</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span>mobileViT_xxs.tflite
+<span class="nv">MODEL_PROFILE</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span>mobileViT_xxs
+<span class="nv">TENSOR_ARENA_SIZE</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="m">8</span>*1024*1024
+<span class="nv">TARGET_PREFIX</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span>riscv64-unknown-elf
+<span class="nv">USE_SOFTWARE_CFU</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="m">0</span>
 </pre></div>
 </div>
-<section id="software">
-<h4>Software<a class="headerlink" href="#software" title="Link to this heading">#</a></h4>
-<p>Below is an example of replacing the original software-computed exponential with the CFU operation:</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">template</span><span class="w"> </span><span class="o">&lt;</span><span class="k">typename</span><span class="w"> </span><span class="nc">tRawType</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">tIntegerBits</span><span class="o">&gt;</span>
-<span class="n">FixedPoint</span><span class="o">&lt;</span><span class="n">tRawType</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="o">&gt;</span><span class="w"> </span><span class="n">exp_on_negative_values</span><span class="p">(</span>
-<span class="w">    </span><span class="n">FixedPoint</span><span class="o">&lt;</span><span class="n">tRawType</span><span class="p">,</span><span class="w"> </span><span class="n">tIntegerBits</span><span class="o">&gt;</span><span class="w"> </span><span class="n">a</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="k">typedef</span><span class="w"> </span><span class="n">FixedPoint</span><span class="o">&lt;</span><span class="n">tRawType</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="o">&gt;</span><span class="w"> </span><span class="n">ResultF</span><span class="p">;</span>
-<span class="w">  </span><span class="p">...</span>
-<span class="w">  </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cfu_op0</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
-<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">b</span><span class="p">;</span>
-<span class="p">}</span>
+<p>The model and profile are located at:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Platform/sw/models/mobileViT_xxs.tflite
+Platform/sw/models/mobileViT_xxs_profile.cc
 </pre></div>
 </div>
-<p>This is just a simple example. You should properly design your CFU op to pass the data needed for the hardware unit. Also, you should properly handle the conversion of <code class="docutils literal notranslate"><span class="pre">FixedPoint</span></code> and the <code class="docutils literal notranslate"><span class="pre">tRawType</span></code> using <code class="docutils literal notranslate"><span class="pre">FromRaw()</span></code> and <code class="docutils literal notranslate"><span class="pre">raw()</span></code>.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Given the symmetry of the Logistic function, it’s only necessary to consider either positive or negative inputs for the exponential computation, with the negative ones being simpler to manage.</p>
+<p>This model requires support for 6D tensors. Verify that the sources actually being compiled contain the following updates:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">tflite-micro/tensorflow/lite/kernels/internal/runtime_shape.h</span></code>: <code class="docutils literal notranslate"><span class="pre">kMaxSmallSize</span></code> is 6.</p></li>
+<li><p>Both the micro Transpose kernel and reference Transpose support up to six dimensions.</p></li>
+<li><p>The BatchMatMul kernel and registration updates supplied in the ZIP are installed.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Platform/sw/project/tflm_ops.cc</span></code> registers Logistic, Transpose, BatchMatMul, and the other operators required by the model. The current resolver capacity is 27.</p></li>
+</ul>
+<p>The insufficient shape capacity in the old version can corrupt memory. Increasing the tensor arena size does not replace this fix. Do not force every tensor’s actual dimension count to 6 either.</p>
+</section>
+<section id="clearing-the-previous-software-build">
+<h3>1.3 Clearing the Previous Software Build<a class="headerlink" href="#clearing-the-previous-software-build" title="Link to this heading">#</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">Platform/sw/Makefile</span></code> copies the root TFLM sources into <code class="docutils literal notranslate"><span class="pre">Platform/build/sw/src/</span></code>, then applies <code class="docutils literal notranslate"><span class="pre">tflm_patches/</span></code>. It does not automatically synchronize subsequent changes to the root TFLM tree. An existing build may therefore still contain the old TFLM sources after the package is installed.</p>
+<p>After installing the package, run this once from <code class="docutils literal notranslate"><span class="pre">Platform/</span></code>, before <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">prog</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>/home/hjeter02/work/AAML_CPU_Backup/Platform
+rm<span class="w"> </span>-rf<span class="w"> </span>build/sw
+</pre></div>
+</div>
+<p>This removes generated software build files, including the cached TFLM copy. It completes the Lab4 environment update. You do not need to create <code class="docutils literal notranslate"><span class="pre">build/sw/</span></code> yourself: <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">run</span></code> recreates it and compiles the updated sources. If the directory does not exist, the command has no effect.</p>
+</section>
+</section>
+<section id="profiling-the-mobilevit">
+<h2>2. Profiling the MobileViT<a class="headerlink" href="#profiling-the-mobilevit" title="Link to this heading">#</a></h2>
+<hr class="docutils" />
+<section id="establishing-a-comparable-baseline">
+<h3>2.1 Establishing a Comparable Baseline<a class="headerlink" href="#establishing-a-comparable-baseline" title="Link to this heading">#</a></h3>
+<p>Using the same model, input, and compilation settings, first record results with both Logistic and Transpose running on the CPU. Then enable acceleration separately.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Experiment mode</p></th>
+<th class="head"><p>Logistic</p></th>
+<th class="head"><p>Transpose</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>SW baseline</p></td>
+<td><p>CPU</p></td>
+<td><p>CPU</p></td>
+</tr>
+<tr class="row-odd"><td><p>Logistic acceleration only</p></td>
+<td><p>NPU</p></td>
+<td><p>CPU</p></td>
+</tr>
+<tr class="row-even"><td><p>Transpose acceleration only</p></td>
+<td><p>CPU</p></td>
+<td><p>NPU</p></td>
+</tr>
+<tr class="row-odd"><td><p>Both accelerated</p></td>
+<td><p>NPU</p></td>
+<td><p>NPU</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Here, SW refers only to these two operators. The existing Conv patch still uses Lab2’s <code class="docutils literal notranslate"><span class="pre">hw_simd_mac</span></code>. Keep the Conv mode fixed and record it explicitly when comparing results. To claim that the entire model runs purely on the CPU, you must also switch and validate Conv and any other existing accelerated paths.</p>
+<p>The current profile fills every byte of the input buffer with 0. This is <strong>raw int8 zero</strong>; the represented numerical value still depends on the input scale and zero point.</p>
+</section>
+<section id="counter-definitions-and-measurement-scope">
+<h3>2.2 Counter Definitions and Measurement Scope<a class="headerlink" href="#counter-definitions-and-measurement-scope" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Counter 0</p></td>
+<td><p>Accumulated cycles for the complete int8 Logistic function</p></td>
+</tr>
+<tr class="row-odd"><td><p>Counter 1</p></td>
+<td><p>Accumulated cycles for the complete Transpose function</p></td>
+</tr>
+<tr class="row-even"><td><p>Starts</p></td>
+<td><p>Accumulated function call count</p></td>
+</tr>
+<tr class="row-odd"><td><p>Average</p></td>
+<td><p>Total / Starts for that counter</p></td>
+</tr>
+<tr class="row-even"><td><p>Inference <code class="docutils literal notranslate"><span class="pre">Cycles</span></code></p></td>
+<td><p>Cycles measured by the runner for the complete <code class="docutils literal notranslate"><span class="pre">Invoke()</span></code> call</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The current template reads the 64-bit cycle counter with <code class="docutils literal notranslate"><span class="pre">perf_get_mcycle64()</span></code> and accumulates results through <code class="docutils literal notranslate"><span class="pre">perf_result</span></code>:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="kt">uint64_t</span><span class="w"> </span><span class="n">start</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">perf_get_mcycle64</span><span class="p">();</span>
+
+<span class="c1">// Complete operator: CPU computation or hardware calls, including</span>
+<span class="c1">// required waits and cache maintenance.</span>
+
+<span class="n">perf_result</span><span class="p">.</span><span class="n">add_start</span><span class="p">(</span><span class="n">counter_id</span><span class="p">);</span>
+<span class="n">perf_result</span><span class="p">.</span><span class="n">add_result</span><span class="p">(</span><span class="n">counter_id</span><span class="p">,</span><span class="w"> </span><span class="n">perf_get_mcycle64</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Use <code class="docutils literal notranslate"><span class="pre">counter_id</span></code> 0 for Logistic and 1 for Transpose. Clear statistics when preparing each model input and print them after inference. Keep UART printing outside the measurement interval.</p>
+<p>Transpose measurements must include cache clean/invalidate operations, parameter setup, transfers, and completion waits. Measuring only the NPU core execution time understates the actual cost. Counter 2 does not currently measure Conv automatically; add timing or a profiler if you need statistics for other operators.</p>
+<p>Record Total when comparing results, rather than relying only on Average. Calculate operator and model speedups separately:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Operator speedup = operator Total cycles in SW mode / operator Total cycles in HW mode
+Model speedup = baseline full Invoke cycles / accelerated full Invoke cycles
+Time (seconds) = cycles / CPU clock frequency (Hz)
+</pre></div>
+</div>
+<p>Keep the model, input, clock frequency, Conv mode, tool versions, and compiler options fixed. Tables or charts can help explain bottlenecks, but measurements of only Logistic and Transpose do not constitute a complete breakdown of all operators.</p>
+</section>
+</section>
+<section id="accelerating-the-logistic-function">
+<h2>3. Accelerating the Logistic Function<a class="headerlink" href="#accelerating-the-logistic-function" title="Link to this heading">#</a></h2>
+<hr class="docutils" />
+<section id="tracing-the-original-computation">
+<h3>3.1 Tracing the Original Computation<a class="headerlink" href="#tracing-the-original-computation" title="Link to this heading">#</a></h3>
+<p>The entry point is the topmost int8 <code class="docutils literal notranslate"><span class="pre">Logistic(...)</span></code> overload in:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Platform/sw/tflm_patches/tensorflow/lite/kernels/internal/reference/integer_ops/logistic.h
+</pre></div>
+</div>
+<p>Its main computation flow is:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>int8 input
+  → subtract input_zero_point
+  → check input_range_radius for saturation
+  → MultiplyByQuantizedMultiplier
+  → FixedPoint&lt;int32_t, 4&gt;
+  → gemmlowp::logistic
+  → FixedPoint&lt;int32_t, 0&gt;
+  → rounding, output zero point, and clamp
+  → int8 output
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">logistic.h</span></code> obtains the gemmlowp definitions indirectly through <code class="docutils literal notranslate"><span class="pre">common.h</span></code>. The implementation is located in:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>tflite-micro/third_party/gemmlowp/fixedpoint/fixedpoint.h
+</pre></div>
+</div>
+<p>Follow <code class="docutils literal notranslate"><span class="pre">logistic</span></code> and <code class="docutils literal notranslate"><span class="pre">logistic_on_positive_values</span></code> to find <code class="docutils literal notranslate"><span class="pre">exp_on_negative_values</span></code> and <code class="docutils literal notranslate"><span class="pre">one_over_one_plus_x_for_x_in_0_1</span></code>, which implement the exponential and reciprocal portions, respectively.</p>
+</section>
+<section id="fixed-point-formats">
+<h3>3.2 Fixed-Point Formats<a class="headerlink" href="#fixed-point-formats" title="Link to this heading">#</a></h3>
+<p>In the gemmlowp formats described here, the integer-bit count excludes the sign bit:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Type</p></th>
+<th class="head text-right"><p>Sign bits</p></th>
+<th class="head text-right"><p>Integer bits</p></th>
+<th class="head text-right"><p>Fractional bits</p></th>
+<th class="head"><p>Real value represented by raw</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">FixedPoint&lt;int32_t,</span> <span class="pre">4&gt;</span></code></p></td>
+<td class="text-right"><p>1</p></td>
+<td class="text-right"><p>4</p></td>
+<td class="text-right"><p>27</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">raw</span> <span class="pre">/</span> <span class="pre">2^27</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">FixedPoint&lt;int32_t,</span> <span class="pre">0&gt;</span></code></p></td>
+<td class="text-right"><p>1</p></td>
+<td class="text-right"><p>0</p></td>
+<td class="text-right"><p>31</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">raw</span> <span class="pre">/</span> <span class="pre">2^31</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">FromRaw()</span></code> interprets an integer bit pattern in the specified fixed-point format; <code class="docutils literal notranslate"><span class="pre">.raw()</span></code> returns the stored integer. Neither automatically quantizes an arbitrary floating-point value.</p>
+<p>Handle positive and negative inputs, zero, saturation, multiplication widths, truncation, and rounding. Mathematically, <code class="docutils literal notranslate"><span class="pre">sigmoid(0)=0.5</span></code>, whose Q0.31 raw representation is <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">&lt;&lt;</span> <span class="pre">30</span></code>. Do not reuse the pseudocode in the reference notes that returns 1 at zero.</p>
+</section>
+<section id="connecting-software-and-hardware">
+<h3>3.3 Connecting Software and Hardware<a class="headerlink" href="#connecting-software-and-hardware" title="Link to this heading">#</a></h3>
+<p>A useful starting point is to retain the original input quantization and output rounding, replacing only the sigmoid computation in between:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Original CPU computation, preserved for baseline comparisons:</span>
+<span class="c1">// gemmlowp::logistic(FixedPoint4::FromRaw(input_in_q4)).raw();</span>
+</pre></div>
+</div>
+<p>A function name alone does not move work to the NPU. The actual call path in the current interface is:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>logistic.h
+  → sw/app/lab4_accel.h
+  → cfu_raw_op(funct3, funct7, rs1, rs2)
+  → cfu.h: .insn r 0x0B, ...
+  → CPU decodes the CUSTOM-0 instruction
+  → NPU_start, followed by a wait for NPU_done
+  → NPU_out is written back to a CPU register
+</pre></div>
+</div>
+<p>CFU stands for Custom Function Unit; this platform reuses the corresponding software helpers. <code class="docutils literal notranslate"><span class="pre">.insn</span></code> is assembler syntax for encoding an instruction, and <code class="docutils literal notranslate"><span class="pre">0x0B</span></code> is the CUSTOM-0 opcode. The actual hardware entry point is <code class="docutils literal notranslate"><span class="pre">Platform/hw/srcs/NPU.v</span></code>. Follow its <code class="docutils literal notranslate"><span class="pre">NPU_start</span></code> / <code class="docutils literal notranslate"><span class="pre">NPU_done</span></code> protocol for multicycle operations.</p>
+<p>Preserve the instruction functions already used by Lab1 and Lab2. The new RTL and software calls must agree on <code class="docutils literal notranslate"><span class="pre">funct3</span></code>, <code class="docutils literal notranslate"><span class="pre">funct7</span></code>, input formats, and return values.</p>
+</section>
+</section>
+<section id="accelerating-the-transpose-function">
+<h2>4. Accelerating the Transpose Function<a class="headerlink" href="#accelerating-the-transpose-function" title="Link to this heading">#</a></h2>
+<hr class="docutils" />
+<section id="from-matrix-transpose-to-multidimensional-indexing">
+<h3>4.1 From Matrix Transpose to Multidimensional Indexing<a class="headerlink" href="#from-matrix-transpose-to-multidimensional-indexing" title="Link to this heading">#</a></h3>
+<p>The entry point is located in:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Platform/sw/tflm_patches/tensorflow/lite/kernels/internal/reference/transpose.h
+</pre></div>
+</div>
+<p>For a two-dimensional matrix, <code class="docutils literal notranslate"><span class="pre">output[i][j]</span> <span class="pre">=</span> <span class="pre">input[j][i]</span></code> can be expressed as strided reads from contiguous memory:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>input shape = [2, 3], perm = [1, 0]
+
+input:              output:
+1 2 3               1 4
+4 5 6               2 5
+                    3 6
+
+input buffer:  1, 2, 3, 4, 5, 6
+output buffer: 1, 4, 2, 5, 3, 6
+</pre></div>
+</div>
+<p>The input strides in this example are <code class="docutils literal notranslate"><span class="pre">[3,</span> <span class="pre">1]</span></code>. Advancing along the innermost output dimension moves the input pointer by three elements, so the innermost loop can use:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">output_data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">*</span><span class="n">input_data</span><span class="p">;</span>
+<span class="n">input_data</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">loop_stride</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>This is part of the transpose because the outer recursion, <code class="docutils literal notranslate"><span class="pre">perm</span></code>, and <code class="docutils literal notranslate"><span class="pre">loop_stride</span></code> have already determined which input positions to read.</p>
+<p>For a multidimensional tensor with output coordinates <code class="docutils literal notranslate"><span class="pre">o[d]</span></code>:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>output_shape[d] = input_shape[perm[d]]
+input_offset = Σ o[d] * input_stride[perm[d]]
+input_byte_address = input_base + input_offset * sizeof(T)
+</pre></div>
 </div>
 </section>
-<section id="hardware">
-<h4>Hardware<a class="headerlink" href="#hardware" title="Link to this heading">#</a></h4>
-<p>For the hardware unit section, it’s important to first familiarize yourself with the <strong>val/rdy interface</strong> of the CFU. In Lab 2, the calculation required only a single cycle, making it straightforward to handle. However, in this lab, your CFU operations may take more than one cycle to complete. To better understand how to manage multi-cycle operations, refer to this article for examples and guidance.</p>
+</section>
+<section id="check-results">
+<h2>5. Check Results<a class="headerlink" href="#check-results" title="Link to this heading">#</a></h2>
+<hr class="docutils" />
+<section id="basic-test-verification">
+<h3>5.1 Basic Test Verification<a class="headerlink" href="#basic-test-verification" title="Link to this heading">#</a></h3>
+<p>Losigtic function acceleration:
+Run <code class="docutils literal notranslate"><span class="pre">l:</span> <span class="pre">run</span> <span class="pre">logistic</span> <span class="pre">test</span></code> in <code class="docutils literal notranslate"><span class="pre">l:</span> <span class="pre">Lab</span> <span class="pre">menu</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Lab</span> <span class="p">:</span> <span class="n">Self</span> <span class="n">Test</span>
+<span class="o">===============</span>
+ <span class="n">l</span><span class="p">:</span> <span class="n">run</span> <span class="n">logistic</span> <span class="n">test</span>
+ <span class="n">t</span><span class="p">:</span> <span class="n">run</span> <span class="n">transpose</span> <span class="n">test</span>
+ <span class="n">x</span><span class="p">:</span> <span class="n">eXit</span> <span class="n">to</span> <span class="n">previous</span> <span class="n">menu</span>
+<span class="n">lab</span><span class="o">&gt;</span> <span class="n">l</span>
+
+<span class="n">Running</span> <span class="n">run</span> <span class="n">logistic</span> <span class="n">test</span>
+<span class="p">[</span><span class="n">PASS</span><span class="p">]</span> <span class="n">LogisticQuantizedInt8AroundZeroShouldMatchGolden</span>
+<span class="p">[</span><span class="n">PASS</span><span class="p">]</span> <span class="n">LogisticQuantizedInt8NarrowRangeShouldMatchGolden</span>
+<span class="p">[</span><span class="n">PASS</span><span class="p">]</span> <span class="n">LogisticQuantizedInt8BasicShouldMatchGolden</span>
+<span class="p">[</span><span class="n">PASS</span><span class="p">]</span> <span class="n">LogisticQuantizedInt8WideRangeShouldMatchGolden</span>
+<span class="n">Logistic</span> <span class="n">tests</span><span class="p">:</span> <span class="mi">4</span><span class="o">/</span><span class="mi">4</span> <span class="n">passed</span>
+<span class="o">---</span>
+</pre></div>
+</div>
+<p>Transpose function acceleration:
+Run <code class="docutils literal notranslate"><span class="pre">t:</span> <span class="pre">run</span> <span class="pre">transpose</span> <span class="pre">test</span></code> in <code class="docutils literal notranslate"><span class="pre">l:</span> <span class="pre">Lab</span> <span class="pre">menu</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Lab</span> <span class="p">:</span> <span class="n">Self</span> <span class="n">Test</span>
+<span class="o">===============</span>
+ <span class="n">l</span><span class="p">:</span> <span class="n">run</span> <span class="n">logistic</span> <span class="n">test</span>
+ <span class="n">t</span><span class="p">:</span> <span class="n">run</span> <span class="n">transpose</span> <span class="n">test</span>
+ <span class="n">x</span><span class="p">:</span> <span class="n">eXit</span> <span class="n">to</span> <span class="n">previous</span> <span class="n">menu</span>
+<span class="n">lab</span><span class="o">&gt;</span> <span class="n">t</span>
+
+<span class="n">Running</span> <span class="n">run</span> <span class="n">transpose</span> <span class="n">test</span>
+<span class="p">[</span><span class="n">PASS</span><span class="p">]</span> <span class="mi">2</span><span class="n">D_2x3_perm10</span>
+<span class="p">[</span><span class="n">PASS</span><span class="p">]</span> <span class="mi">2</span><span class="n">D_4x5_perm10</span>
+<span class="p">[</span><span class="n">PASS</span><span class="p">]</span> <span class="mi">2</span><span class="n">D_1x8_perm10</span>
+<span class="p">[</span><span class="n">PASS</span><span class="p">]</span> <span class="mi">2</span><span class="n">D_identity_3x4_perm01</span>
+<span class="p">[</span><span class="n">PASS</span><span class="p">]</span> <span class="mi">3</span><span class="n">D_2x2x2_perm210</span>
+<span class="p">[</span><span class="n">PASS</span><span class="p">]</span> <span class="mi">3</span><span class="n">D_2x3x4_perm201</span>
+<span class="p">[</span><span class="n">PASS</span><span class="p">]</span> <span class="mi">3</span><span class="n">D_2x3x4_perm021</span>
+<span class="p">[</span><span class="n">PASS</span><span class="p">]</span> <span class="mi">3</span><span class="n">D_3x2x5_perm102</span>
+<span class="p">[</span><span class="n">PASS</span><span class="p">]</span> <span class="mi">3</span><span class="n">D_identity_2x3x4_perm012</span>
+<span class="p">[</span><span class="n">PASS</span><span class="p">]</span> <span class="mi">4</span><span class="n">D_NHWC_to_NCHW_1x3x4x2</span>
+<span class="p">[</span><span class="n">PASS</span><span class="p">]</span> <span class="mi">4</span><span class="n">D_NCHW_to_NHWC_2x2x3x4</span>
+<span class="p">[</span><span class="n">PASS</span><span class="p">]</span> <span class="mi">4</span><span class="n">D_reverse_2x3x2x3_perm3210</span>
+<span class="p">[</span><span class="n">PASS</span><span class="p">]</span> <span class="mi">5</span><span class="n">D_2x2x2x2x3_perm43210</span>
+<span class="p">[</span><span class="n">PASS</span><span class="p">]</span> <span class="mi">6</span><span class="n">D_2x2x2x2x2x2_perm543210</span>
+<span class="n">Transpose</span> <span class="n">tests</span><span class="p">:</span> <span class="mi">14</span><span class="o">/</span><span class="mi">14</span> <span class="n">passed</span>
+<span class="o">---</span>
+</pre></div>
+</div>
+</section>
+<section id="running-tflm-model-inference">
+<h3>5.2 Running TFLM Model Inference<a class="headerlink" href="#running-tflm-model-inference" title="Link to this heading">#</a></h3>
+<p>In this part, We use <code class="docutils literal notranslate"><span class="pre">mobileViT_xxs</span></code> as our benchmark model. Then, compare runtime cycles to show performance improve on accelerated version logistic &amp; tranpose function.
+The model and profile are located at:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Platform/sw/models/mobileViT_xxs.tflite
+Platform/sw/models/mobileViT_xxs_profile.cc
+</pre></div>
+</div>
+<p>Run <code class="docutils literal notranslate"><span class="pre">t:</span> <span class="pre">TFLM</span> <span class="pre">inferencr,</span> <span class="pre">verificatoin,</span> <span class="pre">and</span> <span class="pre">cycles</span></code> at the default menu.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">TinyRISC</span><span class="o">-</span><span class="n">V</span> <span class="n">SoC</span> <span class="n">Platform</span>
+<span class="o">=======================</span>
+ <span class="n">l</span><span class="p">:</span> <span class="n">Lab</span> <span class="n">menu</span>
+ <span class="n">t</span><span class="p">:</span> <span class="n">TFLM</span> <span class="n">inference</span><span class="p">,</span> <span class="n">verification</span><span class="p">,</span> <span class="ow">and</span> <span class="n">cycles</span>
+ <span class="n">p</span><span class="p">:</span> <span class="n">Performance</span> <span class="n">counter</span> <span class="n">tests</span>
+ <span class="n">i</span><span class="p">:</span> <span class="n">System</span> <span class="n">info</span>
+<span class="n">main</span><span class="o">&gt;</span> <span class="n">t</span>
+
+<span class="n">Running</span> <span class="n">TFLM</span> <span class="n">inference</span><span class="p">,</span> <span class="n">verification</span><span class="p">,</span> <span class="ow">and</span> <span class="n">cycles</span>
+
+<span class="o">===</span> <span class="n">TFLM</span> <span class="n">Functional</span> <span class="n">Verification</span> <span class="o">===</span>
+<span class="n">Model</span><span class="p">:</span> <span class="n">mobileViT_xxs</span><span class="o">.</span><span class="n">tflite</span> <span class="p">(</span><span class="mi">1212672</span> <span class="nb">bytes</span><span class="p">)</span>
+<span class="n">Tensor</span> <span class="n">arena</span><span class="p">:</span> <span class="mi">8388608</span> <span class="nb">bytes</span>
+<span class="n">Profile</span><span class="p">:</span> <span class="n">mobileVit_xxs</span>
+<span class="n">Input</span> <span class="n">profile</span><span class="p">:</span> <span class="n">zero</span> <span class="nb">input</span>
+<span class="n">Output</span> <span class="n">profile</span><span class="p">:</span> <span class="n">Print</span> <span class="n">Output</span> <span class="n">Value</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mi">0</span>
+<span class="n">Samples</span><span class="p">:</span> <span class="mi">1</span>
+
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">---</span> <span class="n">Sample</span> <span class="mi">1</span><span class="o">/</span><span class="mi">1</span> <span class="o">---</span>
+<span class="n">Running</span> <span class="n">inference</span><span class="o">...</span>
+<span class="n">Inference</span> <span class="n">complete</span><span class="o">.</span>
+<span class="n">Output</span> <span class="p">(</span><span class="mi">10</span> <span class="nb">bytes</span><span class="p">):</span>
+<span class="mi">00</span><span class="p">:</span> <span class="o">-</span><span class="mi">32</span>
+<span class="mi">01</span><span class="p">:</span> <span class="mi">114</span>
+<span class="mi">02</span><span class="p">:</span> <span class="o">-</span><span class="mi">38</span>
+<span class="mi">03</span><span class="p">:</span> <span class="mi">52</span>
+<span class="mi">04</span><span class="p">:</span> <span class="mi">50</span>
+<span class="mi">05</span><span class="p">:</span> <span class="mi">127</span>
+<span class="mi">06</span><span class="p">:</span> <span class="o">-</span><span class="mi">120</span>
+<span class="mi">07</span><span class="p">:</span> <span class="o">-</span><span class="mi">128</span>
+<span class="mi">08</span><span class="p">:</span> <span class="o">-</span><span class="mi">71</span>
+<span class="mi">09</span><span class="p">:</span> <span class="mi">80</span>
+
+<span class="o">==============================================</span>
+ <span class="n">Counter</span> <span class="o">|</span>       <span class="n">Total</span> <span class="o">|</span> <span class="n">Starts</span> <span class="o">|</span>   <span class="n">Average</span>
+<span class="o">---------+-------------+--------+-------------</span>
+    <span class="mi">0</span>    <span class="o">|</span>         <span class="n">xxx</span> <span class="o">|</span>    <span class="n">xxx</span> <span class="o">|</span>         <span class="n">xxx</span>
+    <span class="mi">1</span>    <span class="o">|</span>         <span class="n">xxx</span> <span class="o">|</span>    <span class="n">xxx</span> <span class="o">|</span>         <span class="n">xxx</span>
+    <span class="mi">2</span>    <span class="o">|</span>           <span class="mi">0</span> <span class="o">|</span>      <span class="mi">0</span> <span class="o">|</span>         <span class="n">n</span><span class="o">/</span><span class="n">a</span>
+    <span class="mi">3</span>    <span class="o">|</span>           <span class="mi">0</span> <span class="o">|</span>      <span class="mi">0</span> <span class="o">|</span>         <span class="n">n</span><span class="o">/</span><span class="n">a</span>
+    <span class="mi">4</span>    <span class="o">|</span>           <span class="mi">0</span> <span class="o">|</span>      <span class="mi">0</span> <span class="o">|</span>         <span class="n">n</span><span class="o">/</span><span class="n">a</span>
+    <span class="mi">5</span>    <span class="o">|</span>           <span class="mi">0</span> <span class="o">|</span>      <span class="mi">0</span> <span class="o">|</span>         <span class="n">n</span><span class="o">/</span><span class="n">a</span>
+    <span class="mi">6</span>    <span class="o">|</span>           <span class="mi">0</span> <span class="o">|</span>      <span class="mi">0</span> <span class="o">|</span>         <span class="n">n</span><span class="o">/</span><span class="n">a</span>
+    <span class="mi">7</span>    <span class="o">|</span>           <span class="mi">0</span> <span class="o">|</span>      <span class="mi">0</span> <span class="o">|</span>         <span class="n">n</span><span class="o">/</span><span class="n">a</span>
+    <span class="mi">8</span>    <span class="o">|</span>           <span class="mi">0</span> <span class="o">|</span>      <span class="mi">0</span> <span class="o">|</span>         <span class="n">n</span><span class="o">/</span><span class="n">a</span>
+    <span class="mi">9</span>    <span class="o">|</span>           <span class="mi">0</span> <span class="o">|</span>      <span class="mi">0</span> <span class="o">|</span>         <span class="n">n</span><span class="o">/</span><span class="n">a</span>
+<span class="o">==============================================</span>
+<span class="n">Cycles</span><span class="p">:</span> <span class="n">xxx</span>
+<span class="n">Time</span> <span class="p">(</span><span class="mi">50000000</span> <span class="n">Hz</span><span class="p">):</span> <span class="n">xxx</span> <span class="n">ms</span>
+<span class="o">---</span>
+</pre></div>
+</div>
 <blockquote>
-<div><p><a class="reference external" href="https://cfu-playground.readthedocs.io/en/latest/interface.html">Details and Use Cases of the CPU &lt;-&gt; CFU interface</a></p>
+<div><p>xxx represents values measured during execution. Counter 0 measures Logistic, and Counter 1 measures Transpose. Total is the accumulated cycle count, Starts is the number of calls, and Average is Total / Starts. The final Cycles and Time report the complete inference measurement.</p>
 </div></blockquote>
-<p>For calculating results using hardware, you have the option to employ either a Lookup Table or Mathematical Approximation methods, such as the Taylor Series, Newton-Raphson division.</p>
-<p>In this lab, for the <strong>exponential function, we recommend using either a Lookup Table or the Taylor Series</strong>. For the <strong>reciprocal function, we suggest using a Lookup Table or the Newton-Raphson division method</strong>, similar to the approach used in <code class="docutils literal notranslate"><span class="pre">one_over_one_plus_x_for_x_in_0_1()</span></code>, but implemented in hardware.</p>
 </section>
 </section>
-</section>
-<section id="accelerating-the-softmax-function-20">
-<h2>Accelerating the Softmax Function - 20%<a class="headerlink" href="#accelerating-the-softmax-function-20" title="Link to this heading">#</a></h2>
-<div class="amsmath math notranslate nohighlight">
-\[\begin{gather*}
-\text{softmax}(x_i) = \frac{e^{x_{i}}}{\sum_{j=1}^n e^{x_{j}}}
-\end{gather*}\]</div>
-<p>Add the Softmax function to your project.</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>cp<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>../../third_party/tflite-micro/tensorflow/lite/kernels/internal/reference/softmax.h<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>src/tensorflow/lite/kernels/internal/reference/softmax.h
-</pre></div>
-</div>
-<div class="admonition important">
-<p class="admonition-title">Important</p>
-<p>Add the <strong>fifth perf counter</strong> at the beginning and end of the <strong>second</strong> Softmax function within the <code class="docutils literal notranslate"><span class="pre">softmax.h</span></code> file in your project. This step is crucial for evaluating your score, so please ensure it is not overlooked.</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// Quantized softmax with int8_t/uint8_t input and int8_t/uint8_t/int16_t</span>
-<span class="c1">// output.</span>
-<span class="k">template</span><span class="w"> </span><span class="o">&lt;</span><span class="k">typename</span><span class="w"> </span><span class="nc">InputT</span><span class="p">,</span><span class="w"> </span><span class="k">typename</span><span class="w"> </span><span class="nc">OutputT</span><span class="o">&gt;</span>
-<span class="kr">inline</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="n">Softmax</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">SoftmaxParams</span><span class="o">&amp;</span><span class="w"> </span><span class="n">params</span><span class="p">,</span>
-<span class="w">                    </span><span class="k">const</span><span class="w"> </span><span class="n">RuntimeShape</span><span class="o">&amp;</span><span class="w"> </span><span class="n">input_shape</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">InputT</span><span class="o">*</span><span class="w"> </span><span class="n">input_data</span><span class="p">,</span>
-<span class="w">                    </span><span class="k">const</span><span class="w"> </span><span class="n">RuntimeShape</span><span class="o">&amp;</span><span class="w"> </span><span class="n">output_shape</span><span class="p">,</span><span class="w"> </span><span class="n">OutputT</span><span class="o">*</span><span class="w"> </span><span class="n">output_data</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="n">perf_enable_counter</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span>
-<span class="w">  </span>
-<span class="w">  </span><span class="p">...</span>
-
-<span class="w">  </span><span class="n">perf_disable_counter</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-</div>
-<section id="id1">
-<h3>Evaluation Criteria<a class="headerlink" href="#id1" title="Link to this heading">#</a></h3>
-<p>You should first pass the <code class="docutils literal notranslate"><span class="pre">SOFTMAX</span> <span class="pre">TEST</span></code> in the <code class="docutils literal notranslate"><span class="pre">Project</span> <span class="pre">menu</span></code>, then run MobileViT with any input and obtain scores based on the criteria.</p>
-<div class="pst-scrollable-table-container"><table class="table">
-<thead>
-<tr class="row-odd"><th class="head"><p>Cycles of Counter 5</p></th>
-<th class="head"><p>&gt; 60M</p></th>
-<th class="head text-left"><p>30~60M</p></th>
-<th class="head text-left"><p>&lt; 30M</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>Score</p></td>
-<td><p>0</p></td>
-<td class="text-left"><p>10</p></td>
-<td class="text-left"><p>20</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="admonition attention">
-<p class="admonition-title">Attention</p>
-<p>You will get <strong>0%</strong> if you can’t pass all <code class="docutils literal notranslate"><span class="pre">SOFTMAX</span> <span class="pre">TEST</span></code> in the <code class="docutils literal notranslate"><span class="pre">Project</span> <span class="pre">menu</span></code>.</p>
-</div>
-</section>
-<section id="id2">
-<h3>Guide<a class="headerlink" href="#id2" title="Link to this heading">#</a></h3>
-<p>Following the previous approach, replacing the exponential and reciprocal functions with CFU operations is a good idea. The CFU operations designed for the Logistic function might work here too.</p>
-<p>But, be careful: the fixed-point integer bits used for the exponential function are different in the Logistic and Softmax functions—<strong>the Logistic uses 4 and the Softmax uses 5</strong>. Pay close attention to this detail.</p>
-</section>
-</section>
-<section id="questions-in-the-demo-10">
-<h2>Questions in the Demo - 10%<a class="headerlink" href="#questions-in-the-demo-10" title="Link to this heading">#</a></h2>
-<p>You will be asked several questions about the concepts covered in this lab and your implementation. This section accounts for 10% of the total lab score.</p>
+<section id="questions-in-the-demo">
+<h2>6. Questions in the Demo<a class="headerlink" href="#questions-in-the-demo" title="Link to this heading">#</a></h2>
+<hr class="docutils" />
+<p>You will be asked several questions about the concepts covered in this lab and your implementation. This section accounts for X% of the total lab score.</p>
 </section>
 <section id="submission">
-<h2>Submission<a class="headerlink" href="#submission" title="Link to this heading">#</a></h2>
+<h2>7. Submission<a class="headerlink" href="#submission" title="Link to this heading">#</a></h2>
+<hr class="docutils" />
 <p>You need to hand in your <strong>CFU-Playground project folder</strong> without the <code class="docutils literal notranslate"><span class="pre">build</span></code> folder and renamed with your student ID.</p>
 <p>Please organize your submission files into a zip archive structured as follows:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>YourID.zip
-    └── YourID/
-        ├── src/
-        │    ├── folder... 
-        │    └── files...
-        ├── cfu.v
-        ├── Makefile
-        └── Other files needed for compilation...
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>[YourID]-lab4.zip
+└── [YourID]-lab4/
+    ├── hw/
+    │   ├── NPU.v
+    │   └── {any other required modules}
+    ├── sw/
+    │   ├── logistic.h
+    │   ├── transpose.h
+    │   └── {any other required headers or source files}
+    └── report/
+        └── lab4_report.pdf
 </pre></div>
 </div>
 <div class="admonition important">
@@ -790,29 +876,36 @@ Add the integer version of the Logistic function to your project.</p>
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#goal-of-this-lab">Goal of this lab</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#introduction">Introduction</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#porting-and-profiling-the-models-10">Porting and Profiling the Models - 10%</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#porting-the-new-model-and-tests-5">Porting the New Model and Tests - 5%</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#profiling-the-mobilevit-5">Profiling the MobileViT - 5%</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#goal-of-this-lab">Goal of this lab</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#porting-the-model-and-tests">1. Porting the Model and Tests</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#project-structure-extracting">1.1 Project Structure &amp; Extracting</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#model-configuration-and-tflm-updates">1.2 Model Configuration and TFLM Updates</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#clearing-the-previous-software-build">1.3 Clearing the Previous Software Build</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#accelerating-the-logistic-function-60">Accelerating the Logistic Function - 60%</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#evaluation-criteria">Evaluation Criteria</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#guide">Guide</a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#software">Software</a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#hardware">Hardware</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#profiling-the-mobilevit">2. Profiling the MobileViT</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#establishing-a-comparable-baseline">2.1 Establishing a Comparable Baseline</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#counter-definitions-and-measurement-scope">2.2 Counter Definitions and Measurement Scope</a></li>
 </ul>
 </li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#accelerating-the-logistic-function">3. Accelerating the Logistic Function</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tracing-the-original-computation">3.1 Tracing the Original Computation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fixed-point-formats">3.2 Fixed-Point Formats</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#connecting-software-and-hardware">3.3 Connecting Software and Hardware</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#accelerating-the-softmax-function-20">Accelerating the Softmax Function - 20%</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Evaluation Criteria</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Guide</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#accelerating-the-transpose-function">4. Accelerating the Transpose Function</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#from-matrix-transpose-to-multidimensional-indexing">4.1 From Matrix Transpose to Multidimensional Indexing</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#questions-in-the-demo-10">Questions in the Demo - 10%</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#submission">Submission</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#check-results">5. Check Results</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#basic-test-verification">5.1 Basic Test Verification</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#running-tflm-model-inference">5.2 Running TFLM Model Inference</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#questions-in-the-demo">6. Questions in the Demo</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#submission">7. Submission</a></li>
 </ul>
   </nav></div>
 

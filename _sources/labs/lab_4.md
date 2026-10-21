@@ -1,347 +1,404 @@
 # Lab 4 : Elementwise Unit
 
-## Goal of this lab
----
-- [Porting and Profiling the Models - 10%](#porting-and-profiling-the-models-10)
-- [Accelerating the Logistic Function - 60%](#accelerating-the-logistic-function-60)
-- [Accelerating the Softmax Function - 20%](#accelerating-the-softmax-function-20)
-- [Questions in the Demo - 10%](#questions-in-the-demo-10)
-
 ## Introduction
 ---
-Modern models frequently utilize specialized activation functions that involve complex mathematical computations, such as exponentials, square roots, and reciprocals. Unlike simpler functions like ReLU, these sophisticated operations can become bottlenecks during model inference. In this lab, we will design an element-wise unit specifically for enhancing the inference speed of the **Logistic** and **Softmax** functions in the **MobileViT** model.
+Modern models frequently utilize specialized activation functions that involve complex mathematical computations, such as exponentials, square roots, and reciprocals. Unlike simpler functions like ReLU, these sophisticated operations can become bottlenecks during model inference. In this lab, we will design an element-wise unit specifically for enhancing the inference speed of the **Logistic** functions in the **MobileViT** model.
+Logistic applies the sigmoid function to each element:
+$$ \sigma(x)=\frac{1}{1+e^{-x}} $$
+Additionally, MobileViT combines convolution, nonlinear operations, and multidimensional tensor rearrangement. This lab focuses on two different costs: fixed-point numerical computation in Logistic, and index calculation and memory transfers in **Transpose**.
 
-## Porting and Profiling the Models - 10%
+
+## Goal of this lab
 ---
-### Porting the New Model and Tests - 5%
+1. Integrate MobileViT xxs and its tests into the platform and establish a correct software baseline.
+2. Trace the quantization and fixed-point arithmetic in int8 Logistic and design a hardware accelerator.
+3. Understand multidimensional Transpose strides and address generation, and rearrange data through the NPU AXI master.
+4. Handle multicycle custom instructions and memory consistency between the CPU cache and NPU.
 
-In this lab, we provide you a new model and the project template. Follow the instrusctions below to install them.
-
-1. Project Template with Tests
-
-    The project template contains some tests and files you'll use in this lab.
-    ```sh
-    $ cd ${CFU_ROOT}/proj/
-    $ wget https://github.com/nycu-caslab/AAML2025/raw/main/lab4_util/lab4_template.zip
-    $ unzip lab4_template.zip
-    ```
-
-    In the `/src/tensorflow/lite/micro/` directory, you’ll find tests for the Logistic and Softmax functions, along with some updated kernels for MobileViT inference. **DO NOT MODIFY** any files in this directory.
-
-
-2. MobileViT Model
-
-    This is the model we aim to accelerate. We will use this model to benchmark the performance of your design.
-    ```sh
-    $ cd ${CFU_ROOT}/common/src/models
-    $ wget https://github.com/nycu-caslab/AAML2025/raw/main/lab4_util/lab4_model.zip
-    $ unzip lab4_model.zip
-    ```
-
-After that, just like we did in lab 1, we should modify some files to add the new models: 
-
-`CFU-Playground/common/src/models/models.c`  
-```c
-#include "models/ds_cnn_stream_fe/ds_cnn.h"
-// add codes below
-#include "models/mobileViT_xxs/mobileViT.h"
-
-...
-
-#if defined(INCLUDE_MODEL_DS_CNN_STREAM_FE)
-        MENU_ITEM(AUTO_INC_CHAR, "Ds cnn stream fe", ds_cnn_stream_fe_menu),
-#endif
-// add codes below
-#if defined(INCLUDE_MODEL_MOBILE_VIT_XXS)
-        MENU_ITEM(AUTO_INC_CHAR, "MobileViT xxs", mobileViT_xxs_menu),
-#endif
+## 1. Porting the Model and Tests
+---
+### 1.1 Project Structure & Extracting
+```text
+YOUR_PROJECT/
+    ├── tflite-micro/
+    └── Platform/
+        ├── Makefile
+        ├── hw/
+        │   └── srcs/NPU.v
+        └── sw/
+            ├── app/
+            ├── models/
+            ├── project/
+            ├── tflm_patches/
+            └── project.mk
 ```
 
-`CFU-Playground/common/src/tflite.cc`
+`lab4.zip` provides the model, tests, and TFLM updates. The current project also includes accelerators, wrappers, simulation tools, and upload-flow fixes. The ZIP is not a backup of the complete current implementation.
+
+Omit the ZIP's outermost `lab4/` directory when mapping files into the project. **Merge folders, overwrite files with the same path, and add new files.** Keep existing files that are not included in the package; the package contains updates, not a complete replacement for the platform or TFLM tree.
+
+| Source in the ZIP | Destination under `AAML_CPU_Backup/` |
+| --- | --- |
+| `lab4/Platform/sw/app/` | `Platform/sw/app/` |
+| `lab4/Platform/sw/models/` | `Platform/sw/models/` |
+| `lab4/Platform/sw/project/` | `Platform/sw/project/` |
+| `lab4/Platform/sw/tflm_patches/` | `Platform/sw/tflm_patches/` |
+| `lab4/Platform/sw/project.mk` | Overwrite `Platform/sw/project.mk` |
+| `lab4/tflite-micro/` | **`tflite-micro/` at the project root** |
+
+### 1.2 Model Configuration and TFLM Updates
+
+The package supplies `Platform/sw/project.mk`, which is read automatically by the default build commands. Its Lab4 settings are:
+
+```makefile
+MODEL_DIR := models
+MODEL_FILE := mobileViT_xxs.tflite
+MODEL_PROFILE := mobileViT_xxs
+TENSOR_ARENA_SIZE := 8*1024*1024
+TARGET_PREFIX := riscv64-unknown-elf
+USE_SOFTWARE_CFU := 0
+```
+
+The model and profile are located at:
+
+```text
+Platform/sw/models/mobileViT_xxs.tflite
+Platform/sw/models/mobileViT_xxs_profile.cc
+```
+
+This model requires support for 6D tensors. Verify that the sources actually being compiled contain the following updates:
+
+- `tflite-micro/tensorflow/lite/kernels/internal/runtime_shape.h`: `kMaxSmallSize` is 6.
+- Both the micro Transpose kernel and reference Transpose support up to six dimensions.
+- The BatchMatMul kernel and registration updates supplied in the ZIP are installed.
+- `Platform/sw/project/tflm_ops.cc` registers Logistic, Transpose, BatchMatMul, and the other operators required by the model. The current resolver capacity is 27.
+
+The insufficient shape capacity in the old version can corrupt memory. Increasing the tensor arena size does not replace this fix. Do not force every tensor's actual dimension count to 6 either.
+
+### 1.3 Clearing the Previous Software Build
+
+`Platform/sw/Makefile` copies the root TFLM sources into `Platform/build/sw/src/`, then applies `tflm_patches/`. It does not automatically synchronize subsequent changes to the root TFLM tree. An existing build may therefore still contain the old TFLM sources after the package is installed.
+
+After installing the package, run this once from `Platform/`, before `make prog`:
+
+```bash
+cd /home/hjeter02/work/AAML_CPU_Backup/Platform
+rm -rf build/sw
+```
+
+This removes generated software build files, including the cached TFLM copy. It completes the Lab4 environment update. You do not need to create `build/sw/` yourself: `make run` recreates it and compiles the updated sources. If the directory does not exist, the command has no effect.
+
+## 2. Profiling the MobileViT
+---
+
+### 2.1 Establishing a Comparable Baseline
+
+Using the same model, input, and compilation settings, first record results with both Logistic and Transpose running on the CPU. Then enable acceleration separately.
+
+| Experiment mode | Logistic | Transpose |
+| --- | --- | --- |
+| SW baseline | CPU | CPU |
+| Logistic acceleration only | NPU | CPU |
+| Transpose acceleration only | CPU | NPU |
+| Both accelerated | NPU | NPU |
+
+Here, SW refers only to these two operators. The existing Conv patch still uses Lab2's `hw_simd_mac`. Keep the Conv mode fixed and record it explicitly when comparing results. To claim that the entire model runs purely on the CPU, you must also switch and validate Conv and any other existing accelerated paths.
+
+The current profile fills every byte of the input buffer with 0. This is **raw int8 zero**; the represented numerical value still depends on the input scale and zero point.
+
+### 2.2 Counter Definitions and Measurement Scope
+
+| Field | Meaning |
+| --- | --- |
+| Counter 0 | Accumulated cycles for the complete int8 Logistic function |
+| Counter 1 | Accumulated cycles for the complete Transpose function |
+| Starts | Accumulated function call count |
+| Average | Total / Starts for that counter |
+| Inference `Cycles` | Cycles measured by the runner for the complete `Invoke()` call |
+
+The current template reads the 64-bit cycle counter with `perf_get_mcycle64()` and accumulates results through `perf_result`:
+
 ```cpp
-#ifdef INCLUDE_MODEL_DS_CNN_STREAM_FE
-    2048 * 1024,
-#endif
-// add codes below
-#ifdef INCLUDE_MODEL_MOBILE_VIT_XXS
-    16384 * 1024,
-#endif
+uint64_t start = perf_get_mcycle64();
+
+// Complete operator: CPU computation or hardware calls, including
+// required waits and cache maintenance.
+
+perf_result.add_start(counter_id);
+perf_result.add_result(counter_id, perf_get_mcycle64() - start);
 ```
 
-`CFU-Playground/proj/<lab4 proj folder>/Makefile`  
-(This has been done in the project template.)
-```sh
-DEFINES += INCLUDE_MODEL_MOBILE_VIT_XXS
+Use `counter_id` 0 for Logistic and 1 for Transpose. Clear statistics when preparing each model input and print them after inference. Keep UART printing outside the measurement interval.
+
+Transpose measurements must include cache clean/invalidate operations, parameter setup, transfers, and completion waits. Measuring only the NPU core execution time understates the actual cost. Counter 2 does not currently measure Conv automatically; add timing or a profiler if you need statistics for other operators.
+
+Record Total when comparing results, rather than relying only on Average. Calculate operator and model speedups separately:
+
+```text
+Operator speedup = operator Total cycles in SW mode / operator Total cycles in HW mode
+Model speedup = baseline full Invoke cycles / accelerated full Invoke cycles
+Time (seconds) = cycles / CPU clock frequency (Hz)
 ```
 
-After completing these steps, you should be able to run the MobileViT model and the Tests in the `Project menu`.
-```sh
-$ make prog EXTRA_LITEX_ARGS="--cpu-variant=perf+cfu"
-$ make load
-```
-* MobileViT result of zeros input without any modification
-```
- Counter |  Total | Starts | Average |     Raw
----------+--------+--------+---------+--------------
-    0    |     0  |     0  |   n/a   |            0
-    1    |     0  |     0  |   n/a   |            0
-    2    |     0  |     0  |   n/a   |            0
-    3    |     0  |     0  |   n/a   |            0
-    4    |     0  |     0  |   n/a   |            0
-    5    |   145M |     9  |    16M  |    145244066
-    6    |  1318M |    37  |    36M  |   1317968736
-    7    |     0  |     0  |   n/a   |            0
-  5234M (   5233667340 )  cycles total
-0 : -128,
-1 : 67,
-2 : 57,
-3 : -72,
-4 : 100,
-5 : 37,
-6 : -9,
-7 : -8,
-8 : -6,
-9 : -21,
-```
-* Tests for Logistic and Softmax
-```
-CFU Playground
-==============
- 1: TfLM Models menu
- 2: Functional CFU Tests
->3: Project menu
- 4: Performance Counter Tests
- 5: TFLite Unit Tests
- 6: Benchmarks
- 7: Util Tests
- 8: Embench IoT
- d: Donut demo
-main> 3
+Keep the model, input, clock frequency, Conv mode, tool versions, and compiler options fixed. Tables or charts can help explain bottlenecks, but measurements of only Logistic and Transpose do not constitute a complete breakdown of all operators.
 
-Running Project menu
+## 3. Accelerating the Logistic Function
+---
 
-Project Menu
-============
- 1: Run logistic tests
- 2: Run softmax tests
+### 3.1 Tracing the Original Computation
+
+The entry point is the topmost int8 `Logistic(...)` overload in:
+
+```text
+Platform/sw/tflm_patches/tensorflow/lite/kernels/internal/reference/integer_ops/logistic.h
+```
+
+Its main computation flow is:
+
+```text
+int8 input
+  → subtract input_zero_point
+  → check input_range_radius for saturation
+  → MultiplyByQuantizedMultiplier
+  → FixedPoint<int32_t, 4>
+  → gemmlowp::logistic
+  → FixedPoint<int32_t, 0>
+  → rounding, output zero point, and clamp
+  → int8 output
+```
+
+`logistic.h` obtains the gemmlowp definitions indirectly through `common.h`. The implementation is located in:
+
+```text
+tflite-micro/third_party/gemmlowp/fixedpoint/fixedpoint.h
+```
+
+Follow `logistic` and `logistic_on_positive_values` to find `exp_on_negative_values` and `one_over_one_plus_x_for_x_in_0_1`, which implement the exponential and reciprocal portions, respectively.
+
+### 3.2 Fixed-Point Formats
+
+In the gemmlowp formats described here, the integer-bit count excludes the sign bit:
+
+| Type | Sign bits | Integer bits | Fractional bits | Real value represented by raw |
+| --- | ---: | ---: | ---: | --- |
+| `FixedPoint<int32_t, 4>` | 1 | 4 | 27 | `raw / 2^27` |
+| `FixedPoint<int32_t, 0>` | 1 | 0 | 31 | `raw / 2^31` |
+
+`FromRaw()` interprets an integer bit pattern in the specified fixed-point format; `.raw()` returns the stored integer. Neither automatically quantizes an arbitrary floating-point value.
+
+Handle positive and negative inputs, zero, saturation, multiplication widths, truncation, and rounding. Mathematically, `sigmoid(0)=0.5`, whose Q0.31 raw representation is `1 << 30`. Do not reuse the pseudocode in the reference notes that returns 1 at zero.
+
+### 3.3 Connecting Software and Hardware
+
+A useful starting point is to retain the original input quantization and output rounding, replacing only the sigmoid computation in between:
+
+```cpp
+// Original CPU computation, preserved for baseline comparisons:
+// gemmlowp::logistic(FixedPoint4::FromRaw(input_in_q4)).raw();
+
+```
+
+A function name alone does not move work to the NPU. The actual call path in the current interface is:
+
+```text
+logistic.h
+  → sw/app/lab4_accel.h
+  → cfu_raw_op(funct3, funct7, rs1, rs2)
+  → cfu.h: .insn r 0x0B, ...
+  → CPU decodes the CUSTOM-0 instruction
+  → NPU_start, followed by a wait for NPU_done
+  → NPU_out is written back to a CPU register
+```
+
+CFU stands for Custom Function Unit; this platform reuses the corresponding software helpers. `.insn` is assembler syntax for encoding an instruction, and `0x0B` is the CUSTOM-0 opcode. The actual hardware entry point is `Platform/hw/srcs/NPU.v`. Follow its `NPU_start` / `NPU_done` protocol for multicycle operations.
+
+Preserve the instruction functions already used by Lab1 and Lab2. The new RTL and software calls must agree on `funct3`, `funct7`, input formats, and return values.
+
+## 4. Accelerating the Transpose Function
+---
+
+### 4.1 From Matrix Transpose to Multidimensional Indexing
+
+The entry point is located in:
+
+```text
+Platform/sw/tflm_patches/tensorflow/lite/kernels/internal/reference/transpose.h
+```
+
+For a two-dimensional matrix, `output[i][j] = input[j][i]` can be expressed as strided reads from contiguous memory:
+
+```text
+input shape = [2, 3], perm = [1, 0]
+
+input:              output:
+1 2 3               1 4
+4 5 6               2 5
+                    3 6
+
+input buffer:  1, 2, 3, 4, 5, 6
+output buffer: 1, 4, 2, 5, 3, 6
+```
+
+The input strides in this example are `[3, 1]`. Advancing along the innermost output dimension moves the input pointer by three elements, so the innermost loop can use:
+
+```cpp
+output_data[i] = *input_data;
+input_data += loop_stride;
+```
+
+This is part of the transpose because the outer recursion, `perm`, and `loop_stride` have already determined which input positions to read.
+
+For a multidimensional tensor with output coordinates `o[d]`:
+
+```text
+output_shape[d] = input_shape[perm[d]]
+input_offset = Σ o[d] * input_stride[perm[d]]
+input_byte_address = input_base + input_offset * sizeof(T)
+```
+
+## 5. Check Results
+---
+### 5.1 Basic Test Verification
+
+Losigtic function acceleration:
+Run `l: run logistic test` in `l: Lab menu`
+
+```
+Lab : Self Test
+===============
+ l: run logistic test
+ t: run transpose test
  x: eXit to previous menu
-project> 1
+lab> l
 
-Running Run logistic tests
-
-LOGISTIC TEST:
-Testing LogisticQuantizedInt8AroundZeroShouldMatchGolden
-Testing LogisticQuantizedInt8NarrowRangeShouldMatchGolden
-Testing LogisticQuantizedInt8BasicShouldMatchGolden
-Testing LogisticQuantizedInt8WideRangeShouldMatchGolden
-4/4 tests passed
-~~~ALL TESTS PASSED~~~
+Running run logistic test
+[PASS] LogisticQuantizedInt8AroundZeroShouldMatchGolden
+[PASS] LogisticQuantizedInt8NarrowRangeShouldMatchGolden
+[PASS] LogisticQuantizedInt8BasicShouldMatchGolden
+[PASS] LogisticQuantizedInt8WideRangeShouldMatchGolden
+Logistic tests: 4/4 passed
+---
 ```
 
-### Profiling the MobileViT - 5%
-
-After executing the MobileViT model, you may notice that the inference process is quite slow. Please **analyze and compare the time consumed by each operation**, with particular attention to the **activation functions**. You may present your analysis in any format, such as **a table or a pie chart**. Additionally, you have the option to use data with or without SIMD MAC acceleration.
-
-Here is an example of a pie chart:  
-<img src="images/lab4/pie_example.png" width="600px">
-
-```{hint}
-You can use either the perf counter or the ticks displayed in the results after execution as your data source. 
-the displayed ticks look something like this:
-
-    ...
-    450,LOGISTIC,1848
-    451,MUL,84
-    452,CONCATENATION,35
-    453,CONV_2D,27022
-    454,LOGISTIC,1804
-    455,MUL,84
-    456,CONV_2D,9782
-    457,LOGISTIC,7071
-    458,MUL,333
-    459,AVERAGE_POOL_2D,84
-    460,RESHAPE,6
-    461,FULLY_CONNECTED,48
-    Perf counters not enabled.
-      5558M (   5558234259 )  cycles total
+Transpose function acceleration:
+Run `t: run transpose test` in `l: Lab menu`
 
 ```
+Lab : Self Test
+===============
+ l: run logistic test
+ t: run transpose test
+ x: eXit to previous menu
+lab> t
 
-Next, trace the code of the Logistic function to identify the **complex mathematical computations involved**, which may be contributing to the slow execution.
-
-Make sure to present your findings to the TAs during the demo.
-```{hint}
-You can start tracing the code from this file, and the model will use the topmost overloaded `Logistic(...)` function:  
-`CFU-Playground/third_party/tflite-micro/tensorflow\
-/lite/kernels/internal/reference/integer_ops/logistic.h`  
-Then, you will find the mathematical computations are defined in:  
-`CFU-Playground/third_party/tflite-micro/third_party/gemmlowp/fixedpoint/fixedpoint.h`
+Running run transpose test
+[PASS] 2D_2x3_perm10
+[PASS] 2D_4x5_perm10
+[PASS] 2D_1x8_perm10
+[PASS] 2D_identity_3x4_perm01
+[PASS] 3D_2x2x2_perm210
+[PASS] 3D_2x3x4_perm201
+[PASS] 3D_2x3x4_perm021
+[PASS] 3D_3x2x5_perm102
+[PASS] 3D_identity_2x3x4_perm012
+[PASS] 4D_NHWC_to_NCHW_1x3x4x2
+[PASS] 4D_NCHW_to_NHWC_2x2x3x4
+[PASS] 4D_reverse_2x3x2x3_perm3210
+[PASS] 5D_2x2x2x2x3_perm43210
+[PASS] 6D_2x2x2x2x2x2_perm543210
+Transpose tests: 14/14 passed
+---
 ```
 
-## Accelerating the Logistic Function - 60%
+### 5.2 Running TFLM Model Inference
+In this part, We use `mobileViT_xxs` as our benchmark model. Then, compare runtime cycles to show performance improve on accelerated version logistic & tranpose function.
+The model and profile are located at:
+
+```text
+Platform/sw/models/mobileViT_xxs.tflite
+Platform/sw/models/mobileViT_xxs_profile.cc
+```
+Run `t: TFLM inferencr, verificatoin, and cycles` at the default menu.
+```
+TinyRISC-V SoC Platform
+=======================
+ l: Lab menu
+ t: TFLM inference, verification, and cycles
+ p: Performance counter tests
+ i: System info
+main> t
+
+Running TFLM inference, verification, and cycles
+
+=== TFLM Functional Verification ===
+Model: mobileViT_xxs.tflite (1212672 bytes)
+Tensor arena: 8388608 bytes
+Profile: mobileVit_xxs
+Input profile: zero input
+Output profile: Print Output Value, tolerance=0
+Samples: 1
+
+```
+```
+--- Sample 1/1 ---
+Running inference...
+Inference complete.
+Output (10 bytes):
+00: -32
+01: 114
+02: -38
+03: 52
+04: 50
+05: 127
+06: -120
+07: -128
+08: -71
+09: 80
+
+==============================================
+ Counter |       Total | Starts |   Average
+---------+-------------+--------+-------------
+    0    |         xxx |    xxx |         xxx
+    1    |         xxx |    xxx |         xxx
+    2    |           0 |      0 |         n/a
+    3    |           0 |      0 |         n/a
+    4    |           0 |      0 |         n/a
+    5    |           0 |      0 |         n/a
+    6    |           0 |      0 |         n/a
+    7    |           0 |      0 |         n/a
+    8    |           0 |      0 |         n/a
+    9    |           0 |      0 |         n/a
+==============================================
+Cycles: xxx
+Time (50000000 Hz): xxx ms
+---
+```
+> xxx represents values measured during execution. Counter 0 measures Logistic, and Counter 1 measures Transpose. Total is the accumulated cycle count, Starts is the number of calls, and Average is Total / Starts. The final Cycles and Time report the complete inference measurement.
+
+## 6. Questions in the Demo
 ---
 
-\begin{gather*}
-\text{logistic}(x) = \frac{1}{1 + e^{-x}}
-\end{gather*}
-
-(We have done these for you in the template.)  
-Add the integer version of the Logistic function to your project. 
-```sh
-$ cp \
-  ../../third_party/tflite-micro/tensorflow/lite/kernels/internal/reference/integer_ops/logistic.h \
-  src/tensorflow/lite/kernels/internal/reference/integer_ops/logistic.h
-```
-````{important}
-Add the **sixth perf counter** at the beginning and end of the **topmost** Logistic function within the `logistic.h` file in your project. This step is crucial for evaluating your score, so please ensure it is not overlooked.
-
-```cpp
-inline void Logistic(int32_t input_zero_point, int32_t input_range_radius,
-                     int32_t input_multiplier, int32_t input_left_shift,
-                     int32_t input_size, const int8_t* input_data,
-                     int8_t* output_data) {
-  perf_enable_counter(6);
-
-  ...
-
-  perf_disable_counter(6);
-}
-```
-````
-
-### Evaluation Criteria
-You should first pass the `LOGISTIC TEST` in the `Project menu`, then run MobileViT with any input and obtain scores based on the criteria.
-
-| Cycles of Counter 6 | > 1000M | 400~1000M | 140~400M | < 140M |
-| ------------------- | ------- | --------- |:-------- |:------ |
-| Score               | 0       | 10        | 30       | 60     |
-
-```{hint}
-You may need to accelerate both the exponential and reciprocal parts in order to meet the full score cycle count criteria.
-```
-
-```{attention} 
-You will get **0%** if you can't pass all `LOGISTIC TEST` in the `Project menu`.
-```
-
-### Guide
-
-```{note}
-**You are not required to follow to the provided guide below**. Instead, feel free to use any method to accelerate the inference of Logistic function, provided that it passes the unit test.
-```
-First of all, it is essential to familiarize yourself with **fixed-point** arithmetic and the `FixedPoint` class defined in `fixedpoint.h`  ( Part 2: the FixedPoint class ). The key components and functions you are likely to use within the `FixedPoint` class include `kIntegerBits`, `FromRaw()`, and `raw()`.
-
-Additionally, You can refer to [Wikipedia - Q format notation](https://en.wikipedia.org/wiki/Q_(number_format)) and the comments for the `FixedPoint` class in `fixedpoint.h` to help you understand fixed-point arithmetic. **The [Q format converter](https://chummersone.github.io/qformat.html#converter) is also a very useful tool** that you can use to convert between fixed-point and floating-point numbers, which will definitely assist you in debugging.
+You will be asked several questions about the concepts covered in this lab and your implementation. This section accounts for X% of the total lab score.
 
 
-
-After tracing the code, you may notice that the **exponential** and the **reciprocal** are the primary bottlenecks, so we can focus on accelerating these two operations in this function.  
-`third_party/gemmlowp/fixedpoint/fixedpoint.h`
-```cpp
-// Returns logistic(x) = 1 / (1 + exp(-x)) for x > 0.
-template <typename tRawType, int tIntegerBits>
-FixedPoint<tRawType, 0> logistic_on_positive_values(
-    FixedPoint<tRawType, tIntegerBits> a) {
-  return one_over_one_plus_x_for_x_in_0_1(exp_on_negative_values(-a));
-}
-```
-
-#### Software
-
-Below is an example of replacing the original software-computed exponential with the CFU operation:
-```cpp
-template <typename tRawType, int tIntegerBits>
-FixedPoint<tRawType, 0> exp_on_negative_values(
-    FixedPoint<tRawType, tIntegerBits> a) {
-  typedef FixedPoint<tRawType, 0> ResultF;
-  ...
-  b = cfu_op0(0, 0, 0);
-  return b;
-}
-```
-This is just a simple example. You should properly design your CFU op to pass the data needed for the hardware unit. Also, you should properly handle the conversion of `FixedPoint` and the `tRawType` using `FromRaw()` and `raw()`.
-
-```{note}
-Given the symmetry of the Logistic function, it's only necessary to consider either positive or negative inputs for the exponential computation, with the negative ones being simpler to manage.
-```
-
-#### Hardware
-For the hardware unit section, it’s important to first familiarize yourself with the **val/rdy interface** of the CFU. In Lab 2, the calculation required only a single cycle, making it straightforward to handle. However, in this lab, your CFU operations may take more than one cycle to complete. To better understand how to manage multi-cycle operations, refer to this article for examples and guidance.
-> [Details and Use Cases of the CPU <-> CFU interface](https://cfu-playground.readthedocs.io/en/latest/interface.html)
-
-For calculating results using hardware, you have the option to employ either a Lookup Table or Mathematical Approximation methods, such as the Taylor Series, Newton-Raphson division.
-
-In this lab, for the **exponential function, we recommend using either a Lookup Table or the Taylor Series**. For the **reciprocal function, we suggest using a Lookup Table or the Newton-Raphson division method**, similar to the approach used in `one_over_one_plus_x_for_x_in_0_1()`, but implemented in hardware.
-
-## Accelerating the Softmax Function - 20%
-
-\begin{gather*}
-\text{softmax}(x_i) = \frac{e^{x_{i}}}{\sum_{j=1}^n e^{x_{j}}}
-\end{gather*}
-
-Add the Softmax function to your project.
-```sh
-$ cp \
-  ../../third_party/tflite-micro/tensorflow/lite/kernels/internal/reference/softmax.h \
-  src/tensorflow/lite/kernels/internal/reference/softmax.h
-```
-
-````{important}
-Add the **fifth perf counter** at the beginning and end of the **second** Softmax function within the `softmax.h` file in your project. This step is crucial for evaluating your score, so please ensure it is not overlooked.
-
-```cpp
-// Quantized softmax with int8_t/uint8_t input and int8_t/uint8_t/int16_t
-// output.
-template <typename InputT, typename OutputT>
-inline void Softmax(const SoftmaxParams& params,
-                    const RuntimeShape& input_shape, const InputT* input_data,
-                    const RuntimeShape& output_shape, OutputT* output_data) {
-  perf_enable_counter(5);
-  
-  ...
-
-  perf_disable_counter(5);
-}
-```
-````
-
-### Evaluation Criteria
-
-You should first pass the `SOFTMAX TEST` in the `Project menu`, then run MobileViT with any input and obtain scores based on the criteria.
-
-| Cycles of Counter 5 | > 60M  | 30~60M  | < 30M |
-| ------------------- | ------ |:------- |:----- |
-| Score               | 0      | 10      | 20    |
-
-```{attention} 
-You will get **0%** if you can't pass all `SOFTMAX TEST` in the `Project menu`.
-```
-
-### Guide
-
-Following the previous approach, replacing the exponential and reciprocal functions with CFU operations is a good idea. The CFU operations designed for the Logistic function might work here too. 
-
-But, be careful: the fixed-point integer bits used for the exponential function are different in the Logistic and Softmax functions—**the Logistic uses 4 and the Softmax uses 5**. Pay close attention to this detail.
-
-## Questions in the Demo - 10%
-
-You will be asked several questions about the concepts covered in this lab and your implementation. This section accounts for 10% of the total lab score.
-
-
-## Submission
+## 7. Submission
+---
 
 You need to hand in your **CFU-Playground project folder** without the `build` folder and renamed with your student ID. 
 
 Please organize your submission files into a zip archive structured as follows:
 ```
-YourID.zip
-    └── YourID/
-        ├── src/
-        │    ├── folder... 
-        │    └── files...
-        ├── cfu.v
-        ├── Makefile
-        └── Other files needed for compilation...
+[YourID]-lab4.zip
+└── [YourID]-lab4/
+    ├── hw/
+    │   ├── NPU.v
+    │   └── {any other required modules}
+    ├── sw/
+    │   ├── logistic.h
+    │   ├── transpose.h
+    │   └── {any other required headers or source files}
+    └── report/
+        └── lab4_report.pdf
 ```
 
 ```{important}
