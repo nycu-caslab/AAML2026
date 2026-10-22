@@ -82,7 +82,7 @@ The insufficient shape capacity in the old version can corrupt memory. Increasin
 After installing the package, run this once from `Platform/`, before `make prog`:
 
 ```bash
-cd /home/hjeter02/work/AAML_CPU_Backup/Platform
+cd /Platform
 rm -rf build/sw
 ```
 
