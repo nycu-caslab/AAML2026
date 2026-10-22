@@ -373,6 +373,7 @@
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#accelerating-the-transpose-function">4. Accelerating the Transpose Function</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#from-matrix-transpose-to-multidimensional-indexing">4.1 From Matrix Transpose to Multidimensional Indexing</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#implementation-constraints">4.2 Implementation Constraints</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#check-results">5. Check Results</a><ul class="nav section-nav flex-column">
@@ -696,6 +697,17 @@ input_byte_address = input_base + input_offset * sizeof(T)
 </pre></div>
 </div>
 </section>
+<section id="implementation-constraints">
+<h3>4.2 Implementation Constraints<a class="headerlink" href="#implementation-constraints" title="Link to this heading">#</a></h3>
+<p>In hardware-accelerated mode, Transpose must move tensor elements through the NPU’s AXI master interface. The data-copy operation corresponding to <code class="docutils literal notranslate"><span class="pre">*output_data</span> <span class="pre">=</span> <span class="pre">*input_data</span></code> must be implemented in the NPU.</p>
+<ul class="simple">
+<li><p>Input tensor elements must not be loaded into CPU general-purpose registers as part of the Transpose operation.</p></li>
+<li><p>Output tensor elements must not be written from CPU general-purpose registers as part of the Transpose operation.</p></li>
+<li><p>The CPU must not use ordinary load/store instructions through its load/store unit (LSU) to perform the tensor rearrangement. Reading an element on the CPU and passing its value to the NPU is also prohibited.</p></li>
+<li><p>The CPU may compute shapes, strides, and addresses; pass configuration parameters and buffer addresses to the NPU; issue commands; and wait for completion.</p></li>
+<li><p>Necessary cache maintenance operations, including clean and invalidate, are allowed to maintain consistency between CPU and NPU memory accesses.</p></li>
+</ul>
+</section>
 </section>
 <section id="check-results">
 <h2>5. Check Results<a class="headerlink" href="#check-results" title="Link to this heading">#</a></h2>
@@ -825,7 +837,6 @@ Platform/sw/models/mobileViT_xxs_profile.cc
 <section id="submission">
 <h2>7. Submission<a class="headerlink" href="#submission" title="Link to this heading">#</a></h2>
 <hr class="docutils" />
-<p>You need to hand in your <strong>CFU-Playground project folder</strong> without the <code class="docutils literal notranslate"><span class="pre">build</span></code> folder and renamed with your student ID.</p>
 <p>Please organize your submission files into a zip archive structured as follows:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>[YourID]-lab4.zip
 └── [YourID]-lab4/
@@ -897,6 +908,7 @@ Platform/sw/models/mobileViT_xxs_profile.cc
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#accelerating-the-transpose-function">4. Accelerating the Transpose Function</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#from-matrix-transpose-to-multidimensional-indexing">4.1 From Matrix Transpose to Multidimensional Indexing</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#implementation-constraints">4.2 Implementation Constraints</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#check-results">5. Check Results</a><ul class="nav section-nav flex-column">
