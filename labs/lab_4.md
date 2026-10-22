@@ -255,6 +255,15 @@ output_shape[d] = input_shape[perm[d]]
 input_offset = Σ o[d] * input_stride[perm[d]]
 input_byte_address = input_base + input_offset * sizeof(T)
 ```
+### 4.2 Implementation Constraints
+
+In hardware-accelerated mode, Transpose must move tensor elements through the NPU's AXI master interface. The data-copy operation corresponding to `*output_data = *input_data` must be implemented in the NPU.
+
+- Input tensor elements must not be loaded into CPU general-purpose registers as part of the Transpose operation.
+- Output tensor elements must not be written from CPU general-purpose registers as part of the Transpose operation.
+- The CPU must not use ordinary load/store instructions through its load/store unit (LSU) to perform the tensor rearrangement. Reading an element on the CPU and passing its value to the NPU is also prohibited.
+- The CPU may compute shapes, strides, and addresses; pass configuration parameters and buffer addresses to the NPU; issue commands; and wait for completion.
+- Necessary cache maintenance operations, including clean and invalidate, are allowed to maintain consistency between CPU and NPU memory accesses.
 
 ## 5. Check Results
 ---
@@ -382,9 +391,7 @@ You will be asked several questions about the concepts covered in this lab and y
 
 
 ## 7. Submission
----
-
-You need to hand in your **CFU-Playground project folder** without the `build` folder and renamed with your student ID. 
+--- 
 
 Please organize your submission files into a zip archive structured as follows:
 ```
