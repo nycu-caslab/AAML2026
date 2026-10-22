@@ -37,7 +37,7 @@ YOUR_PROJECT/
 
 Omit the ZIP's outermost `lab4/` directory when mapping files into the project. **Merge folders, overwrite files with the same path, and add new files.** Keep existing files that are not included in the package; the package contains updates, not a complete replacement for the platform or TFLM tree.
 
-| Source in the ZIP | Destination under `AAML_CPU_Backup/` |
+| Source in the ZIP | Destination under `TinyRISC-V-SoC-Platform/` |
 | --- | --- |
 | `lab4/Platform/sw/app/` | `Platform/sw/app/` |
 | `lab4/Platform/sw/models/` | `Platform/sw/models/` |
@@ -83,7 +83,7 @@ After installing the package, run this once from `Platform/`, before `make prog`
 
 ```bash
 cd /Platform
-rm -rf build/sw
+make sw_clean
 ```
 
 This removes generated software build files, including the cached TFLM copy. It completes the Lab4 environment update. You do not need to create `build/sw/` yourself: `make run` recreates it and compiles the updated sources. If the directory does not exist, the command has no effect.
@@ -113,26 +113,50 @@ The current profile fills every byte of the input buffer with 0. This is **raw i
 | Counter 0 | Accumulated cycles for the complete int8 Logistic function |
 | Counter 1 | Accumulated cycles for the complete Transpose function |
 | Starts | Accumulated function call count |
+| Total | Sum of measured cycles across all calls to that operator during one inference |
 | Average | Total / Starts for that counter |
 | Inference `Cycles` | Cycles measured by the runner for the complete `Invoke()` call |
 
-The current template reads the 64-bit cycle counter with `perf_get_mcycle64()` and accumulates results through `perf_result`:
+### 2.3 Implementation and Timing Requirements
+
+Implement each operator within the marked design region below. Use counter ID `0` for Logistic and `1` for Transpose. Helper functions may be defined elsewhere, but all per-call work must execute within the measured interval.
 
 ```cpp
+// TIMING START — DO NOT MODIFY OR MOVE.
 uint64_t start = perf_get_mcycle64();
 
-// Complete operator: CPU computation or hardware calls, including
-// required waits and cache maintenance.
+// ================= DESIGN REGION BEGIN =================
+// Implement the complete operator here.
+// You may call helper functions and hardware accelerators.
+//
+// Include all per-call work:
+// - Parameter and stride calculations and required input processing.
+// - Required cache maintenance and data transfers.
+// - CPU or NPU computation.
+// - Waiting for hardware completion.
+// - Final output processing and required cache maintenance.
+//
+// All output data must be ready before leaving this region.
+// Do not move work outside this region to reduce measured cycles.
+// Do not return early or bypass the timing and statistics below.
+// ================== DESIGN REGION END ==================
 
+// TIMING END AND STATISTICS — DO NOT MODIFY OR MOVE.
 perf_result.add_start(counter_id);
 perf_result.add_result(counter_id, perf_get_mcycle64() - start);
 ```
 
-Use `counter_id` 0 for Logistic and 1 for Transpose. Clear statistics when preparing each model input and print them after inference. Keep UART printing outside the measurement interval.
+```{warning}
+Preserve the provided timing boundaries, counter assignments, cycle-counter implementation, and statistics collection and reporting logic. These requirements apply to both the CPU baseline and the accelerated implementation.
 
-Transpose measurements must include cache clean/invalidate operations, parameter setup, transfers, and completion waits. Measuring only the NPU core execution time understates the actual cost. Counter 2 does not currently measure Conv automatically; add timing or a profiler if you need statistics for other operators.
+Each operator invocation must be measured exactly once, from before its per-call preparation begins until computation and required memory/cache operations have completed and the output is ready for use. Moving work outside this interval, bypassing measurement, or altering recorded cycles to improve the reported speedup is prohibited.
+```
 
-Record Total when comparing results, rather than relying only on Average. Calculate operator and model speedups separately:
+### 2.4 Reporting Cycles and Speedup
+
+Preserve the existing measurement sequence: clear statistics when preparing each model input, accumulate results across all operator calls during inference, and print statistics after inference. Keep UART printing outside the operator measurement intervals.
+
+Use **Total**, not Average, to calculate operator speedup. Calculate operator and model speedups separately:
 
 ```text
 Operator speedup = operator Total cycles in SW mode / operator Total cycles in HW mode
@@ -140,7 +164,9 @@ Model speedup = baseline full Invoke cycles / accelerated full Invoke cycles
 Time (seconds) = cycles / CPU clock frequency (Hz)
 ```
 
-Keep the model, input, clock frequency, Conv mode, tool versions, and compiler options fixed. Tables or charts can help explain bottlenecks, but measurements of only Logistic and Transpose do not constitute a complete breakdown of all operators.
+Keep the model, input, clock frequency, Conv mode, tool versions, and compiler options fixed between baseline and accelerated runs. Report the operator Total cycles and full inference cycles for each experiment mode, together with the corresponding speedups.
+
+Counter 2 does not currently measure Conv automatically. Any additional profiling must preserve the required measurements above. Measurements of only Logistic and Transpose do not constitute a complete breakdown of all operators.
 
 ## 3. Accelerating the Logistic Function
 ---
@@ -153,7 +179,7 @@ The entry point is the topmost int8 `Logistic(...)` overload in:
 Platform/sw/tflm_patches/tensorflow/lite/kernels/internal/reference/integer_ops/logistic.h
 ```
 
-Its main computation flow is:
+This lab targets the int8 overload; the int16 overload later in the file is a separate implementation. The original CPU computation follows this flow:
 
 ```text
 int8 input
@@ -167,6 +193,8 @@ int8 input
   → int8 output
 ```
 
+Inputs outside the permitted radius take the saturation branch directly. For other inputs, accelerate the sigmoid computation as described in Section 3.3.
+
 `logistic.h` obtains the gemmlowp definitions indirectly through `common.h`. The implementation is located in:
 
 ```text
@@ -174,6 +202,16 @@ tflite-micro/third_party/gemmlowp/fixedpoint/fixedpoint.h
 ```
 
 Follow `logistic` and `logistic_on_positive_values` to find `exp_on_negative_values` and `one_over_one_plus_x_for_x_in_0_1`, which implement the exponential and reciprocal portions, respectively.
+
+The mathematical relationships behind these functions are:
+
+```text
+sigmoid(x) = 1 / (1 + exp(-x))
+sigmoid(-x) = 1 - sigmoid(x)
+sigmoid(0) = 0.5
+```
+
+For a positive magnitude, the original implementation evaluates the exponential of its negative value, then the reciprocal expression. It uses symmetry to handle negative inputs and handles zero explicitly. These equations explain the computation; the fixed-point implementation also determines approximation, rounding, and saturation behavior.
 
 ### 3.2 Fixed-Point Formats
 
@@ -186,23 +224,32 @@ In the gemmlowp formats described here, the integer-bit count excludes the sign 
 
 `FromRaw()` interprets an integer bit pattern in the specified fixed-point format; `.raw()` returns the stored integer. Neither automatically quantizes an arbitrary floating-point value.
 
+The Q0.31 sigmoid result is an intermediate value, not the final int8 output. The original code applies `RoundingDivideByPOT(..., 23)`, adds the output zero point of `-128`, and clamps the result to `[-128, 127]`. For example, the Q0.31 representation of `0.5` becomes `128` after rounding and scaling, then `0` after the zero-point adjustment.
+
 Handle positive and negative inputs, zero, saturation, multiplication widths, truncation, and rounding. Mathematically, `sigmoid(0)=0.5`, whose Q0.31 raw representation is `1 << 30`. Do not reuse the pseudocode in the reference notes that returns 1 at zero.
 
 ### 3.3 Connecting Software and Hardware
 
-A useful starting point is to retain the original input quantization and output rounding, replacing only the sigmoid computation in between:
+Implement your changes inside the `DESIGN REGION BEGIN` / `DESIGN REGION END` markers in the int8 Logistic template, following Section 2.3. Preserve Counter 0 and its timing boundaries around the complete operator, including the input loop, quantization, saturation handling, hardware calls, and output processing.
+
+A useful starting point is to retain the original input quantization and output rounding, replacing the following CPU sigmoid computation with a call to your hardware implementation:
 
 ```cpp
-// Original CPU computation, preserved for baseline comparisons:
-// gemmlowp::logistic(FixedPoint4::FromRaw(input_in_q4)).raw();
-
+const int32_t output_in_q0 =
+    gemmlowp::logistic(FixedPoint4::FromRaw(input_in_q4)).raw();
 ```
 
-A function name alone does not move work to the NPU. The actual call path in the current interface is:
+This computation is inside the non-saturated branch of the input loop. Record the original CPU implementation's results for the baseline comparisons described in Section 2.1.
+
+After changing the header's implementation, run `make sw_clean` from `Platform/` before rebuilding with `make run`. If the RTL changes, also rebuild and program the hardware with `make prog` before running the software.
+
+If you replace only this expression, the replacement must accept the signed Q4.27 raw input and produce a compatible Q0.31 raw result. Preserve the subsequent rounding, output zero-point adjustment, and clamping. You may organize the hardware internally as you choose while preserving the operator's required behavior.
+
+Connect the software call to your hardware through the platform's custom-instruction interface. A typical call path is:
 
 ```text
-logistic.h
-  → sw/app/lab4_accel.h
+logistic.h: accelerator call inside the design region
+  → your software wrapper
   → cfu_raw_op(funct3, funct7, rs1, rs2)
   → cfu.h: .insn r 0x0B, ...
   → CPU decodes the CUSTOM-0 instruction
@@ -212,18 +259,40 @@ logistic.h
 
 CFU stands for Custom Function Unit; this platform reuses the corresponding software helpers. `.insn` is assembler syntax for encoding an instruction, and `0x0B` is the CUSTOM-0 opcode. The actual hardware entry point is `Platform/hw/srcs/NPU.v`. Follow its `NPU_start` / `NPU_done` protocol for multicycle operations.
 
-Preserve the instruction functions already used by Lab1 and Lab2. The new RTL and software calls must agree on `funct3`, `funct7`, input formats, and return values.
+Define the instruction function fields, operand meanings, and result format consistently in your software and RTL. Preserve the instruction functions already used by Lab1 and Lab2. For a multicycle computation, assert completion only when the result is valid; the CPU must wait for completion before consuming it. Include this execution and waiting time in the operator measurement specified in Section 2.3.
 
 ## 4. Accelerating the Transpose Function
 ---
 
 ### 4.1 From Matrix Transpose to Multidimensional Indexing
 
-The entry point is located in:
+The entry point is `Transpose(...)` in:
 
 ```text
 Platform/sw/tflm_patches/tensorflow/lite/kernels/internal/reference/transpose.h
 ```
+
+Transpose changes the order of tensor dimensions and rearranges the corresponding elements. It preserves every element's value and the total element count; it does not perform arithmetic or requantization on tensor values.
+
+The original implementation uses contiguous row-major storage, where the last dimension varies fastest. The following metadata describes the mapping:
+
+| Metadata | Meaning |
+| --- | --- |
+| `input_shape[d]`, `output_shape[d]` | Number of elements along dimension `d` of the respective tensor |
+| `perm[d]` | Input dimension corresponding to output dimension `d` |
+| `input_stride[d]`, `output_stride[d]` | Offset in elements for advancing one position along dimension `d` of the respective tensor |
+
+For a rank-`D` tensor, `perm` contains each dimension index from `0` to `D - 1` exactly once. The shape and stride relationships are:
+
+```text
+output_shape[d] = input_shape[perm[d]]
+
+// Compute strides separately for the input and output shapes.
+stride[D - 1] = 1
+stride[d] = stride[d + 1] * shape[d + 1]   // d = D - 2, ..., 0
+```
+
+Strides and offsets here are measured in elements. Multiply an element offset by `sizeof(T)` when calculating a byte address.
 
 For a two-dimensional matrix, `output[i][j] = input[j][i]` can be expressed as strided reads from contiguous memory:
 
@@ -239,23 +308,56 @@ input buffer:  1, 2, 3, 4, 5, 6
 output buffer: 1, 4, 2, 5, 3, 6
 ```
 
-The input strides in this example are `[3, 1]`. Advancing along the innermost output dimension moves the input pointer by three elements, so the innermost loop can use:
+The input strides in this example are `[3, 1]`, and the output strides are `[2, 1]`. Since `perm[1] = 0`, advancing along the innermost output dimension advances the input position by `input_stride[0]`, or three elements.
 
-```cpp
-output_data[i] = *input_data;
-input_data += loop_stride;
-```
-
-This is part of the transpose because the outer recursion, `perm`, and `loop_stride` have already determined which input positions to read.
-
-For a multidimensional tensor with output coordinates `o[d]`:
+The same mapping applies to higher-dimensional tensors. For example:
 
 ```text
-output_shape[d] = input_shape[perm[d]]
-input_offset = Σ o[d] * input_stride[perm[d]]
-input_byte_address = input_base + input_offset * sizeof(T)
+input_shape   = [2, 3, 4]
+input_stride  = [12, 4, 1]
+perm          = [1, 0, 2]
+output_shape  = [3, 2, 4]
+output_stride = [8, 4, 1]
+
+output[a, b, c] = input[b, a, c]
+input_offset   = b * 12 + a * 4 + c
+output_offset  = a * 8 + b * 4 + c
 ```
+
+For a general tensor with output coordinates `o[d]`, sum over all dimensions:
+
+```text
+input_offset = Σ o[d] * input_stride[perm[d]]
+output_offset = Σ o[d] * output_stride[d]
+input_byte_address = input_base + input_offset * sizeof(T)
+output_byte_address = output_base + output_offset * sizeof(T)
+```
+
+Trace the original CPU implementation through these functions:
+
+```text
+Transpose(...)
+  → SetupTransposeStrides(...) for the input and output shapes
+  → TransposeImpl(...) starting at depth 0
+      → recursively traverse the output dimensions
+      → copy elements at the innermost dimension
+```
+
+Each recursion level corresponds to one output dimension. At an outer level, the function advances the input pointer by `input_stride[perm[depth]]` and the output pointer by `output_stride[depth]` between recursive calls. At the innermost level, output positions are contiguous, so the original CPU loop is:
+
+```cpp
+const int loop_stride = input_stride[perm[depth]];
+for (int i = 0; i < output_shape[depth]; ++i) {
+  output_data[i] = *input_data;
+  input_data += loop_stride;
+}
+```
+
+This loop performs the transpose because the recursion has already selected the starting positions, and `perm` determines the input step for each output dimension. These details explain the original algorithm; your accelerator does not need to reproduce its recursive structure.
+
 ### 4.2 Implementation Constraints
+
+Implement your changes within the Transpose template's `DESIGN REGION BEGIN` / `DESIGN REGION END` markers. Preserve Counter 1 and include all per-call preparation, data movement, completion waits, and required cache maintenance within the timing boundaries specified in Section 2.3.
 
 In hardware-accelerated mode, Transpose must move tensor elements through the NPU's AXI master interface. The data-copy operation corresponding to `*output_data = *input_data` must be implemented in the NPU.
 
@@ -265,8 +367,41 @@ In hardware-accelerated mode, Transpose must move tensor elements through the NP
 - The CPU may compute shapes, strides, and addresses; pass configuration parameters and buffer addresses to the NPU; issue commands; and wait for completion.
 - Necessary cache maintenance operations, including clean and invalidate, are allowed to maintain consistency between CPU and NPU memory accesses.
 
+### 4.3 Optimization Hints
+
+These hints are provided for reference only. You are not required to follow them or implement any of the listed techniques. You may develop your own design, provided it satisfies the implementation constraints in Section 4.2 and the timing requirements in Section 2.3.
+
+The effectiveness of each optimization depends on tensor shapes, permutations, and platform behavior. Evaluate each change using the complete operator's Total cycles.
+
+- **Reduce cache-maintenance overhead.** Consider the cache-line coverage of each buffer and avoid redundant operations on the same line when correctness permits. Preserve required clean/invalidate operations and unrelated data that shares a cache line.
+
+- **Overlap CPU and NPU work.** If your interface supports overlap, consider preparing metadata or addresses for upcoming work while the NPU performs the current transfer. The CPU must not read or write tensor elements, and all work must finish within the measured operator interval.
+
+- **Explore CPU/NPU work partitioning.** Compare computing address information on the CPU with generating it in the NPU. Consider the tradeoff between CPU computation, command traffic, and hardware complexity. Tensor data movement must remain in the NPU.
+
+- **Reduce command overhead.** Consider whether one command can describe more work, reducing repeated configuration and synchronization. Account for any additional metadata preparation or hardware control cost.
+
+- **Simplify address calculations.** Look for repeated arithmetic that can be reused within an invocation. Consider incremental address updates instead of repeatedly calculating full multidimensional offsets.
+
+- **Exploit contiguous dimensions.** Some permutations preserve contiguous groups of elements. Consider whether these groups can be handled together and whether adjacent dimensions can be combined without changing the required mapping.
+
+- **Explore traversal order and tiling.** Different traversal orders or tile sizes may improve read or write locality. Consider the tradeoff between contiguous input reads, contiguous output writes, and temporary storage inside the NPU.
+
+- **Use AXI bandwidth efficiently.** Consider packing multiple tensor elements into each bus-width transfer and using bursts for contiguous addresses where supported. Handle alignment, partial transfers, and write strobes correctly.
+
+- **Use internal buffering.** Consider FIFOs or double buffering inside the NPU to decouple reading, rearrangement, and writing. Additional buffering may help hide latency, but its control and resource costs may outweigh the benefit.
+
+- **Specialize for general shape patterns.** Consider optimized paths for classes of permutations or shapes, while retaining correct handling of all required cases. Select paths using metadata; do not recognize public test inputs or return precomputed answers.
+
 ## 5. Check Results
 ---
+
+```{warning}
+Your implementation must compute results from the provided inputs. Hardcoding expected answers in hardware or software, or detecting specific test inputs to return precomputed answers, is not allowed. This requirement applies to both the Logistic and Transpose tests and the final TFLM model outputs.
+
+Passing the public tests and matching the example model output are necessary but do not guarantee correctness. We will also run hidden test cases with different inputs to verify your implementation. The ±2 tolerance for final model outputs also applies to hidden model inference tests.
+```
+
 ### 5.1 Basic Test Verification
 
 Losigtic function acceleration:
@@ -382,15 +517,39 @@ Cycles: xxx
 Time (50000000 Hz): xxx ms
 ---
 ```
+For the same model and zero input shown above, compare each final int8 output element against the corresponding reference value in the example. An absolute error of up to **2 quantization steps (±2)** is allowed:
+
+`abs(actual[i] - reference[i]) <= 2`
+
+All 10 output elements must satisfy this condition to pass. This tolerance applies to the raw quantized integer values, not percentages or dequantized floating-point values. For example, a reference value of `-32` accepts results from `-34` to `-30`, inclusive.
+
 > xxx represents values measured during execution. Counter 0 measures Logistic, and Counter 1 measures Transpose. Total is the accumulated cycle count, Starts is the number of calls, and Average is Total / Starts. The final Cycles and Time report the complete inference measurement.
 
-## 6. Questions in the Demo
+## 6. Grading Policy
 ---
 
-You will be asked several questions about the concepts covered in this lab and your implementation. This section accounts for X% of the total lab score.
+| Category | Requirement | Weight |
+| --- | --- | ---: |
+| Basic | Logistic passes all correctness tests and runs faster than the CPU baseline. | 25% |
+| Basic | Transpose passes all correctness tests. | 25% |
+| Advanced | Transpose passes all correctness tests and runs faster than the CPU baseline. | 10% |
+| Advanced | Transpose speedup ranking among correct implementations. | 10% |
+| Demo | Explain your implementation and answer questions during the demo. | 30% |
+| **Total** | | **100%** |
+
+The Basic component accounts for 50%, the Advanced component for 20%, and the Demo for 30% of the lab score. The 25% Basic score for Logistic requires both correctness and a speedup greater than 1.
+
+Speedup is calculated as the CPU baseline's accumulated operator cycles divided by the accelerated implementation's accumulated operator cycles. Use Counter 0 for Logistic and Counter 1 for Transpose, following the measurement requirements in Section 2. Compare runs using the same model, input, clock frequency, and compilation settings.
+
+Only implementations that pass all Transpose correctness tests are eligible for the Transpose speedup ranking. The ranking-to-score mapping will be announced separately.
+
+## 7. Questions in the Demo
+---
+
+You will be asked several questions about the concepts covered in this lab and your implementation. This section accounts for 30% of the total lab score.
 
 
-## 7. Submission
+## 8. Submission
 --- 
 
 Please organize your submission files into a zip archive structured as follows:
