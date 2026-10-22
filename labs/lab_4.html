@@ -493,7 +493,7 @@ Platform/sw/models/mobileViT_xxs_profile.cc
 <h3>1.3 Clearing the Previous Software Build<a class="headerlink" href="#clearing-the-previous-software-build" title="Link to this heading">#</a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">Platform/sw/Makefile</span></code> copies the root TFLM sources into <code class="docutils literal notranslate"><span class="pre">Platform/build/sw/src/</span></code>, then applies <code class="docutils literal notranslate"><span class="pre">tflm_patches/</span></code>. It does not automatically synchronize subsequent changes to the root TFLM tree. An existing build may therefore still contain the old TFLM sources after the package is installed.</p>
 <p>After installing the package, run this once from <code class="docutils literal notranslate"><span class="pre">Platform/</span></code>, before <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">prog</span></code>:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>/home/hjeter02/work/AAML_CPU_Backup/Platform
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>/Platform
 rm<span class="w"> </span>-rf<span class="w"> </span>build/sw
 </pre></div>
 </div>
