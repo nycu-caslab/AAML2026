@@ -32,12 +32,9 @@ YOUR_PROJECT/
             ├── tflm_patches/
             └── project.mk
 ```
+**Merge folders, overwrite files with the same path, and add new files.** Keep existing files that are not included in the package; the package contains updates, not a complete replacement for the platform or TFLM tree.
 
-`lab4.zip` provides the model, tests, and TFLM updates. The current project also includes accelerators, wrappers, simulation tools, and upload-flow fixes. The ZIP is not a backup of the complete current implementation.
-
-Omit the ZIP's outermost `lab4/` directory when mapping files into the project. **Merge folders, overwrite files with the same path, and add new files.** Keep existing files that are not included in the package; the package contains updates, not a complete replacement for the platform or TFLM tree.
-
-| Source in the ZIP | Destination under `TinyRISC-V-SoC-Platform/` |
+| Source in the lab4 | Destination under `TinyRISC-V-SoC-Platform/` |
 | --- | --- |
 | `lab4/Platform/sw/app/` | `Platform/sw/app/` |
 | `lab4/Platform/sw/models/` | `Platform/sw/models/` |
@@ -352,7 +349,7 @@ The effectiveness of each optimization depends on tensor shapes, permutations, a
 Implement each operator within the marked design region below. Use counter ID `0` for Logistic and `1` for Transpose. Helper functions may be defined elsewhere, but all per-call work must execute within the measured interval.
 
 ```cpp
-// TIMING START — DO NOT MODIFY OR MOVE.
+// TIMING START - DO NOT MODIFY OR MOVE.
 uint64_t start = perf_get_mcycle64();
 
 // ================= DESIGN REGION BEGIN =================
@@ -371,7 +368,7 @@ uint64_t start = perf_get_mcycle64();
 // Do not return early or bypass the timing and statistics below.
 // ================== DESIGN REGION END ==================
 
-// TIMING END AND STATISTICS — DO NOT MODIFY OR MOVE.
+// TIMING END AND STATISTICS - DO NOT MODIFY OR MOVE.
 perf_result.add_start(counter_id);
 perf_result.add_result(counter_id, perf_get_mcycle64() - start);
 ```

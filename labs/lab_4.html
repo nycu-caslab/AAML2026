@@ -438,11 +438,10 @@ Additionally, MobileViT combines convolution, nonlinear operations, and multidim
             └── project.mk
 </pre></div>
 </div>
-<p><code class="docutils literal notranslate"><span class="pre">lab4.zip</span></code> provides the model, tests, and TFLM updates. The current project also includes accelerators, wrappers, simulation tools, and upload-flow fixes. The ZIP is not a backup of the complete current implementation.</p>
-<p>Omit the ZIP’s outermost <code class="docutils literal notranslate"><span class="pre">lab4/</span></code> directory when mapping files into the project. <strong>Merge folders, overwrite files with the same path, and add new files.</strong> Keep existing files that are not included in the package; the package contains updates, not a complete replacement for the platform or TFLM tree.</p>
+<p><strong>Merge folders, overwrite files with the same path, and add new files.</strong> Keep existing files that are not included in the package; the package contains updates, not a complete replacement for the platform or TFLM tree.</p>
 <div class="pst-scrollable-table-container"><table class="table">
 <thead>
-<tr class="row-odd"><th class="head"><p>Source in the ZIP</p></th>
+<tr class="row-odd"><th class="head"><p>Source in the lab4</p></th>
 <th class="head"><p>Destination under <code class="docutils literal notranslate"><span class="pre">TinyRISC-V-SoC-Platform/</span></code></p></th>
 </tr>
 </thead>
@@ -789,7 +788,7 @@ output_byte_address = output_base + output_offset * sizeof(T)
 <section id="implementation-and-timing-requirements">
 <h3>5.2 Implementation and Timing Requirements<a class="headerlink" href="#implementation-and-timing-requirements" title="Link to this heading">#</a></h3>
 <p>Implement each operator within the marked design region below. Use counter ID <code class="docutils literal notranslate"><span class="pre">0</span></code> for Logistic and <code class="docutils literal notranslate"><span class="pre">1</span></code> for Transpose. Helper functions may be defined elsewhere, but all per-call work must execute within the measured interval.</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// TIMING START — DO NOT MODIFY OR MOVE.</span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// TIMING START - DO NOT MODIFY OR MOVE.</span>
 <span class="kt">uint64_t</span><span class="w"> </span><span class="n">start</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">perf_get_mcycle64</span><span class="p">();</span>
 
 <span class="c1">// ================= DESIGN REGION BEGIN =================</span>
@@ -808,7 +807,7 @@ output_byte_address = output_base + output_offset * sizeof(T)
 <span class="c1">// Do not return early or bypass the timing and statistics below.</span>
 <span class="c1">// ================== DESIGN REGION END ==================</span>
 
-<span class="c1">// TIMING END AND STATISTICS — DO NOT MODIFY OR MOVE.</span>
+<span class="c1">// TIMING END AND STATISTICS - DO NOT MODIFY OR MOVE.</span>
 <span class="n">perf_result</span><span class="p">.</span><span class="n">add_start</span><span class="p">(</span><span class="n">counter_id</span><span class="p">);</span>
 <span class="n">perf_result</span><span class="p">.</span><span class="n">add_result</span><span class="p">(</span><span class="n">counter_id</span><span class="p">,</span><span class="w"> </span><span class="n">perf_get_mcycle64</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start</span><span class="p">);</span>
 </pre></div>
