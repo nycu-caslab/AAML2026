@@ -571,8 +571,8 @@ You will be asked several questions about the concepts covered in this lab and y
 
 Please organize your submission files into a zip archive structured as follows:
 ```
-[YourID]-lab4.zip
-└── [YourID]-lab4/
+aaml-lab4-[id].zip
+└── aaml-lab4-[id]/
     ├── hw/
     │   ├── NPU.v
     │   └── {any other required modules}
