@@ -360,14 +360,7 @@
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#clearing-the-previous-software-build">1.3 Clearing the Previous Software Build</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#profiling-the-mobilevit">2. Profiling the MobileViT</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#establishing-a-comparable-baseline">2.1 Establishing a Comparable Baseline</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#counter-definitions-and-measurement-scope">2.2 Counter Definitions and Measurement Scope</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#implementation-and-timing-requirements">2.3 Implementation and Timing Requirements</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#reporting-cycles-and-speedup">2.4 Reporting Cycles and Speedup</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fpga-timing-constraint">2.5 FPGA Timing Constraint</a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#establishing-a-software-baseline">2. Establishing a Software Baseline</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#accelerating-the-logistic-function">3. Accelerating the Logistic Function</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tracing-the-original-computation">3.1 Tracing the Original Computation</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fixed-point-formats">3.2 Fixed-Point Formats</a></li>
@@ -380,14 +373,21 @@
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optimization-hints">4.3 Optimization Hints</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#check-results">5. Check Results</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#basic-test-verification">5.1 Basic Test Verification</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#running-tflm-model-inference">5.2 Running TFLM Model Inference</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#performance-evaluation-and-timing-requirements">5. Performance Evaluation and Timing Requirements</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#counter-definitions-and-measurement-scope">5.1 Counter Definitions and Measurement Scope</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#implementation-and-timing-requirements">5.2 Implementation and Timing Requirements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#reporting-cycles-and-speedup">5.3 Reporting Cycles and Speedup</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fpga-timing-constraint">5.4 FPGA Timing Constraint</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grading-policy">6. Grading Policy</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#questions-in-the-demo">7. Questions in the Demo</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#submission">8. Submission</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#check-results">6. Check Results</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#basic-test-verification">6.1 Basic Test Verification</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#running-tflm-model-inference">6.2 Running TFLM Model Inference</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grading-policy">7. Grading Policy</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#questions-in-the-demo">8. Questions in the Demo</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#submission">9. Submission</a></li>
 </ul>
             </nav>
         </div>
@@ -505,11 +505,9 @@ make<span class="w"> </span>sw_clean
 <p>This removes generated software build files, including the cached TFLM copy. It completes the Lab4 environment update. You do not need to create <code class="docutils literal notranslate"><span class="pre">build/sw/</span></code> yourself: <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">run</span></code> recreates it and compiles the updated sources. If the directory does not exist, the command has no effect.</p>
 </section>
 </section>
-<section id="profiling-the-mobilevit">
-<h2>2. Profiling the MobileViT<a class="headerlink" href="#profiling-the-mobilevit" title="Link to this heading">#</a></h2>
+<section id="establishing-a-software-baseline">
+<h2>2. Establishing a Software Baseline<a class="headerlink" href="#establishing-a-software-baseline" title="Link to this heading">#</a></h2>
 <hr class="docutils" />
-<section id="establishing-a-comparable-baseline">
-<h3>2.1 Establishing a Comparable Baseline<a class="headerlink" href="#establishing-a-comparable-baseline" title="Link to this heading">#</a></h3>
 <p>Using the same model, input, and compilation settings, first record results with both Logistic and Transpose running on the CPU. Then enable acceleration separately.</p>
 <div class="pst-scrollable-table-container"><table class="table">
 <thead>
@@ -541,95 +539,10 @@ make<span class="w"> </span>sw_clean
 <p>Here, SW refers only to these two operators. The existing Conv patch still uses Lab2’s <code class="docutils literal notranslate"><span class="pre">hw_simd_mac</span></code>. Keep the Conv mode fixed and record it explicitly when comparing results. To claim that the entire model runs purely on the CPU, you must also switch and validate Conv and any other existing accelerated paths.</p>
 <p>The current profile fills every byte of the input buffer with 0. This is <strong>raw int8 zero</strong>; the represented numerical value still depends on the input scale and zero point.</p>
 </section>
-<section id="counter-definitions-and-measurement-scope">
-<h3>2.2 Counter Definitions and Measurement Scope<a class="headerlink" href="#counter-definitions-and-measurement-scope" title="Link to this heading">#</a></h3>
-<div class="pst-scrollable-table-container"><table class="table">
-<thead>
-<tr class="row-odd"><th class="head"><p>Field</p></th>
-<th class="head"><p>Meaning</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>Counter 0</p></td>
-<td><p>Accumulated cycles for the complete int8 Logistic function</p></td>
-</tr>
-<tr class="row-odd"><td><p>Counter 1</p></td>
-<td><p>Accumulated cycles for the complete Transpose function</p></td>
-</tr>
-<tr class="row-even"><td><p>Starts</p></td>
-<td><p>Accumulated function call count</p></td>
-</tr>
-<tr class="row-odd"><td><p>Total</p></td>
-<td><p>Sum of measured cycles across all calls to that operator during one inference</p></td>
-</tr>
-<tr class="row-even"><td><p>Average</p></td>
-<td><p>Total / Starts for that counter</p></td>
-</tr>
-<tr class="row-odd"><td><p>Inference <code class="docutils literal notranslate"><span class="pre">Cycles</span></code></p></td>
-<td><p>Cycles measured by the runner for the complete <code class="docutils literal notranslate"><span class="pre">Invoke()</span></code> call</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-</section>
-<section id="implementation-and-timing-requirements">
-<h3>2.3 Implementation and Timing Requirements<a class="headerlink" href="#implementation-and-timing-requirements" title="Link to this heading">#</a></h3>
-<p>Implement each operator within the marked design region below. Use counter ID <code class="docutils literal notranslate"><span class="pre">0</span></code> for Logistic and <code class="docutils literal notranslate"><span class="pre">1</span></code> for Transpose. Helper functions may be defined elsewhere, but all per-call work must execute within the measured interval.</p>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// TIMING START — DO NOT MODIFY OR MOVE.</span>
-<span class="kt">uint64_t</span><span class="w"> </span><span class="n">start</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">perf_get_mcycle64</span><span class="p">();</span>
-
-<span class="c1">// ================= DESIGN REGION BEGIN =================</span>
-<span class="c1">// Implement the complete operator here.</span>
-<span class="c1">// You may call helper functions and hardware accelerators.</span>
-<span class="c1">//</span>
-<span class="c1">// Include all per-call work:</span>
-<span class="c1">// - Parameter and stride calculations and required input processing.</span>
-<span class="c1">// - Required cache maintenance and data transfers.</span>
-<span class="c1">// - CPU or NPU computation.</span>
-<span class="c1">// - Waiting for hardware completion.</span>
-<span class="c1">// - Final output processing and required cache maintenance.</span>
-<span class="c1">//</span>
-<span class="c1">// All output data must be ready before leaving this region.</span>
-<span class="c1">// Do not move work outside this region to reduce measured cycles.</span>
-<span class="c1">// Do not return early or bypass the timing and statistics below.</span>
-<span class="c1">// ================== DESIGN REGION END ==================</span>
-
-<span class="c1">// TIMING END AND STATISTICS — DO NOT MODIFY OR MOVE.</span>
-<span class="n">perf_result</span><span class="p">.</span><span class="n">add_start</span><span class="p">(</span><span class="n">counter_id</span><span class="p">);</span>
-<span class="n">perf_result</span><span class="p">.</span><span class="n">add_result</span><span class="p">(</span><span class="n">counter_id</span><span class="p">,</span><span class="w"> </span><span class="n">perf_get_mcycle64</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start</span><span class="p">);</span>
-</pre></div>
-</div>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>Preserve the provided timing boundaries, counter assignments, cycle-counter implementation, and statistics collection and reporting logic. These requirements apply to both the CPU baseline and the accelerated implementation.</p>
-<p>Each operator invocation must be measured exactly once, from before its per-call preparation begins until computation and required memory/cache operations have completed and the output is ready for use. Moving work outside this interval, bypassing measurement, or altering recorded cycles to improve the reported speedup is prohibited.</p>
-</div>
-</section>
-<section id="reporting-cycles-and-speedup">
-<h3>2.4 Reporting Cycles and Speedup<a class="headerlink" href="#reporting-cycles-and-speedup" title="Link to this heading">#</a></h3>
-<p>Preserve the existing measurement sequence: clear statistics when preparing each model input, accumulate results across all operator calls during inference, and print statistics after inference. Keep UART printing outside the operator measurement intervals.</p>
-<p>Use <strong>Total</strong>, not Average, to calculate operator speedup. Calculate operator and model speedups separately:</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Operator speedup = operator Total cycles in SW mode / operator Total cycles in HW mode
-Model speedup = baseline full Invoke cycles / accelerated full Invoke cycles
-Time (seconds) = cycles / CPU clock frequency (Hz)
-</pre></div>
-</div>
-<p>Keep the model, input, clock frequency, Conv mode, tool versions, and compiler options fixed between baseline and accelerated runs. Report the operator Total cycles and full inference cycles for each experiment mode, together with the corresponding speedups.</p>
-<p>Counter 2 does not currently measure Conv automatically. Any additional profiling must preserve the required measurements above. Measurements of only Logistic and Transpose do not constitute a complete breakdown of all operators.</p>
-</section>
-<section id="fpga-timing-constraint">
-<h3>2.5 FPGA Timing Constraint<a class="headerlink" href="#fpga-timing-constraint" title="Link to this heading">#</a></h3>
-<div class="admonition important">
-<p class="admonition-title">Important</p>
-<p>The complete FPGA design must achieve <strong>WNS &gt;= 0 ns</strong> for setup timing in the final post-route Design Timing Summary generated by Vivado. This requirement applies to the integrated design containing both the Logistic and Transpose accelerators.</p>
-<p>Use the provided clock and timing constraints. Do not reduce the required clock frequency or relax timing constraints to satisfy this requirement. A synthesis timing estimate or a timing report for an isolated accelerator module is not sufficient.</p>
-<p>Passing functional tests on the FPGA does not waive this timing requirement.</p>
-</div>
-</section>
-</section>
 <section id="accelerating-the-logistic-function">
 <h2>3. Accelerating the Logistic Function<a class="headerlink" href="#accelerating-the-logistic-function" title="Link to this heading">#</a></h2>
 <hr class="docutils" />
+<p>Before modifying the operator, review the measurement requirements in Section 5.2. All per-call work must remain within the provided timing boundaries.</p>
 <section id="tracing-the-original-computation">
 <h3>3.1 Tracing the Original Computation<a class="headerlink" href="#tracing-the-original-computation" title="Link to this heading">#</a></h3>
 <p>The entry point is the topmost int8 <code class="docutils literal notranslate"><span class="pre">Logistic(...)</span></code> overload in:</p>
@@ -696,13 +609,13 @@ sigmoid(0) = 0.5
 </section>
 <section id="connecting-software-and-hardware">
 <h3>3.3 Connecting Software and Hardware<a class="headerlink" href="#connecting-software-and-hardware" title="Link to this heading">#</a></h3>
-<p>Implement your changes inside the <code class="docutils literal notranslate"><span class="pre">DESIGN</span> <span class="pre">REGION</span> <span class="pre">BEGIN</span></code> / <code class="docutils literal notranslate"><span class="pre">DESIGN</span> <span class="pre">REGION</span> <span class="pre">END</span></code> markers in the int8 Logistic template, following Section 2.3. Preserve Counter 0 and its timing boundaries around the complete operator, including the input loop, quantization, saturation handling, hardware calls, and output processing.</p>
+<p>Implement your changes inside the <code class="docutils literal notranslate"><span class="pre">DESIGN</span> <span class="pre">REGION</span> <span class="pre">BEGIN</span></code> / <code class="docutils literal notranslate"><span class="pre">DESIGN</span> <span class="pre">REGION</span> <span class="pre">END</span></code> markers in the int8 Logistic template, following Section 5.2. Preserve Counter 0 and its timing boundaries around the complete operator, including the input loop, quantization, saturation handling, hardware calls, and output processing.</p>
 <p>A useful starting point is to retain the original input quantization and output rounding, replacing the following CPU sigmoid computation with a call to your hardware implementation:</p>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">const</span><span class="w"> </span><span class="kt">int32_t</span><span class="w"> </span><span class="n">output_in_q0</span><span class="w"> </span><span class="o">=</span>
 <span class="w">    </span><span class="n">gemmlowp</span><span class="o">::</span><span class="n">logistic</span><span class="p">(</span><span class="n">FixedPoint4</span><span class="o">::</span><span class="n">FromRaw</span><span class="p">(</span><span class="n">input_in_q4</span><span class="p">)).</span><span class="n">raw</span><span class="p">();</span>
 </pre></div>
 </div>
-<p>This computation is inside the non-saturated branch of the input loop. Record the original CPU implementation’s results for the baseline comparisons described in Section 2.1.</p>
+<p>This computation is inside the non-saturated branch of the input loop. Record the original CPU implementation’s results for the baseline comparisons described in Section 2.</p>
 <p>After changing the header’s implementation, run <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">sw_clean</span></code> from <code class="docutils literal notranslate"><span class="pre">Platform/</span></code> before rebuilding with <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">run</span></code>. If the RTL changes, also rebuild and program the hardware with <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">prog</span></code> before running the software.</p>
 <p>If you replace only this expression, the replacement must accept the signed Q4.27 raw input and produce a compatible Q0.31 raw result. Preserve the subsequent rounding, output zero-point adjustment, and clamping. You may organize the hardware internally as you choose while preserving the operator’s required behavior.</p>
 <p>Connect the software call to your hardware through the platform’s custom-instruction interface. A typical call path is:</p>
@@ -716,12 +629,13 @@ sigmoid(0) = 0.5
 </pre></div>
 </div>
 <p>CFU stands for Custom Function Unit; this platform reuses the corresponding software helpers. <code class="docutils literal notranslate"><span class="pre">.insn</span></code> is assembler syntax for encoding an instruction, and <code class="docutils literal notranslate"><span class="pre">0x0B</span></code> is the CUSTOM-0 opcode. The actual hardware entry point is <code class="docutils literal notranslate"><span class="pre">Platform/hw/srcs/NPU.v</span></code>. Follow its <code class="docutils literal notranslate"><span class="pre">NPU_start</span></code> / <code class="docutils literal notranslate"><span class="pre">NPU_done</span></code> protocol for multicycle operations.</p>
-<p>Define the instruction function fields, operand meanings, and result format consistently in your software and RTL. Preserve the instruction functions already used by Lab1 and Lab2. For a multicycle computation, assert completion only when the result is valid; the CPU must wait for completion before consuming it. Include this execution and waiting time in the operator measurement specified in Section 2.3.</p>
+<p>Define the instruction function fields, operand meanings, and result format consistently in your software and RTL. Preserve the instruction functions already used by Lab1 and Lab2. For a multicycle computation, assert completion only when the result is valid; the CPU must wait for completion before consuming it. Include this execution and waiting time in the operator measurement specified in Section 5.2.</p>
 </section>
 </section>
 <section id="accelerating-the-transpose-function">
 <h2>4. Accelerating the Transpose Function<a class="headerlink" href="#accelerating-the-transpose-function" title="Link to this heading">#</a></h2>
 <hr class="docutils" />
+<p>Before modifying the operator, review the measurement requirements in Section 5.2. All per-call work must remain within the provided timing boundaries.</p>
 <section id="from-matrix-transpose-to-multidimensional-indexing">
 <h3>4.1 From Matrix Transpose to Multidimensional Indexing<a class="headerlink" href="#from-matrix-transpose-to-multidimensional-indexing" title="Link to this heading">#</a></h3>
 <p>The entry point is <code class="docutils literal notranslate"><span class="pre">Transpose(...)</span></code> in:</p>
@@ -810,7 +724,7 @@ output_byte_address = output_base + output_offset * sizeof(T)
 </section>
 <section id="implementation-constraints">
 <h3>4.2 Implementation Constraints<a class="headerlink" href="#implementation-constraints" title="Link to this heading">#</a></h3>
-<p>Implement your changes within the Transpose template’s <code class="docutils literal notranslate"><span class="pre">DESIGN</span> <span class="pre">REGION</span> <span class="pre">BEGIN</span></code> / <code class="docutils literal notranslate"><span class="pre">DESIGN</span> <span class="pre">REGION</span> <span class="pre">END</span></code> markers. Preserve Counter 1 and include all per-call preparation, data movement, completion waits, and required cache maintenance within the timing boundaries specified in Section 2.3.</p>
+<p>Implement your changes within the Transpose template’s <code class="docutils literal notranslate"><span class="pre">DESIGN</span> <span class="pre">REGION</span> <span class="pre">BEGIN</span></code> / <code class="docutils literal notranslate"><span class="pre">DESIGN</span> <span class="pre">REGION</span> <span class="pre">END</span></code> markers. Preserve Counter 1 and include all per-call preparation, data movement, completion waits, and required cache maintenance within the timing boundaries specified in Section 5.2.</p>
 <p>In hardware-accelerated mode, Transpose must move tensor elements through the NPU’s AXI master interface. The data-copy operation corresponding to <code class="docutils literal notranslate"><span class="pre">*output_data</span> <span class="pre">=</span> <span class="pre">*input_data</span></code> must be implemented in the NPU.</p>
 <ul class="simple">
 <li><p>Input tensor elements must not be loaded into CPU general-purpose registers as part of the Transpose operation.</p></li>
@@ -822,7 +736,7 @@ output_byte_address = output_base + output_offset * sizeof(T)
 </section>
 <section id="optimization-hints">
 <h3>4.3 Optimization Hints<a class="headerlink" href="#optimization-hints" title="Link to this heading">#</a></h3>
-<p>These hints are provided for reference only. You are not required to follow them or implement any of the listed techniques. You may develop your own design, provided it satisfies the implementation constraints in Section 4.2 and the timing requirements in Section 2.3.</p>
+<p>These hints are provided for reference only. You are not required to follow them or implement any of the listed techniques. You may develop your own design, provided it satisfies the implementation constraints in Section 4.2 and the timing requirements in Section 5.2.</p>
 <p>The effectiveness of each optimization depends on tensor shapes, permutations, and platform behavior. Evaluate each change using the complete operator’s Total cycles.</p>
 <ul class="simple">
 <li><p><strong>Reduce cache-maintenance overhead.</strong> Consider the cache-line coverage of each buffer and avoid redundant operations on the same line when correctness permits. Preserve required clean/invalidate operations and unrelated data that shares a cache line.</p></li>
@@ -838,8 +752,97 @@ output_byte_address = output_base + output_offset * sizeof(T)
 </ul>
 </section>
 </section>
+<section id="performance-evaluation-and-timing-requirements">
+<h2>5. Performance Evaluation and Timing Requirements<a class="headerlink" href="#performance-evaluation-and-timing-requirements" title="Link to this heading">#</a></h2>
+<hr class="docutils" />
+<section id="counter-definitions-and-measurement-scope">
+<h3>5.1 Counter Definitions and Measurement Scope<a class="headerlink" href="#counter-definitions-and-measurement-scope" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Counter 0</p></td>
+<td><p>Accumulated cycles for the complete int8 Logistic function</p></td>
+</tr>
+<tr class="row-odd"><td><p>Counter 1</p></td>
+<td><p>Accumulated cycles for the complete Transpose function</p></td>
+</tr>
+<tr class="row-even"><td><p>Starts</p></td>
+<td><p>Accumulated function call count</p></td>
+</tr>
+<tr class="row-odd"><td><p>Total</p></td>
+<td><p>Sum of measured cycles across all calls to that operator during one inference</p></td>
+</tr>
+<tr class="row-even"><td><p>Average</p></td>
+<td><p>Total / Starts for that counter</p></td>
+</tr>
+<tr class="row-odd"><td><p>Inference <code class="docutils literal notranslate"><span class="pre">Cycles</span></code></p></td>
+<td><p>Cycles measured by the runner for the complete <code class="docutils literal notranslate"><span class="pre">Invoke()</span></code> call</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="implementation-and-timing-requirements">
+<h3>5.2 Implementation and Timing Requirements<a class="headerlink" href="#implementation-and-timing-requirements" title="Link to this heading">#</a></h3>
+<p>Implement each operator within the marked design region below. Use counter ID <code class="docutils literal notranslate"><span class="pre">0</span></code> for Logistic and <code class="docutils literal notranslate"><span class="pre">1</span></code> for Transpose. Helper functions may be defined elsewhere, but all per-call work must execute within the measured interval.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="c1">// TIMING START — DO NOT MODIFY OR MOVE.</span>
+<span class="kt">uint64_t</span><span class="w"> </span><span class="n">start</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">perf_get_mcycle64</span><span class="p">();</span>
+
+<span class="c1">// ================= DESIGN REGION BEGIN =================</span>
+<span class="c1">// Implement the complete operator here.</span>
+<span class="c1">// You may call helper functions and hardware accelerators.</span>
+<span class="c1">//</span>
+<span class="c1">// Include all per-call work:</span>
+<span class="c1">// - Parameter and stride calculations and required input processing.</span>
+<span class="c1">// - Required cache maintenance and data transfers.</span>
+<span class="c1">// - CPU or NPU computation.</span>
+<span class="c1">// - Waiting for hardware completion.</span>
+<span class="c1">// - Final output processing and required cache maintenance.</span>
+<span class="c1">//</span>
+<span class="c1">// All output data must be ready before leaving this region.</span>
+<span class="c1">// Do not move work outside this region to reduce measured cycles.</span>
+<span class="c1">// Do not return early or bypass the timing and statistics below.</span>
+<span class="c1">// ================== DESIGN REGION END ==================</span>
+
+<span class="c1">// TIMING END AND STATISTICS — DO NOT MODIFY OR MOVE.</span>
+<span class="n">perf_result</span><span class="p">.</span><span class="n">add_start</span><span class="p">(</span><span class="n">counter_id</span><span class="p">);</span>
+<span class="n">perf_result</span><span class="p">.</span><span class="n">add_result</span><span class="p">(</span><span class="n">counter_id</span><span class="p">,</span><span class="w"> </span><span class="n">perf_get_mcycle64</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start</span><span class="p">);</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Preserve the provided timing boundaries, counter assignments, cycle-counter implementation, and statistics collection and reporting logic. These requirements apply to both the CPU baseline and the accelerated implementation.</p>
+<p>Each operator invocation must be measured exactly once, from before its per-call preparation begins until computation and required memory/cache operations have completed and the output is ready for use. Moving work outside this interval, bypassing measurement, or altering recorded cycles to improve the reported speedup is prohibited.</p>
+</div>
+</section>
+<section id="reporting-cycles-and-speedup">
+<h3>5.3 Reporting Cycles and Speedup<a class="headerlink" href="#reporting-cycles-and-speedup" title="Link to this heading">#</a></h3>
+<p>Preserve the existing measurement sequence: clear statistics when preparing each model input, accumulate results across all operator calls during inference, and print statistics after inference. Keep UART printing outside the operator measurement intervals.</p>
+<p>Use <strong>Total</strong>, not Average, to calculate operator speedup. Calculate operator and model speedups separately:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Operator speedup = operator Total cycles in SW mode / operator Total cycles in HW mode
+Model speedup = baseline full Invoke cycles / accelerated full Invoke cycles
+Time (seconds) = cycles / CPU clock frequency (Hz)
+</pre></div>
+</div>
+<p>Keep the model, input, clock frequency, Conv mode, tool versions, and compiler options fixed between baseline and accelerated runs. Report the operator Total cycles and full inference cycles for each experiment mode, together with the corresponding speedups.</p>
+<p>Counter 2 does not currently measure Conv automatically. Any additional profiling must preserve the required measurements above. Measurements of only Logistic and Transpose do not constitute a complete breakdown of all operators.</p>
+</section>
+<section id="fpga-timing-constraint">
+<h3>5.4 FPGA Timing Constraint<a class="headerlink" href="#fpga-timing-constraint" title="Link to this heading">#</a></h3>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>The complete FPGA design must achieve <strong>WNS &gt;= 0 ns</strong> for setup timing in the final post-route Design Timing Summary generated by Vivado. This requirement applies to the integrated design containing both the Logistic and Transpose accelerators.</p>
+<p>Use the provided clock and timing constraints. Do not reduce the required clock frequency or relax timing constraints to satisfy this requirement. A synthesis timing estimate or a timing report for an isolated accelerator module is not sufficient.</p>
+<p>Passing functional tests on the FPGA does not waive this timing requirement.</p>
+</div>
+</section>
+</section>
 <section id="check-results">
-<h2>5. Check Results<a class="headerlink" href="#check-results" title="Link to this heading">#</a></h2>
+<h2>6. Check Results<a class="headerlink" href="#check-results" title="Link to this heading">#</a></h2>
 <hr class="docutils" />
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
@@ -847,7 +850,7 @@ output_byte_address = output_base + output_offset * sizeof(T)
 <p>Passing the public tests and matching the example model output are necessary but do not guarantee correctness. We will also run hidden test cases with different inputs to verify your implementation. The ±2 tolerance for final model outputs also applies to hidden model inference tests.</p>
 </div>
 <section id="basic-test-verification">
-<h3>5.1 Basic Test Verification<a class="headerlink" href="#basic-test-verification" title="Link to this heading">#</a></h3>
+<h3>6.1 Basic Test Verification<a class="headerlink" href="#basic-test-verification" title="Link to this heading">#</a></h3>
 <p>Losigtic function acceleration:
 Run <code class="docutils literal notranslate"><span class="pre">l:</span> <span class="pre">run</span> <span class="pre">logistic</span> <span class="pre">test</span></code> in <code class="docutils literal notranslate"><span class="pre">l:</span> <span class="pre">Lab</span> <span class="pre">menu</span></code></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Lab</span> <span class="p">:</span> <span class="n">Self</span> <span class="n">Test</span>
@@ -896,7 +899,7 @@ Run <code class="docutils literal notranslate"><span class="pre">t:</span> <span
 </div>
 </section>
 <section id="running-tflm-model-inference">
-<h3>5.2 Running TFLM Model Inference<a class="headerlink" href="#running-tflm-model-inference" title="Link to this heading">#</a></h3>
+<h3>6.2 Running TFLM Model Inference<a class="headerlink" href="#running-tflm-model-inference" title="Link to this heading">#</a></h3>
 <p>In this part, We use <code class="docutils literal notranslate"><span class="pre">mobileViT_xxs</span></code> as our benchmark model. Then, compare runtime cycles to show performance improve on accelerated version logistic &amp; tranpose function.
 The model and profile are located at:</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Platform/sw/models/mobileViT_xxs.tflite
@@ -967,7 +970,7 @@ Platform/sw/models/mobileViT_xxs_profile.cc
 </section>
 </section>
 <section id="grading-policy">
-<h2>6. Grading Policy<a class="headerlink" href="#grading-policy" title="Link to this heading">#</a></h2>
+<h2>7. Grading Policy<a class="headerlink" href="#grading-policy" title="Link to this heading">#</a></h2>
 <hr class="docutils" />
 <div class="pst-scrollable-table-container"><table class="table">
 <thead>
@@ -1005,16 +1008,37 @@ Platform/sw/models/mobileViT_xxs_profile.cc
 </table>
 </div>
 <p>The Basic component accounts for 50%, the Advanced component for 20%, and the Demo for 30% of the lab score. The 25% Basic score for Logistic requires both correctness and a speedup greater than 1.</p>
-<p>Speedup is calculated as the CPU baseline’s accumulated operator cycles divided by the accelerated implementation’s accumulated operator cycles. Use Counter 0 for Logistic and Counter 1 for Transpose, following the measurement requirements in Section 2. Compare runs using the same model, input, clock frequency, and compilation settings.</p>
-<p>Only implementations that pass all Transpose correctness tests are eligible for the Transpose speedup ranking. The ranking-to-score mapping will be announced separately.</p>
+<p>Speedup is calculated as the CPU baseline’s accumulated operator cycles divided by the accelerated implementation’s accumulated operator cycles. Use Counter 0 for Logistic and Counter 1 for Transpose, following the measurement requirements in Section 5. Compare runs using the same model, input, clock frequency, and compilation settings. Only implementations that pass all Transpose correctness tests are eligible for the Transpose speedup ranking.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Performance ranking</p></th>
+<th class="head text-right"><p>Score</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Top 1–25%</p></td>
+<td class="text-right"><p>10</p></td>
+</tr>
+<tr class="row-odd"><td><p>Top 26–50%</p></td>
+<td class="text-right"><p>7</p></td>
+</tr>
+<tr class="row-even"><td><p>Top 51–75%</p></td>
+<td class="text-right"><p>4</p></td>
+</tr>
+<tr class="row-odd"><td><p>Top 76–100%</p></td>
+<td class="text-right"><p>1</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 </section>
 <section id="questions-in-the-demo">
-<h2>7. Questions in the Demo<a class="headerlink" href="#questions-in-the-demo" title="Link to this heading">#</a></h2>
+<h2>8. Questions in the Demo<a class="headerlink" href="#questions-in-the-demo" title="Link to this heading">#</a></h2>
 <hr class="docutils" />
 <p>You will be asked several questions about the concepts covered in this lab and your implementation. This section accounts for 30% of the total lab score.</p>
 </section>
 <section id="submission">
-<h2>8. Submission<a class="headerlink" href="#submission" title="Link to this heading">#</a></h2>
+<h2>9. Submission<a class="headerlink" href="#submission" title="Link to this heading">#</a></h2>
 <hr class="docutils" />
 <p>Please organize your submission files into a zip archive structured as follows:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>[YourID]-lab4.zip
@@ -1022,12 +1046,10 @@ Platform/sw/models/mobileViT_xxs_profile.cc
     ├── hw/
     │   ├── NPU.v
     │   └── {any other required modules}
-    ├── sw/
-    │   ├── logistic.h
-    │   ├── transpose.h
-    │   └── {any other required headers or source files}
-    └── report/
-        └── lab4_report.pdf
+    └── sw/
+        ├── logistic.h
+        ├── transpose.h
+        └── {any other required headers or source files}
 </pre></div>
 </div>
 <div class="admonition important">
@@ -1074,14 +1096,7 @@ Platform/sw/models/mobileViT_xxs_profile.cc
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#clearing-the-previous-software-build">1.3 Clearing the Previous Software Build</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#profiling-the-mobilevit">2. Profiling the MobileViT</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#establishing-a-comparable-baseline">2.1 Establishing a Comparable Baseline</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#counter-definitions-and-measurement-scope">2.2 Counter Definitions and Measurement Scope</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#implementation-and-timing-requirements">2.3 Implementation and Timing Requirements</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#reporting-cycles-and-speedup">2.4 Reporting Cycles and Speedup</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fpga-timing-constraint">2.5 FPGA Timing Constraint</a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#establishing-a-software-baseline">2. Establishing a Software Baseline</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#accelerating-the-logistic-function">3. Accelerating the Logistic Function</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tracing-the-original-computation">3.1 Tracing the Original Computation</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fixed-point-formats">3.2 Fixed-Point Formats</a></li>
@@ -1094,14 +1109,21 @@ Platform/sw/models/mobileViT_xxs_profile.cc
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optimization-hints">4.3 Optimization Hints</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#check-results">5. Check Results</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#basic-test-verification">5.1 Basic Test Verification</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#running-tflm-model-inference">5.2 Running TFLM Model Inference</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#performance-evaluation-and-timing-requirements">5. Performance Evaluation and Timing Requirements</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#counter-definitions-and-measurement-scope">5.1 Counter Definitions and Measurement Scope</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#implementation-and-timing-requirements">5.2 Implementation and Timing Requirements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#reporting-cycles-and-speedup">5.3 Reporting Cycles and Speedup</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fpga-timing-constraint">5.4 FPGA Timing Constraint</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grading-policy">6. Grading Policy</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#questions-in-the-demo">7. Questions in the Demo</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#submission">8. Submission</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#check-results">6. Check Results</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#basic-test-verification">6.1 Basic Test Verification</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#running-tflm-model-inference">6.2 Running TFLM Model Inference</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grading-policy">7. Grading Policy</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#questions-in-the-demo">8. Questions in the Demo</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#submission">9. Submission</a></li>
 </ul>
   </nav></div>
 
