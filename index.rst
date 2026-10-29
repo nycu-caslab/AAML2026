@@ -47,6 +47,7 @@ Lecture and Office Hours
     labs/lab_1
     labs/lab_2
     labs/lab_3
+    labs/lab_4
 
 .. toctree::
     :hidden:
