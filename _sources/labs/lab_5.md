@@ -96,7 +96,7 @@ We provide you some scenarios to think about:
 To solve cache coherence problems without CBO, we use hardware to deal with it.  
 This section is a little bit complex, you may need to trace codes of `CPU(I/O to Backend_top)`, `Backend_top`, `dcache_pro`, `(MEM)` in `Platform/hw/srcs/sources_1/imports` to understand how they work and interact with each other. And you may need to modify them or add new modules in the same folder and use `Block Design`.
 
-Here is a guideline of BD: 
+Here is a guideline of BD: https://hackmd.io/@yanyoulin/H1xq5Pk0zg
 
 For every GEMV operation, the NPU must use the latest A and B values written by the CPU. Once the operation completes, CPU reads of C must return the NPU's results, and older cached values must not overwrite C later. Hardware must provide these guarantees without software cache-maintenance operations in the Lab5 GEMV execution path. You may choose how to coordinate the CPU cache and NPU.  
 
@@ -134,6 +134,21 @@ Also, to earn the score for this part, you still need to complete the `TFLM infe
 ```{important} 
 You will get **0%** if you can't pass the `TFLM inference, verification, and cycles` or didn't meet the requirement.
 ```
+
+**Here is the hardware maximum usage.**  
+You can check the informations in `Platform\build\reports\post_route_utilization_npu.rpt`.
+| Resource| Maximum NPU usage |
+| ---  | ---: |
+| LUTs | 5,000 |
+| Flip-flop | 3,000 |
+| DSP | 16 |
+| RAMB18 | 10 |
+| RAMB36 | 10 |
+
+```{important} 
+You will get **0%** if you didn't meet the requirement.
+```
+
 result example:
 ```
 ==============================================
