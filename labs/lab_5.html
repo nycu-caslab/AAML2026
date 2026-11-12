@@ -47,6 +47,7 @@
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Lab 4 : Elementwise Unit" href="lab_4.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
@@ -148,8 +149,6 @@
       
       
       
-        
-      
       <dialog id="pst-primary-sidebar-modal"></dialog>
       <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
         
@@ -193,12 +192,13 @@
 <li class="toctree-l1"><a class="reference internal" href="../class/staff.html">Staff</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Labs:</span></p>
-<ul class="nav bd-sidenav">
+<ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="lab_0.html">Lab 0 : Environment Setup</a></li>
 <li class="toctree-l1"><a class="reference internal" href="lab_1.html">Lab 1 : Aligned AXI Data on SIMD</a></li>
 <li class="toctree-l1"><a class="reference internal" href="lab_2.html">Lab 2: AXI4 Burst Reads for a SIMD</a></li>
 <li class="toctree-l1"><a class="reference internal" href="lab_3.html">Lab 3 : Systolic Array</a></li>
 <li class="toctree-l1"><a class="reference internal" href="lab_4.html">Lab 4 : Elementwise Unit</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Lab 5 : Systolic Array Integration and Cache Coherence</a></li>
 </ul>
 
     </div>
@@ -494,7 +494,7 @@ We provide you some scenarios to think about:</p>
 </div>
 <p>To solve cache coherence problems without CBO, we use hardware to deal with it.<br />
 This section is a little bit complex, you may need to trace codes of <code class="docutils literal notranslate"><span class="pre">CPU(I/O</span> <span class="pre">to</span> <span class="pre">Backend_top)</span></code>, <code class="docutils literal notranslate"><span class="pre">Backend_top</span></code>, <code class="docutils literal notranslate"><span class="pre">dcache_pro</span></code>, <code class="docutils literal notranslate"><span class="pre">(MEM)</span></code> in <code class="docutils literal notranslate"><span class="pre">Platform/hw/srcs/sources_1/imports</span></code> to understand how they work and interact with each other. And you may need to modify them or add new modules in the same folder and use <code class="docutils literal notranslate"><span class="pre">Block</span> <span class="pre">Design</span></code>.</p>
-<p>Here is a guideline of BD: https://hackmd.io/&#64;yanyoulin/H1xq5Pk0zg</p>
+<p>Here is a guideline of BD: <a class="reference external" href="https://hackmd.io/&#64;yanyoulin/H1xq5Pk0zg">Here</a></p>
 <p>For every GEMV operation, the NPU must use the latest A and B values written by the CPU. Once the operation completes, CPU reads of C must return the NPU’s results, and older cached values must not overwrite C later. Hardware must provide these guarantees without software cache-maintenance operations in the Lab5 GEMV execution path. You may choose how to coordinate the CPU cache and NPU.</p>
 <p>One possible design is to let the NPU request D-cache writeback or invalidation when needed around its AXI memory accesses. Other hardware approaches are also valid.</p>
 <p>After you finish your work, you can still use <code class="docutils literal notranslate"><span class="pre">systolic_array_test</span></code> to test your work. But before you test, make sure you delete or comment all CBO extension use.</p>
@@ -656,6 +656,15 @@ You can check the informations in <code class="docutils literal notranslate"><sp
                 <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
+    <a class="left-prev"
+       href="lab_4.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Lab 4 : Elementwise Unit</p>
+      </div>
+    </a>
 </div>
                 </footer>
               

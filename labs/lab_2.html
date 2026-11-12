@@ -201,6 +201,7 @@
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Lab 2: AXI4 Burst Reads for a SIMD</a></li>
 <li class="toctree-l1"><a class="reference internal" href="lab_3.html">Lab 3 : Systolic Array</a></li>
 <li class="toctree-l1"><a class="reference internal" href="lab_4.html">Lab 4 : Elementwise Unit</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lab_5.html">Lab 5 : Systolic Array Integration and Cache Coherence</a></li>
 </ul>
 
     </div>
@@ -686,9 +687,7 @@ Make sure that your design can handle all edge cases correctly.</p>
 <h3>Latency efficiency<a class="headerlink" href="#latency-efficiency" title="Link to this heading">#</a></h3>
 <p>Let <span class="math notranslate nohighlight">\(\mathcal{T}\)</span> be the official test set and let <span class="math notranslate nohighlight">\(C_{i,t}\)</span> be the <code class="docutils literal notranslate"><span class="pre">interpreter.Invoke()</span></code> cycle count for student <span class="math notranslate nohighlight">\(i\)</span> on test <span class="math notranslate nohighlight">\(t\)</span>. Every test has equal weight, and the latency used for ranking is the average:</p>
 <div class="math notranslate nohighlight">
-\[
-\overline{C}_i=\frac{1}{|\mathcal{T}|}\sum_{t\in\mathcal{T}}C_{i,t}.
-\]</div>
+\[\overline{C}_i=\frac{1}{|\mathcal{T}|}\sum_{t\in\mathcal{T}}C_{i,t}.\]</div>
 <p>Lower <span class="math notranslate nohighlight">\(\overline{C}_i\)</span> is better. Cached final outputs are not allowed.</p>
 </section>
 <section id="ranking">
