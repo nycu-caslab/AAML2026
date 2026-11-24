@@ -211,8 +211,8 @@ $$
 ### Latency
 $$
 \begin{gathered}
-\text{LAT}_{\text{rank}} = \min \left( 20 \times \frac{\#\text{students} - \text{Rank}_{\text{student}}}{\#\text{students}}, 20 \right) \\
-\text{where } \text{Rank}_{\text{student}} \in [0, \#\text{students} - 1]
+\text{LAT}_{\text{rank}} = \min \left( 20 \times \frac{N - \text{Rank}_{\text{student}}}{N}, 20 \right) \\
+\text{where } N = \text{number of students}, \quad \text{Rank}_{\text{student}} \in [0, N - 1]
 \end{gathered}
 $$
 
