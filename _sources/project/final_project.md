@@ -1,19 +1,14 @@
-# Final Project: Pruned Wav2Letter
-
-```{danger}
-***[Update: 2025/11/27 22:10]***<br>
-The project template has been updated to fix a potential bug.
-If you have cloned the repository before this time, please delete and re-clone the repository.
-```
+# Final Project: BERT-Medium Accelerator
 
 ## Introduction
 ----
-In this final project, you are required to design a CFU to accelerate the Wav2Letter model for automatic speech recognition (ASR) tasks. The primary goal is to minimize inference latency while maintaining the model's accuracy.
+In this final project, you are required to design a NPU to accelerate the BERT-Medium model for natural language processing (NLP) sequence classification tasks. The primary goal is to minimize inference latency—targeting well under the software-only execution time—while maintaining the model's accuracy.
 
 ### Selected Model
-We use a quantized version of the Wav2Letter architecture. The default implementation, provided by Arm, is pruned to 50% sparsity and quantized using the TensorFlow Model Optimization Toolkit.
+We use an INT8 quantized version of the BERT-Medium architecture. The default implementation provided in the template is configured with a fixed sequence length of 125 to optimize the matrix dimensions for hardware acceleration while preserving sequence classification performance. BERT is an encoder-based model used to classify sequences into positive or negative. We also introduced specialized modifications to BERT to support INT8-based QKV computations.
 
-You don’t need to integrate the model yourself; it is already included in the CFU template. You can inspect the model architecture using [Netron](https://netron.app/). It might provide you some inspiration for your design.
+You don’t need to integrate the model yourself; the bare-metal C headers are already included in the CFU template. You can inspect the .tflite model architecture using [Netron](https://netron.app/).
+
 
 ```{note}
 The model takes a long time (**>60 minutes**) to inference the full evaluation dataset using the pure software implementation. Please start your project as soon as possible.
@@ -22,69 +17,150 @@ The model takes a long time (**>60 minutes**) to inference the full evaluation d
 ## Setup
 ----
 ### Clone the Final Project Template
+We have integrated all the necessary files into the repo. Please clone it into a clean environment.
 ```bash
-$ cd ${CFU_ROOT}/proj
-$ git clone https://github.com/nycu-caslab/AAML-2025-Project.git
+git clone git@github.com:nycu-caslab/AAML-2026-Project.git
 ```
-
-### Prepare the Model File
-Download the original Wav2Letter tflite model:
-```bash
-$ cd AAML-2025-Project/src/wav2letter/model
-$ wget https://github.com/ARM-software/ML-Zoo/raw/master/models/speech_recognition/wav2letter/tflite_pruned_int8/wav2letter_pruned_int8.tflite
-```
-Then convert the tflite file into a header file:
-```bash
-$ chmod +x model_convert.sh
-$ ./model_convert.sh
-```
-
-### Python Dependencies
-```bash
-$ pip install numpy pyserial tqdm jiwer
-```
+After you clone the repository, change the remote origin to your own repo. Then, make your repo private.
 
 ## Requirements
 ----
 ### Files
-- **Modifiable files**
-    1. `src/tensorflow/lite/kernels/internal/reference/integer_ops/conv.h`
-    2. `src/tensorflow/lite/kernels/internal/reference/leaky_relu.h`
-    3. `cfu.v`
-    4. The `.tflite` model file and the generated header file. (Only if you modify the architecture)
+- **Required Modifications**
+    1. `tensorflow/lite/kernels/internal/reference/batch_matmul.h`
+    2. `tensorflow/lite/kernels/internal/reference/fully_connected.h`
+    3. `NPU.v`
+
+- **Selected Modifications**
+    - You can adjust the clock frequency by modifying **PLATFORM_CLOCK_HZ** in **sw/app/platform_config.h**. This parameter is connected to the hardware configuration, so any changes will be reflected in the hardware settings.
+    - Remember to run **make prog** again after modifying PLATFORM_CLOCK_HZ.
+    - You are only allowed to adjust the clock frequency in increments of **5 Hz**.
+
+- **Other Modifiable files**
+    - Other tflm operation files related to this model such as transpose.
 - **Custom files**
-    - You can add any files you need to improve your design. 
+    - You can add any files you need to improve your design.
+    - You can even adjust the memory layout if you know how to do. 
 
 ```{important}
-**DO NOT MODIFY** any other files in the template or in the source code under `${CFU_ROOT}/common/**` and `${CFU_ROOT}/third_party/**` unless permitted.
+**DO NOT MODIFY ** any other files under tflite-micro
 ```
-
-### Architecture
-You can modify the model architecture. But your accuracy can not be less than **72%** (see [Grading Formula](#grading-formula)).
-
 ```{important}
-You are **NOT ALLOWED** to modify the model intentionally to fit the provided **test dataset** (overfitting). You must ensure your model generalizes well to unseen audio. If we find that this has occurred, you will receive **0 points** on the final project.
+**You are not permitted to modify the AXI interface, but you can add ports for hardware coherence.
+```
+```{important}
+If you want to modify tflm related files, you must copy those files to the tflm_patches
 ```
 
 ### Golden Test
-You can use the golden test to verify if your implementation gives the same results as the original model.
-- How to run:
-    1. `make prog && make load`
-    2. Press `3` > `w` > `g` to run the golden test. The result should be like:
-    ![](images/golden.png)
+There are five test cases for you to validate the output results. The software will automatically compare your results against the golden outputs.
+
+To prevent someone from designing based on input data, we might use some hidden case to test your design.
+
+The permitted error tolerance is 0.01%.
+
+- You can refer the result below:
+    ```language = c
+    TinyRISC-V SoC Platform
+    =======================
+     l: Lab menu
+     t: TFLM inference, verification, and cycles
+     p: Performance counter tests
+     i: System info
+    main> t
+
+	Running TFLM inference, verification, and cycles
+	
+	=== TFLM Functional Verification ===
+	Model: bert_medium_int8.tflite (42311176 bytes)
+	Tensor arena: 8000000 bytes
+	Profile: bert_medium_classifier
+	Input profile: public text fixtures
+	Output profile: golden outputs check, tolerance=0.000100
+	Samples: 5
+	
+	========== Running Test Case 0 ==========
+	Loading attention mask for public_test_0...
+	Loading input IDs for public_test_0...
+	Running inference...
+	Inference complete.
+	Output type: 1
+	Output bytes: 8
+	Output[0]: Actual=0.076653, Golden=0.076653 [PASS]
+	Output[1]: Actual=0.204408, Golden=0.204408 [PASS]
+	[Status] public_test_0: ALL OUTPUTS PASS.
+	
+	Cycles: 52635942199
+	Time (65000000 Hz): 809783 ms
+	
+	========== Running Test Case 1 ==========
+	Loading attention mask for public_test_1...
+	Loading input IDs for public_test_1...
+	Running inference...
+	Inference complete.
+	Output type: 1
+	Output bytes: 8
+	Output[0]: Actual=0.101352, Golden=0.101352 [PASS]
+	Output[1]: Actual=0.186522, Golden=0.186522 [PASS]
+	[Status] public_test_1: ALL OUTPUTS PASS.
+	
+	Cycles: 52636854654
+	Time (65000000 Hz): 809797 ms
+	
+	========== Running Test Case 2 ==========
+	Loading attention mask for public_test_2...
+	Loading input IDs for public_test_2...
+	Running inference...
+	Inference complete.
+	Output type: 1
+	Output bytes: 8
+	Output[0]: Actual=0.017034, Golden=0.017033 [PASS]
+	Output[1]: Actual=0.096242, Golden=0.096242 [PASS]
+	[Status] public_test_2: ALL OUTPUTS PASS.
+	
+	Cycles: 52635456300
+	Time (65000000 Hz): 809776 ms
+	
+	========== Running Test Case 3 ==========
+	Loading attention mask for public_test_3...
+	Loading input IDs for public_test_3...
+	Running inference...
+	Inference complete.
+	Output type: 1
+	Output bytes: 8
+	Output[0]: Actual=0.094539, Golden=0.094539 [PASS]
+	Output[1]: Actual=0.215480, Golden=0.215480 [PASS]
+	[Status] public_test_3: ALL OUTPUTS PASS.
+	
+	Cycles: 52633864419
+	Time (65000000 Hz): 809751 ms
+	
+	========== Running Test Case 4 ==========
+	Loading attention mask for public_test_4...
+	Loading input IDs for public_test_4...
+	Running inference...
+	Inference complete.
+	Output type: 1
+	Output bytes: 8
+	Output[0]: Actual=0.030661, Golden=0.030661 [PASS]
+	Output[1]: Actual=0.160120, Golden=0.160120 [PASS]
+	[Status] public_test_4: ALL OUTPUTS PASS.
+	
+	Cycles: 52628198640
+	Time (65000000 Hz): 809664 ms
+	
+	========== Summary ==========
+	Total PASS: 5
+	Total FAIL: 0
+	
+	Total for 5 samples:
+	Cycles: 263170316212
+	Time (65000000 Hz): 4048774 ms
+	---
+    ```
 
 ### Performance
-We use a provided Python script to evaluate your design.
-- Steps:
-    1. `make prog && make load`
-    2. Reboot the LiteX.
-    3. **Close the litex-term terminal** (Critical! To free up the UART port).
-    4. Run the script:
-       ```bash
-       $ python eval.py --port /dev/ttyUSB1 (or any serial you are using)
-       ```
-The result should be like:  
-![](images/script.png)
+There are no restrictions on hardware resources, as long as the design can run on the Arty A7 board. We strongly encourage students to focus on accelerator design as much as possible.
 
 You need to minimize the latency as low as it could be.
 
@@ -95,82 +171,87 @@ If you just want to check the latency of your design, it would be easier to run 
 ## Presentation
 ----
 - You should give a presentation in the last class of this semester.
-    - **2025/12/24(Wen.)**, starting at **10:10**.
+    - **2026/12/24(Thu.)**, starting at **10:10**.
 - Time Limit: At most **5 minutes** per team.
 - Content:
+    - Task Assignment Table
+    - Accelerated Items
     - Introduction: Strategy for SW profiling & HW architecture.
-    - Implementation: Details of your CFU & kernel optimizations.
-    - Evaluation: Final accuracy & latency.
+    - Implementation: Details of your NPU & kernel optimizations.
+    - Evaluation: Final accuracy & latency & hardware utilization.
 
 ```{important}
-You will receive a **30-point deduction** if you do not present your work.
+Each group member must present the part they claimed responsibility for in the task assignment table.
 ```
 
 ## Grading Policy
 ----
-- Your performance will be compared against the TA’s baseline, implemented with only the SIMD approach from Lab 2. The baseline latency will **NOT** be released.
+- Basic Requirements
+    - You must to design the hardware accelerator for the batch_matmul and fully_connected.
+    - Your design must achieve performance equal to or better than the baseline implementation using SIMD MAC and AXI burst transfers.
+    - Your design must pass all output validation tests.
+    - Your clock frequency must be in increments of **5 Hz**
+    - Your slacks must be **non-negative**.
+
 - **Ranking:** A leaderboard will be released after the deadline.
 
 ## Grading Formula
 ----
-### Accuracy
-
-\begin{gather*}
-\text{ACC} = \begin{cases}
-    1 & \text{if } {\text{ACC}_{\text{student}}} \text{≥ 72%} \\
-    0 & \text{if } {\text{ACC}_{\text{student}}} \text{< 72%}
+### Basic Requirements
+$$
+\begin{gathered}
+\text{BASIC} =
+\begin{cases}
+    1 & \text{if the basic requirements are met} \\
+    0 & \text{if the basic requirements are not met}
 \end{cases}
-\end{gather*}
-
-```{Note}
-Better accuracy (e.g., 90%) does **NOT** give you a higher score.
-```
+\end{gathered}
+$$
 
 ### Latency
-
-\begin{gather*}
-\text{LAT}_{\text{base}} = \min \left( 80 \times \frac{\text{LAT}_{\text{TA}}}{\text{LAT}_{\text{student}}}, 80 \right)
-\end{gather*}
-
-\begin{gather*}
+$$
+\begin{gathered}
 \text{LAT}_{\text{rank}} = \min \left( 20 \times \frac{\#\text{students} - \text{Rank}_{\text{student}}}{\#\text{students}}, 20 \right) \\
 \text{where } \text{Rank}_{\text{student}} \in [0, \#\text{students} - 1]
-\end{gather*}
+\end{gathered}
+$$
 
 ### Presentation
 
-\begin{gather*}
+$$
+\begin{gathered}
 \text{Present} = 
 \begin{cases} 
     -30 & \text{if you submit a plain impl of Lab 2 OR do not present} \\
     -0 & \text{otherwise} 
 \end{cases}
-\end{gather*}
+\end{gathered}
+$$
 
 ### Final score
 
-\begin{gather*}
+$$
+\begin{gathered}
 \text{Score} = 
-\max \left( \text{ACC} \times (\text{LAT}_{\text{base}} + \text{LAT}_{\text{rank}} + \text{Present}), 0 \right) \
-\\
+\text{BASIC} \times (\text{80} + \text{LAT}_{\text{rank}} + \text{Present}) \\
 (\text{Highest score} = 1 \times (80 + 20 - 0) = 100)
-\end{gather*}
+\end{gathered}
+$$
 
 ## Submission
 ----
-- **Deadline: 2025/12/24 10:00** 
-    - Your last commit will be considered as your submission time.
-    - Fill in your repo link and your presentation slides link to the spreadsheet before the deadline.
-
+- **Deadline: 2026/12/24 10:00** 
+    - Your last commit will be considered as your submission time. (We only accept timestamps **from the main branch**.)
+    - Submit your repo link and slides **to E3** before the deadline.
+    - You should keep your repo private until 2026/12/24 10:00.
+    - You **must** change your repo to public after 2026/12/24 10:00, **otherwise you will receive 0 points**.
 - Please fork the repo and push your work to it.
     - If you use a custom model architecture, you **MUST** follow these steps:
-        1. Explicitly state in README.md that you are using a custom model.
-        2. Upload your modified `.tflite` file and the converted `.h` file under `src/wav2letter/model`.
-        3. Also upload your training/modification scripts (if any) in the repo for verification.
-
+        1. Explicitly state in README.md that you are using a custom memory layout.
+        2. Upload your modified `.tflite` file and the converted `.h` file under the corresponding path.
+        
 - Grading workflow will be:
     1. Clone your repo.
-    2. Apply your custom model (if specified in README.md).
-    3. `make prog && make load`
-    4. Run the evaluation script.
-    5. Record the metrics.
+    2. `make prog && make run` 
+    3. Run the evaluation script.
+    4. Record the metrics.

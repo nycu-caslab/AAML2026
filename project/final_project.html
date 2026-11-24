@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Final Project: Pruned Wav2Letter &#8212; CSIC30066: Accelerator Architectures for Machine Learning</title>
+    <title>Final Project: BERT-Medium Accelerator &#8212; CSIC30066: Accelerator Architectures for Machine Learning</title>
   
   
   
@@ -344,7 +344,7 @@
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Final Project: Pruned Wav2Letter</h1>
+    <h1>Final Project: BERT-Medium Accelerator</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -360,13 +360,10 @@
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#clone-the-final-project-template">Clone the Final Project Template</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#prepare-the-model-file">Prepare the Model File</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#python-dependencies">Python Dependencies</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#requirements">Requirements</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#files">Files</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#architecture">Architecture</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#golden-test">Golden Test</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#performance">Performance</a></li>
 </ul>
@@ -374,7 +371,7 @@
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#presentation">Presentation</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grading-policy">Grading Policy</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grading-formula">Grading Formula</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#accuracy">Accuracy</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#basic-requirements">Basic Requirements</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#latency">Latency</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Presentation</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#final-score">Final score</a></li>
@@ -392,22 +389,16 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="final-project-pruned-wav2letter">
-<h1>Final Project: Pruned Wav2Letter<a class="headerlink" href="#final-project-pruned-wav2letter" title="Link to this heading">#</a></h1>
-<div class="admonition danger">
-<p class="admonition-title">Danger</p>
-<p><em><strong>[Update: 2025/11/27 22:10]</strong></em><br>
-The project template has been updated to fix a potential bug.
-If you have cloned the repository before this time, please delete and re-clone the repository.</p>
-</div>
+  <section class="tex2jax_ignore mathjax_ignore" id="final-project-bert-medium-accelerator">
+<h1>Final Project: BERT-Medium Accelerator<a class="headerlink" href="#final-project-bert-medium-accelerator" title="Link to this heading">#</a></h1>
 <section id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">#</a></h2>
 <hr class="docutils" />
-<p>In this final project, you are required to design a CFU to accelerate the Wav2Letter model for automatic speech recognition (ASR) tasks. The primary goal is to minimize inference latency while maintaining the model’s accuracy.</p>
+<p>In this final project, you are required to design a NPU to accelerate the BERT-Medium model for natural language processing (NLP) sequence classification tasks. The primary goal is to minimize inference latency—targeting well under the software-only execution time—while maintaining the model’s accuracy.</p>
 <section id="selected-model">
 <h3>Selected Model<a class="headerlink" href="#selected-model" title="Link to this heading">#</a></h3>
-<p>We use a quantized version of the Wav2Letter architecture. The default implementation, provided by Arm, is pruned to 50% sparsity and quantized using the TensorFlow Model Optimization Toolkit.</p>
-<p>You don’t need to integrate the model yourself; it is already included in the CFU template. You can inspect the model architecture using <a class="reference external" href="https://netron.app/">Netron</a>. It might provide you some inspiration for your design.</p>
+<p>We use an INT8 quantized version of the BERT-Medium architecture. The default implementation provided in the template is configured with a fixed sequence length of 125 to optimize the matrix dimensions for hardware acceleration while preserving sequence classification performance. BERT is an encoder-based model used to classify sequences into positive or negative. We also introduced specialized modifications to BERT to support INT8-based QKV computations.</p>
+<p>You don’t need to integrate the model yourself; the bare-metal C headers are already included in the CFU template. You can inspect the .tflite model architecture using <a class="reference external" href="https://netron.app/">Netron</a>.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The model takes a long time (<strong>&gt;60 minutes</strong>) to inference the full evaluation dataset using the pure software implementation. Please start your project as soon as possible.</p>
@@ -419,29 +410,11 @@ If you have cloned the repository before this time, please delete and re-clone t
 <hr class="docutils" />
 <section id="clone-the-final-project-template">
 <h3>Clone the Final Project Template<a class="headerlink" href="#clone-the-final-project-template" title="Link to this heading">#</a></h3>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span><span class="si">${</span><span class="nv">CFU_ROOT</span><span class="si">}</span>/proj
-$<span class="w"> </span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/nycu-caslab/AAML-2025-Project.git
+<p>We have integrated all the necessary files into the repo. Please clone it into a clean environment.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:nycu-caslab/AAML-2026-Project.git
 </pre></div>
 </div>
-</section>
-<section id="prepare-the-model-file">
-<h3>Prepare the Model File<a class="headerlink" href="#prepare-the-model-file" title="Link to this heading">#</a></h3>
-<p>Download the original Wav2Letter tflite model:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>AAML-2025-Project/src/wav2letter/model
-$<span class="w"> </span>wget<span class="w"> </span>https://github.com/ARM-software/ML-Zoo/raw/master/models/speech_recognition/wav2letter/tflite_pruned_int8/wav2letter_pruned_int8.tflite
-</pre></div>
-</div>
-<p>Then convert the tflite file into a header file:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>chmod<span class="w"> </span>+x<span class="w"> </span>model_convert.sh
-$<span class="w"> </span>./model_convert.sh
-</pre></div>
-</div>
-</section>
-<section id="python-dependencies">
-<h3>Python Dependencies<a class="headerlink" href="#python-dependencies" title="Link to this heading">#</a></h3>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>numpy<span class="w"> </span>pyserial<span class="w"> </span>tqdm<span class="w"> </span>jiwer
-</pre></div>
-</div>
+<p>After you clone the repository, change the remote origin to your own repo. Then, make your repo private.</p>
 </section>
 </section>
 <section id="requirements">
@@ -450,65 +423,156 @@ $<span class="w"> </span>./model_convert.sh
 <section id="files">
 <h3>Files<a class="headerlink" href="#files" title="Link to this heading">#</a></h3>
 <ul class="simple">
-<li><p><strong>Modifiable files</strong></p>
+<li><p><strong>Required Modifications</strong></p>
 <ol class="arabic simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">src/tensorflow/lite/kernels/internal/reference/integer_ops/conv.h</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">src/tensorflow/lite/kernels/internal/reference/leaky_relu.h</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">cfu.v</span></code></p></li>
-<li><p>The <code class="docutils literal notranslate"><span class="pre">.tflite</span></code> model file and the generated header file. (Only if you modify the architecture)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tensorflow/lite/kernels/internal/reference/batch_matmul.h</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tensorflow/lite/kernels/internal/reference/fully_connected.h</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">NPU.v</span></code></p></li>
 </ol>
+</li>
+<li><p><strong>Selected Modifications</strong></p>
+<ul>
+<li><p>You can adjust the clock frequency by modifying <strong>PLATFORM_CLOCK_HZ</strong> in <strong>sw/app/platform_config.h</strong>. This parameter is connected to the hardware configuration, so any changes will be reflected in the hardware settings.</p></li>
+<li><p>Remember to run <strong>make prog</strong> again after modifying PLATFORM_CLOCK_HZ.</p></li>
+<li><p>You are only allowed to adjust the clock frequency in increments of <strong>5 Hz</strong>.</p></li>
+</ul>
+</li>
+<li><p><strong>Other Modifiable files</strong></p>
+<ul>
+<li><p>Other tflm operation files related to this model such as transpose.</p></li>
+</ul>
 </li>
 <li><p><strong>Custom files</strong></p>
 <ul>
 <li><p>You can add any files you need to improve your design.</p></li>
+<li><p>You can even adjust the memory layout if you know how to do.</p></li>
 </ul>
 </li>
 </ul>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
-<p><strong>DO NOT MODIFY</strong> any other files in the template or in the source code under <code class="docutils literal notranslate"><span class="pre">${CFU_ROOT}/common/**</span></code> and <code class="docutils literal notranslate"><span class="pre">${CFU_ROOT}/third_party/**</span></code> unless permitted.</p>
+<p>**DO NOT MODIFY ** any other files under tflite-micro</p>
 </div>
-</section>
-<section id="architecture">
-<h3>Architecture<a class="headerlink" href="#architecture" title="Link to this heading">#</a></h3>
-<p>You can modify the model architecture. But your accuracy can not be less than <strong>72%</strong> (see <a class="reference internal" href="#grading-formula"><span class="xref myst">Grading Formula</span></a>).</p>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
-<p>You are <strong>NOT ALLOWED</strong> to modify the model intentionally to fit the provided <strong>test dataset</strong> (overfitting). You must ensure your model generalizes well to unseen audio. If we find that this has occurred, you will receive <strong>0 points</strong> on the final project.</p>
+<p>**You are not permitted to modify the AXI interface, but you can add ports for hardware coherence.</p>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>If you want to modify tflm related files, you must copy those files to the tflm_patches</p>
 </div>
 </section>
 <section id="golden-test">
 <h3>Golden Test<a class="headerlink" href="#golden-test" title="Link to this heading">#</a></h3>
-<p>You can use the golden test to verify if your implementation gives the same results as the original model.</p>
-<ul class="simple">
-<li><p>How to run:</p>
-<ol class="arabic simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">prog</span> <span class="pre">&amp;&amp;</span> <span class="pre">make</span> <span class="pre">load</span></code></p></li>
-<li><p>Press <code class="docutils literal notranslate"><span class="pre">3</span></code> &gt; <code class="docutils literal notranslate"><span class="pre">w</span></code> &gt; <code class="docutils literal notranslate"><span class="pre">g</span></code> to run the golden test. The result should be like:
-<img alt="" src="../_images/golden.png" /></p></li>
-</ol>
+<p>There are five test cases for you to validate the output results. The software will automatically compare your results against the golden outputs.</p>
+<p>To prevent someone from designing based on input data, we might use some hidden case to test your design.</p>
+<p>The permitted error tolerance is 0.01%.</p>
+<ul>
+<li><p>You can refer the result below:</p>
+<div class="highlight-language notranslate"><div class="highlight"><pre><span></span>TinyRISC-V SoC Platform
+=======================
+ l: Lab menu
+ t: TFLM inference, verification, and cycles
+ p: Performance counter tests
+ i: System info
+main&gt; t
+
+Running TFLM inference, verification, and cycles
+
+=== TFLM Functional Verification ===
+Model: bert_medium_int8.tflite (42311176 bytes)
+Tensor arena: 8000000 bytes
+Profile: bert_medium_classifier
+Input profile: public text fixtures
+Output profile: golden outputs check, tolerance=0.000100
+Samples: 5
+
+========== Running Test Case 0 ==========
+Loading attention mask for public_test_0...
+Loading input IDs for public_test_0...
+Running inference...
+Inference complete.
+Output type: 1
+Output bytes: 8
+Output[0]: Actual=0.076653, Golden=0.076653 [PASS]
+Output[1]: Actual=0.204408, Golden=0.204408 [PASS]
+[Status] public_test_0: ALL OUTPUTS PASS.
+
+Cycles: 52635942199
+Time (65000000 Hz): 809783 ms
+
+========== Running Test Case 1 ==========
+Loading attention mask for public_test_1...
+Loading input IDs for public_test_1...
+Running inference...
+Inference complete.
+Output type: 1
+Output bytes: 8
+Output[0]: Actual=0.101352, Golden=0.101352 [PASS]
+Output[1]: Actual=0.186522, Golden=0.186522 [PASS]
+[Status] public_test_1: ALL OUTPUTS PASS.
+
+Cycles: 52636854654
+Time (65000000 Hz): 809797 ms
+
+========== Running Test Case 2 ==========
+Loading attention mask for public_test_2...
+Loading input IDs for public_test_2...
+Running inference...
+Inference complete.
+Output type: 1
+Output bytes: 8
+Output[0]: Actual=0.017034, Golden=0.017033 [PASS]
+Output[1]: Actual=0.096242, Golden=0.096242 [PASS]
+[Status] public_test_2: ALL OUTPUTS PASS.
+
+Cycles: 52635456300
+Time (65000000 Hz): 809776 ms
+
+========== Running Test Case 3 ==========
+Loading attention mask for public_test_3...
+Loading input IDs for public_test_3...
+Running inference...
+Inference complete.
+Output type: 1
+Output bytes: 8
+Output[0]: Actual=0.094539, Golden=0.094539 [PASS]
+Output[1]: Actual=0.215480, Golden=0.215480 [PASS]
+[Status] public_test_3: ALL OUTPUTS PASS.
+
+Cycles: 52633864419
+Time (65000000 Hz): 809751 ms
+
+========== Running Test Case 4 ==========
+Loading attention mask for public_test_4...
+Loading input IDs for public_test_4...
+Running inference...
+Inference complete.
+Output type: 1
+Output bytes: 8
+Output[0]: Actual=0.030661, Golden=0.030661 [PASS]
+Output[1]: Actual=0.160120, Golden=0.160120 [PASS]
+[Status] public_test_4: ALL OUTPUTS PASS.
+
+Cycles: 52628198640
+Time (65000000 Hz): 809664 ms
+
+========== Summary ==========
+Total PASS: 5
+Total FAIL: 0
+
+Total for 5 samples:
+Cycles: 263170316212
+Time (65000000 Hz): 4048774 ms
+---
+</pre></div>
+</div>
 </li>
 </ul>
 </section>
 <section id="performance">
 <h3>Performance<a class="headerlink" href="#performance" title="Link to this heading">#</a></h3>
-<p>We use a provided Python script to evaluate your design.</p>
-<ul>
-<li><p>Steps:</p>
-<ol class="arabic">
-<li><p><code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">prog</span> <span class="pre">&amp;&amp;</span> <span class="pre">make</span> <span class="pre">load</span></code></p></li>
-<li><p>Reboot the LiteX.</p></li>
-<li><p><strong>Close the litex-term terminal</strong> (Critical! To free up the UART port).</p></li>
-<li><p>Run the script:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>python<span class="w"> </span>eval.py<span class="w"> </span>--port<span class="w"> </span>/dev/ttyUSB1<span class="w"> </span><span class="o">(</span>or<span class="w"> </span>any<span class="w"> </span>serial<span class="w"> </span>you<span class="w"> </span>are<span class="w"> </span>using<span class="o">)</span>
-</pre></div>
-</div>
-</li>
-</ol>
-</li>
-</ul>
-<p>The result should be like:<br />
-<img alt="" src="../_images/script.png" /></p>
+<p>There are no restrictions on hardware resources, as long as the design can run on the Arty A7 board. We strongly encourage students to focus on accelerator design as much as possible.</p>
 <p>You need to minimize the latency as low as it could be.</p>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
@@ -522,99 +586,102 @@ $<span class="w"> </span>./model_convert.sh
 <ul class="simple">
 <li><p>You should give a presentation in the last class of this semester.</p>
 <ul>
-<li><p><strong>2025/12/24(Wen.)</strong>, starting at <strong>10:10</strong>.</p></li>
+<li><p><strong>2026/12/24(Thu.)</strong>, starting at <strong>10:10</strong>.</p></li>
 </ul>
 </li>
 <li><p>Time Limit: At most <strong>5 minutes</strong> per team.</p></li>
 <li><p>Content:</p>
 <ul>
+<li><p>Task Assignment Table</p></li>
+<li><p>Accelerated Items</p></li>
 <li><p>Introduction: Strategy for SW profiling &amp; HW architecture.</p></li>
-<li><p>Implementation: Details of your CFU &amp; kernel optimizations.</p></li>
-<li><p>Evaluation: Final accuracy &amp; latency.</p></li>
+<li><p>Implementation: Details of your NPU &amp; kernel optimizations.</p></li>
+<li><p>Evaluation: Final accuracy &amp; latency &amp; hardware utilization.</p></li>
 </ul>
 </li>
 </ul>
 <div class="admonition important">
 <p class="admonition-title">Important</p>
-<p>You will receive a <strong>30-point deduction</strong> if you do not present your work.</p>
+<p>Each group member must present the part they claimed responsibility for in the task assignment table.</p>
 </div>
 </section>
 <section id="grading-policy">
 <h2>Grading Policy<a class="headerlink" href="#grading-policy" title="Link to this heading">#</a></h2>
 <hr class="docutils" />
 <ul class="simple">
-<li><p>Your performance will be compared against the TA’s baseline, implemented with only the SIMD approach from Lab 2. The baseline latency will <strong>NOT</strong> be released.</p></li>
+<li><p>Basic Requirements</p>
+<ul>
+<li><p>You must to design the hardware accelerator for the batch_matmul and fully_connected.</p></li>
+<li><p>Your design must achieve performance equal to or better than the baseline implementation using SIMD MAC and AXI burst transfers.</p></li>
+<li><p>Your design must pass all output validation tests.</p></li>
+<li><p>Your clock frequency must be in increments of <strong>5 Hz</strong></p></li>
+<li><p>Your slacks must be <strong>non-negative</strong>.</p></li>
+</ul>
+</li>
 <li><p><strong>Ranking:</strong> A leaderboard will be released after the deadline.</p></li>
 </ul>
 </section>
 <section id="grading-formula">
 <h2>Grading Formula<a class="headerlink" href="#grading-formula" title="Link to this heading">#</a></h2>
 <hr class="docutils" />
-<section id="accuracy">
-<h3>Accuracy<a class="headerlink" href="#accuracy" title="Link to this heading">#</a></h3>
-<div class="amsmath math notranslate nohighlight">
-\[\begin{gather*}
-\text{ACC} = \begin{cases}
-    1 &amp; \text{if } {\text{ACC}_{\text{student}}} \text{≥ 72%} \\
-    0 &amp; \text{if } {\text{ACC}_{\text{student}}} \text{&lt; 72%}
+<section id="basic-requirements">
+<h3>Basic Requirements<a class="headerlink" href="#basic-requirements" title="Link to this heading">#</a></h3>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{gathered}
+\text{BASIC} =
+\begin{cases}
+    1 &amp; \text{if the basic requirements are met} \\
+    0 &amp; \text{if the basic requirements are not met}
 \end{cases}
-\end{gather*}\]</div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Better accuracy (e.g., 90%) does <strong>NOT</strong> give you a higher score.</p>
-</div>
+\end{gathered}\end{split}\]</div>
 </section>
 <section id="latency">
 <h3>Latency<a class="headerlink" href="#latency" title="Link to this heading">#</a></h3>
-<div class="amsmath math notranslate nohighlight">
-\[\begin{gather*}
-\text{LAT}_{\text{base}} = \min \left( 80 \times \frac{\text{LAT}_{\text{TA}}}{\text{LAT}_{\text{student}}}, 80 \right)
-\end{gather*}\]</div>
-<div class="amsmath math notranslate nohighlight">
-\[\begin{gather*}
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{gathered}
 \text{LAT}_{\text{rank}} = \min \left( 20 \times \frac{\#\text{students} - \text{Rank}_{\text{student}}}{\#\text{students}}, 20 \right) \\
 \text{where } \text{Rank}_{\text{student}} \in [0, \#\text{students} - 1]
-\end{gather*}\]</div>
+\end{gathered}\end{split}\]</div>
 </section>
 <section id="id1">
 <h3>Presentation<a class="headerlink" href="#id1" title="Link to this heading">#</a></h3>
-<div class="amsmath math notranslate nohighlight">
-\[\begin{gather*}
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{gathered}
 \text{Present} = 
 \begin{cases} 
     -30 &amp; \text{if you submit a plain impl of Lab 2 OR do not present} \\
     -0 &amp; \text{otherwise} 
 \end{cases}
-\end{gather*}\]</div>
+\end{gathered}\end{split}\]</div>
 </section>
 <section id="final-score">
 <h3>Final score<a class="headerlink" href="#final-score" title="Link to this heading">#</a></h3>
-<div class="amsmath math notranslate nohighlight">
-\[\begin{gather*}
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{gathered}
 \text{Score} = 
-\max \left( \text{ACC} \times (\text{LAT}_{\text{base}} + \text{LAT}_{\text{rank}} + \text{Present}), 0 \right) \
-\\
+\text{BASIC} \times (\text{80} + \text{LAT}_{\text{rank}} + \text{Present}) \\
 (\text{Highest score} = 1 \times (80 + 20 - 0) = 100)
-\end{gather*}\]</div>
+\end{gathered}\end{split}\]</div>
 </section>
 </section>
 <section id="submission">
 <h2>Submission<a class="headerlink" href="#submission" title="Link to this heading">#</a></h2>
 <hr class="docutils" />
 <ul class="simple">
-<li><p><strong>Deadline: 2025/12/24 10:00</strong></p>
+<li><p><strong>Deadline: 2026/12/24 10:00</strong></p>
 <ul>
-<li><p>Your last commit will be considered as your submission time.</p></li>
-<li><p>Fill in your repo link and your presentation slides link to the spreadsheet before the deadline.</p></li>
+<li><p>Your last commit will be considered as your submission time. (We only accept timestamps <strong>from the main branch</strong>.)</p></li>
+<li><p>Submit your repo link and slides <strong>to E3</strong> before the deadline.</p></li>
+<li><p>You should keep your repo private until 2026/12/24 10:00.</p></li>
+<li><p>You <strong>must</strong> change your repo to public after 2026/12/24 10:00, <strong>otherwise you will receive 0 points</strong>.</p></li>
 </ul>
 </li>
 <li><p>Please fork the repo and push your work to it.</p>
 <ul>
 <li><p>If you use a custom model architecture, you <strong>MUST</strong> follow these steps:</p>
 <ol class="arabic simple">
-<li><p>Explicitly state in README.md that you are using a custom model.</p></li>
-<li><p>Upload your modified <code class="docutils literal notranslate"><span class="pre">.tflite</span></code> file and the converted <code class="docutils literal notranslate"><span class="pre">.h</span></code> file under <code class="docutils literal notranslate"><span class="pre">src/wav2letter/model</span></code>.</p></li>
-<li><p>Also upload your training/modification scripts (if any) in the repo for verification.</p></li>
+<li><p>Explicitly state in README.md that you are using a custom memory layout.</p></li>
+<li><p>Upload your modified <code class="docutils literal notranslate"><span class="pre">.tflite</span></code> file and the converted <code class="docutils literal notranslate"><span class="pre">.h</span></code> file under the corresponding path.</p></li>
 </ol>
 </li>
 </ul>
@@ -622,8 +689,7 @@ $<span class="w"> </span>./model_convert.sh
 <li><p>Grading workflow will be:</p>
 <ol class="arabic simple">
 <li><p>Clone your repo.</p></li>
-<li><p>Apply your custom model (if specified in README.md).</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">prog</span> <span class="pre">&amp;&amp;</span> <span class="pre">make</span> <span class="pre">load</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">prog</span> <span class="pre">&amp;&amp;</span> <span class="pre">make</span> <span class="pre">run</span></code></p></li>
 <li><p>Run the evaluation script.</p></li>
 <li><p>Record the metrics.</p></li>
 </ol>
@@ -667,13 +733,10 @@ $<span class="w"> </span>./model_convert.sh
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setup">Setup</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#clone-the-final-project-template">Clone the Final Project Template</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#prepare-the-model-file">Prepare the Model File</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#python-dependencies">Python Dependencies</a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#requirements">Requirements</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#files">Files</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#architecture">Architecture</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#golden-test">Golden Test</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#performance">Performance</a></li>
 </ul>
@@ -681,7 +744,7 @@ $<span class="w"> </span>./model_convert.sh
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#presentation">Presentation</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grading-policy">Grading Policy</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#grading-formula">Grading Formula</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#accuracy">Accuracy</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#basic-requirements">Basic Requirements</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#latency">Latency</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Presentation</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#final-score">Final score</a></li>
