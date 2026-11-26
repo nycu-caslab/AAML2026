@@ -245,7 +245,7 @@ $$
     - Submit your repo link and slides **to E3** before the deadline.
     - You should keep your repo private until 2026/12/24 10:00.
     - You **must** change your repo to public after 2026/12/24 10:00, **otherwise you will receive 0 points**.
-- Please fork the repo and push your work to it.
+- Please fork the repo(or clone the repo and change the remote origin to point to your own repo) and push your work to it.
     - If you use a custom model architecture, you **MUST** follow these steps:
         1. Explicitly state in README.md that you are using a custom memory layout.
         2. Upload your modified `.tflite` file and the converted `.h` file under the corresponding path.
