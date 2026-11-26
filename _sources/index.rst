@@ -56,3 +56,5 @@ Lecture and Office Hours
     :maxdepth: 2
     :caption: Project:
 
+    project/final_project
+
